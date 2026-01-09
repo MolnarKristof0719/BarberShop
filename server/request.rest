@@ -14,7 +14,7 @@ Content-Type: application/json
 
 {
     "email": "vasarlo1@example.com",
-    "password": "123"
+    "password": "ronaldo"
 }
 
 ###
@@ -78,7 +78,8 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "password": "ronaldo"
+    "name": "vasarlo2",
+    "email": "vasarlo2@example.com"
 }
 
 ### A bejelentkezett user egy adatát módosítja. A role tiltott
@@ -89,6 +90,18 @@ Authorization: Bearer {{token}}
 
 {
      "name": "admin1"
+}
+
+### A bejelnkezett felhasználó jelszó cseréje
+PATCH {{host}}/api/usersmeupdatepassword
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "oldpassword": "ronaldo",
+    "newpassword": "123",
+    "newpassword_confirmation": "123"
 }
 
 ### A bejelentkezett user önmagát lekérheti

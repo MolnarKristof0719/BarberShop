@@ -43,6 +43,9 @@ Route::delete('usersme', [UserController::class, 'destroySelf'])
 Route::patch('usersme', [UserController::class, 'updateSelf'])
 ->middleware('auth:sanctum', 'ability:usersme:patch');
 
+Route::patch('usersmeupdatepassword', [UserController::class, 'updatePassword'])
+->middleware('auth:sanctum', 'ability:usersme:updatePassword');
+
 Route::get('usersme', [UserController::class, 'indexSelf'])
     ->middleware('auth:sanctum', 'ability:usersme:get'); 
 //endregion
