@@ -18,7 +18,6 @@ return new class extends Migration
             $table->date('appointmentDate')->unique();
             $table->string('status');
             $table->string('cancelledBy');
-            $table->timestamps();
         });
     }
 

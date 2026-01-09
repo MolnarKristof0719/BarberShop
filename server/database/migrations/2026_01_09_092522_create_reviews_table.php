@@ -13,13 +13,12 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            // $table->id('appointmentId')
-            // $table->id('barberId');
-            // $table->id('userId');
+            // $table->id('appointmentId')->unique();
+            // $table->id('barberId')->unique();
+            // $table->id('userId')->unique();
             $table->string('rating');
             $table->text('comment');
 
-            $table->timestamps();
         });
     }
 
