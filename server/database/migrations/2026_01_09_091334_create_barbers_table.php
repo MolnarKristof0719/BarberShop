@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('barbers', function (Blueprint $table) {
             $table->id();
-            $table->id('userId')->unique();
+            // $table->id('userId')->unique();
             $table->string('profilePicture')->unique();
             $table->text('introduction');
             $table->boolean('isActive');
-            $table->timestamps();
         });
     }
 

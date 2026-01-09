@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('reference_pictures', function (Blueprint $table) {
             $table->id();
+            $table->string('picture')->unique();
+            // $table->id('barberId');
             $table->timestamps();
         });
     }
