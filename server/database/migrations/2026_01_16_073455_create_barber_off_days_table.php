@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('barberId')->constrained('barbers');
             $table->date('offDay');
             $table->unique(['barberId', 'offDay']);
+            $table->timestamps();
         });
     }
 

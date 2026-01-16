@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('picture');
             $table->foreignId('barberId')->constrained('barbers');
             $table->unique(['picture', 'barberId']);
+            $table->timestamps();
         });
     }
 

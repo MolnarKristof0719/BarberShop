@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('profilePicture');
             $table->unique(['userId', 'profilePicture']);
             $table->text('introduction');
-            $table->boolean('isActive');
+            $table->boolean('isActive')->default(true);
+            $table->timestamps();
         });
     }
 

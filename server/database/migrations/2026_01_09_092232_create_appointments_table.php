@@ -19,6 +19,7 @@ return new class extends Migration {
 
             $table->string('status');
             $table->string('cancelledBy');
+            $table->timestamps();
         });
     }
 
