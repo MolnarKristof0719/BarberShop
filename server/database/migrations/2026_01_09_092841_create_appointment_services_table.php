@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('barberId')->constrained('barbers');
             $table->foreignId('serviceId')->constrained('services');
-            
+            $table->unique(['appointmentId', 'serviceId']);
+
             $table->timestamps();
         });
     }

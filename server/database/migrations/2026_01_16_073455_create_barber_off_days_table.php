@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('barber_off_days', function (Blueprint $table) {
             $table->id();
             $table->foreignId('barberId')->constrained('barbers');
-            $table->date('offDay')->unique();
+            $table->date('offDay');
+            $table->unique(['barberId', 'date']);
         });
     }
 

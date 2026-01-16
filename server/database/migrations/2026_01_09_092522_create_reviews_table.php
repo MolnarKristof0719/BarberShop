@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('appointmentId')->constrained('appointments');
             $table->foreignId('barberId')->constrained('barbers');
             $table->foreignId('userId')->constrained('users');
+            $table->unique(['appointmentId','barberId','userId']);
             $table->string('rating');
             $table->text('comment');
 
