@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('barbers', function (Blueprint $table) {
             $table->id();
-            // $table->id('userId')->unique();
+            $table->foreignId('userId')->constrained('users');
             $table->string('profilePicture')->unique();
             $table->text('introduction');
             $table->boolean('isActive');
