@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('appointment_services', function (Blueprint $table) {
             $table->id();
-            // $table->id('barberId')->unique();
-            // $table->id('serviceId')->unique();
+            $table->foreignId('barberId')->constrained('barbers');
+            $table->foreignId('serviceId')->constrained('services');
             
             $table->timestamps();
         });
