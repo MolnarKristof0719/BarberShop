@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('appointment_services', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barberId')->constrained('barbers');
+            $table->foreignId('appointmentId')->constrained('appointments');
             $table->foreignId('serviceId')->constrained('services');
             $table->unique(['appointmentId', 'serviceId']);
 
