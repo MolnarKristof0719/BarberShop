@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            // $table->id('barberId');
-            // $table->id('userId');
+            $table->foreignId('barberId')->constrained('barbers');
+            $table->foreignId('userId')->constrained('users');
             $table->date('appointmentDate')->unique();
             $table->string('status');
             $table->string('cancelledBy');
