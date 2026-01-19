@@ -20,12 +20,27 @@ class DatabaseSeeder extends Seeder
 
         //Mielőtt seedelünk, minden táblát töröljünk le.
         DB::statement('DELETE FROM users');
+        DB::statement('DELETE FROM barbers');
+        DB::statement('DELETE FROM appointments');
+        DB::statement('DELETE FROM appointmentservices');
+        DB::statement('DELETE FROM reviews');
+        DB::statement('DELETE FROM referencepictures');
+        DB::statement('DELETE FROM services');
+        DB::statement('DELETE FROM barberoffdays');
+        
 
 
 
         //Ami Seeder osztály itt fel van sorolva, annak lefut a run() metódusa
         $this->call([
             UserSeeder::class,
+            BarberSeeder::class,
+            AppointmentSeeder::class,
+            AppointmentServiceSeeder::class,
+            ReviewSeeder::class,
+            ReferencePictureSeeder::class,
+            ServiceSeeder::class,
+            BarberOffDaySeeder::class,
         ]);
     }
 }
