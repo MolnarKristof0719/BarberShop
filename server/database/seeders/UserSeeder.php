@@ -19,19 +19,31 @@ class UserSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('123'),
+            'phoneNumber' => null,
             'role' => 1
         ]);
-        User::factory()->create([
-            'name' => 'Barber',
-            'email' => 'barber@example.com',
-            'password' => Hash::make('123'),
-            'role' => 2
+         User::factory()->count(5)->create([
+            'role' => 2,
         ]);
-        User::factory()->create([
-            'name' => 'Costumer',
-            'email' => 'costumer1@example.com',
-            'password' => Hash::make('123'),
-            'role' => 3
+
+        // 5 Customer
+        User::factory()->count(5)->create([
+            'role' => 3,
         ]);
+
+        // User::factory()->create([
+        //     'name' => 'Barber',
+        //     'email' => 'barber@example.com',
+        //     'password' => Hash::make('123'),
+        //     'phoneNumber' => fake()->phoneNumber(),
+        //     'role' => 2
+        // ]);
+        // User::factory()->create([
+        //     'name' => 'Costumer',
+        //     'email' => 'costumer1@example.com',
+        //     'password' => Hash::make('123'),
+        //     'phoneNumber' => fake()->phoneNumber(),
+        //     'role' => 3
+        // ]);
     }
 }

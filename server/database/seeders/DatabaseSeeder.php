@@ -22,11 +22,11 @@ class DatabaseSeeder extends Seeder
         DB::statement('DELETE FROM users');
         DB::statement('DELETE FROM barbers');
         DB::statement('DELETE FROM appointments');
-        DB::statement('DELETE FROM appointmentservices');
+        DB::statement('DELETE FROM appointment_services');
         DB::statement('DELETE FROM reviews');
-        DB::statement('DELETE FROM referencepictures');
+        DB::statement('DELETE FROM reference_pictures');
         DB::statement('DELETE FROM services');
-        DB::statement('DELETE FROM barberoffdays');
+        DB::statement('DELETE FROM barber_off_days');
         
 
 
