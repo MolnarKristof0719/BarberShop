@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('reference_pictures', function (Blueprint $table) {
             $table->id();
-            $table->string('picture');
-            $table->foreignId('barberId')->constrained('barbers');
+            $table->string('picture',125);
+            $table->foreignId('barberId')->constrained('barbers')->onDelete('restrict');
             $table->unique(['picture', 'barberId']);
             $table->timestamps();
         });

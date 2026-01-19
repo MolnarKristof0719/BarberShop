@@ -18,7 +18,7 @@ class BarberSeeder extends Seeder
         foreach ($barberUsers as $user) {
             Barber::create([
                 'userId' => $user->id,
-                'profilePicture' => 'https://picsum.photos/seed/barber_'.$user->id.'/300/300',
+                'profilePicture' => 'https://xsgames.co/randomusers/assets/avatars/male/' . $user->id .'.jpg',
                 'introduction' => fake()->paragraph(3),
             ]);
         }

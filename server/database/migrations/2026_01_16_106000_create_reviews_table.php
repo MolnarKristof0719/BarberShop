@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('appointmentId')->constrained('appointments');
-            $table->foreignId('barberId')->constrained('barbers');
-            $table->foreignId('userId')->constrained('users');
+            $table->foreignId('appointmentId')->constrained('appointments')->onDelete('restrict');
+            $table->foreignId('barberId')->constrained('barbers')->onDelete('restrict');
+            $table->foreignId('userId')->constrained('users')->onDelete('restrict');
             $table->unique(['appointmentId','barberId','userId']);
-            $table->string('rating');
+            $table->integer('rating');
             $table->text('comment');
             $table->timestamps();
 

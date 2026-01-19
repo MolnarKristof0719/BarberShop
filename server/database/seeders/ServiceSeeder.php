@@ -12,6 +12,7 @@ class ServiceSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+
+      //
     }
 }

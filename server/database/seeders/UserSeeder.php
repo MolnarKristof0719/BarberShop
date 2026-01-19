@@ -22,7 +22,24 @@ class UserSeeder extends Seeder
             'phoneNumber' => null,
             'role' => 1
         ]);
-         User::factory()->count(5)->create([
+        
+        User::factory()->create([
+            'name' => 'Barber',
+            'email' => 'barber@example.com',
+            'password' => Hash::make('123'),
+            'phoneNumber' => fake()->phoneNumber(),
+            'role' => 2
+        ]);
+
+        User::factory()->create([
+            'name' => 'Costumer',
+            'email' => 'costumer1@example.com',
+            'password' => Hash::make('123'),
+            'phoneNumber' => fake()->phoneNumber(),
+            'role' => 3
+        ]);
+
+        User::factory()->count(5)->create([
             'role' => 2,
         ]);
 
@@ -31,19 +48,5 @@ class UserSeeder extends Seeder
             'role' => 3,
         ]);
 
-        // User::factory()->create([
-        //     'name' => 'Barber',
-        //     'email' => 'barber@example.com',
-        //     'password' => Hash::make('123'),
-        //     'phoneNumber' => fake()->phoneNumber(),
-        //     'role' => 2
-        // ]);
-        // User::factory()->create([
-        //     'name' => 'Costumer',
-        //     'email' => 'costumer1@example.com',
-        //     'password' => Hash::make('123'),
-        //     'phoneNumber' => fake()->phoneNumber(),
-        //     'role' => 3
-        // ]);
     }
 }

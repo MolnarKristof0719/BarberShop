@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('appointment_services', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('appointmentId')->constrained('appointments');
-            $table->foreignId('serviceId')->constrained('services');
+            $table->foreignId('appointmentId')->constrained('appointments')->onDelete('restrict');
+            $table->foreignId('serviceId')->constrained('services')->onDelete('restrict');
             $table->unique(['appointmentId', 'serviceId']);
 
             $table->timestamps();

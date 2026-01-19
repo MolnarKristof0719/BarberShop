@@ -12,13 +12,13 @@ return new class extends Migration {
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barberId')->constrained('barbers');
-            $table->foreignId('userId')->constrained('users');
+            $table->foreignId('barberId')->constrained('barbers')->onDelete('restrict');
+            $table->foreignId('userId')->constrained('users')->onDelete('restrict');
             $table->date('appointmentDate');
             $table->unique(['barberId', 'userId', 'appointmentDate']);
 
-            $table->string('status');
-            $table->string('cancelledBy');
+            $table->string('status',50);
+            $table->string('cancelledBy', 50);
             $table->timestamps();
         });
     }
