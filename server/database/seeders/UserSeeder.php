@@ -21,14 +21,14 @@ class UserSeeder extends Seeder
             'role' => 1
         ]);
         User::factory()->create([
-            'name' => 'Raktáros',
-            'email' => 'raktaros@example.com',
+            'name' => 'Barber',
+            'email' => 'barber@example.com',
             'password' => '123',
             'role' => 2
         ]);
         User::factory()->create([
-            'name' => 'Vásárló 1',
-            'email' => 'vasarlo1@example.com',
+            'name' => 'Costumer',
+            'email' => 'costumer1@example.com',
             'password' => '123',
             'role' => 3
         ]);
