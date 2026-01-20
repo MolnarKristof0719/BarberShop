@@ -12,6 +12,7 @@ class AppointmentSeeder extends Seeder
      */
     public function run(): void
     {
+        
         //
     }
 }

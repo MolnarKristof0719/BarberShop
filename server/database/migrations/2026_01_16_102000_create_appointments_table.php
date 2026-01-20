@@ -15,9 +15,10 @@ return new class extends Migration {
             $table->foreignId('barberId')->constrained('barbers')->onDelete('restrict');
             $table->foreignId('userId')->constrained('users')->onDelete('restrict');
             $table->date('appointmentDate');
-            $table->unique(['barberId', 'userId', 'appointmentDate']);
+            $table->time('appointmentTime');
+            $table->unique(['barberId', 'userId', 'appointmentDate', 'appointmentTime']);
 
-            $table->string('status',50);
+            $table->enum('status', ['booked', 'cancelled', 'completed'])->default('booked');
             $table->string('cancelledBy', 50);
         });
     }
