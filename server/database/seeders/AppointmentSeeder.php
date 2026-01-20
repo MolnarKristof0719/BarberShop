@@ -8,6 +8,7 @@ use App\Models\Barber;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class AppointmentSeeder extends Seeder
 {
@@ -16,32 +17,56 @@ class AppointmentSeeder extends Seeder
         /** @var TimeSlotService $slotService */
         $slotService = app(TimeSlotService::class);
 
-        $start = '9:00';
-        $end = '17:00';
+        $start = '09:00';
+        $end   = '17:00';
 
         $slots = $slotService->generateHalfHourSlots($start, $end);
 
         $barberIds = Barber::query()->pluck('id')->all();
-        $userIds = User::query()->pluck('id')->all();
+        $userIds   = User::query()->pluck('id')->all();
 
         if (empty($barberIds) || empty($userIds)) {
             return;
         }
 
-        $target = 200;  
+        // csak a következő 2 hónapig generálunk dátumokat
+        $maxDate = Carbon::today()->addMonthsNoOverflow(2);
+        $maxDaysAhead = Carbon::today()->diffInDays($maxDate);
+
+        $target = 200;
         $created = 0;
         $attempts = 0;
-        $maxAttempts = $target * 80; 
+        $maxAttempts = $target * 120;
 
         while ($created < $target && $attempts < $maxAttempts) {
             $attempts++;
 
             $barberId = $barberIds[array_rand($barberIds)];
-            $userId = $userIds[array_rand($userIds)];
+            $userId   = $userIds[array_rand($userIds)];
 
-            $date = Carbon::today()
-                ->addDays(random_int(0, 60))
-                ->toDateString();
+            // --- DÁTUM VÁLASZTÁS: 2 hónapon belül + ne legyen offDay ---
+            $tries = 0;
+            $maxTriesForDate = 40;
+
+            do {
+                $tries++;
+
+                $date = Carbon::today()
+                    ->addDays(random_int(0, $maxDaysAhead))
+                    ->toDateString();
+
+                $isOffDay = DB::table('barber_off_days')
+                    ->where('barberId', $barberId)
+                    ->where('offDay', $date)
+                    ->exists();
+
+            } while ($isOffDay && $tries < $maxTriesForDate);
+
+            // ha nem találtunk nem-offDay dátumot (ritka), ugorjuk ezt a kört
+            if ($isOffDay) {
+                continue;
+            }
+            // --- /DÁTUM VÁLASZTÁS ---
 
             $time = $slots[array_rand($slots)];
 
@@ -58,6 +83,7 @@ class AppointmentSeeder extends Seeder
                 $cancelledBy = (random_int(0, 1) === 0) ? 'barber' : 'customer';
             }
 
+            // UNIQUE-safe (barberId + date + time)
             $appointment = Appointment::firstOrCreate(
                 [
                     'barberId' => $barberId,

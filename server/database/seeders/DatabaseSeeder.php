@@ -36,9 +36,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ServiceSeeder::class,
             BarberSeeder::class,
+            BarberOffDaySeeder::class,
             AppointmentSeeder::class,
             AppointmentServiceSeeder::class,
-            BarberOffDaySeeder::class,
             ReferencePictureSeeder::class,
             ReviewSeeder::class,
         ]);
