@@ -5,27 +5,37 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('barberId')->constrained('barbers')->onDelete('restrict');
-            $table->foreignId('userId')->constrained('users')->onDelete('restrict');
+
+            $table->foreignId('barberId')
+                ->constrained('barbers')
+                ->onDelete('restrict');
+
+            $table->foreignId('userId')
+                ->constrained('users')
+                ->onDelete('restrict');
+
             $table->date('appointmentDate');
             $table->time('appointmentTime');
-            $table->unique(['barberId', 'userId', 'appointmentDate', 'appointmentTime']);
 
-            $table->enum('status', ['booked', 'cancelled', 'completed'])->default('booked');
-            $table->string('cancelledBy', 50);
+            // egy barbernek egy idősáv = 1 foglalás
+            $table->unique(['barberId', 'appointmentDate', 'appointmentTime'], 'uniq_barber_slot');
+
+            $table->enum('status', ['booked', 'cancelled', 'completed'])
+                ->default('booked');
+
+            $table->enum('cancelledBy', ['none', 'barber', 'customer'])
+                ->default('none');
+
+            // gyorsabb lekérdezésekhez (available slots)
+            $table->index(['barberId', 'appointmentDate'], 'idx_barber_date');
+            $table->index(['userId', 'appointmentDate'], 'idx_user_date');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('appointments');

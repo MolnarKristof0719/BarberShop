@@ -10,4 +10,12 @@ class Appointment extends Model
     /** @use HasFactory<\Database\Factories\AppointmentFactory> */
     use HasFactory;
     public $timestamps = false;
+    protected $fillable = [
+        'barberId',
+        'userId',
+        'appointmentDate',
+        'appointmentTime',
+        'status',
+        'cancelledBy',
+    ];
 }
