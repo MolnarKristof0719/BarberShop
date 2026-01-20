@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
-use App
+
+use App\Helpers\CsvReader;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Service;
 
 class ServiceSeeder extends Seeder
 {
@@ -18,6 +20,6 @@ class ServiceSeeder extends Seeder
     $delimiter = ';';
 
     $data = CsvReader::csvToArray($fileName, $delimiter);
-    Sports::factory()->createMany($data);
+    Service::factory()->createMany($data);
   }
 }
