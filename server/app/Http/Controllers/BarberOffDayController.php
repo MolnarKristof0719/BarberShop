@@ -6,6 +6,8 @@ use App\Models\barberOffDay;
 use App\Http\Requests\StorebarberOffDayRequest;
 use App\Http\Requests\UpdatebarberOffDayRequest;
 
+use Illuminate\Support\Facades\DB;
+
 class BarberOffDayController extends Controller
 {
     /**
@@ -21,7 +23,34 @@ class BarberOffDayController extends Controller
      */
     public function store(StorebarberOffDayRequest $request)
     {
-        //
+        $data = $request->validate([
+            'barberId' => ['required', 'exists:barbers,id'],
+            'offDay' => ['required', 'date'],
+        ]);
+
+        DB::transaction(function () use ($data) {
+
+            // 1) Off day beszúrás (unique miatt insertOrIgnore)
+            DB::table('barber_off_days')->insertOrIgnore([
+                'barberId' => $data['barberId'],
+                'offDay'   => $data['offDay'],
+            ]);
+
+            // 2) Minden azon a napon lévő foglalás -> barber cancelled
+            // Életszerű: csak a booked-ot mondjuk le (completed-et általában nem piszkálunk)
+            DB::table('appointments')
+                ->where('barberId', $data['barberId'])
+                ->where('appointmentDate', $data['offDay'])
+                ->where('status', 'booked')
+                ->update([
+                    'status' => 'cancelled',
+                    'cancelledBy' => 'barber',
+                ]);
+        });
+
+        return response()->json([
+            'message' => 'Szabadnap mentve. Az érintett foglalások lemondva.'
+        ], 201);
     }
 
     /**
