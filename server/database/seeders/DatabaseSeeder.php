@@ -34,13 +34,13 @@ class DatabaseSeeder extends Seeder
         //Ami Seeder osztály itt fel van sorolva, annak lefut a run() metódusa
         $this->call([
             UserSeeder::class,
+            ServiceSeeder::class,
             BarberSeeder::class,
             AppointmentSeeder::class,
             AppointmentServiceSeeder::class,
-            ReviewSeeder::class,
-            ReferencePictureSeeder::class,
-            ServiceSeeder::class,
             BarberOffDaySeeder::class,
+            ReferencePictureSeeder::class,
+            ReviewSeeder::class,
         ]);
     }
 }
