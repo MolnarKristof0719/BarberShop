@@ -9,4 +9,5 @@ class AppointmentService extends Model
 {
     /** @use HasFactory<\Database\Factories\AppointmentServiceFactory> */
     use HasFactory;
+    public $timestamps = false;
 }

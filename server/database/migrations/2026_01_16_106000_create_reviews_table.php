@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unique(['appointmentId','barberId','userId']);
             $table->integer('rating');
             $table->text('comment');
-            $table->timestamps();
 
         });
     }

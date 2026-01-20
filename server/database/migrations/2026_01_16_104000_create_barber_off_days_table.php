@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('barberId')->constrained('barbers')->onDelete('restrict');
             $table->date('offDay');
             $table->unique(['barberId', 'offDay']);
-            $table->timestamps();
         });
     }
 

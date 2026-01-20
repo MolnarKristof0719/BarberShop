@@ -9,4 +9,6 @@ class barberOffDay extends Model
 {
     /** @use HasFactory<\Database\Factories\BarberOffDayFactory> */
     use HasFactory;
+    public $timestamps = false;
+
 }

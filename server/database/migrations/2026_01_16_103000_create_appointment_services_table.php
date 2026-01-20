@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('serviceId')->constrained('services')->onDelete('restrict');
             $table->unique(['appointmentId', 'serviceId']);
 
-            $table->timestamps();
         });
     }
 

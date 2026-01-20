@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('picture',125);
             $table->foreignId('barberId')->constrained('barbers')->onDelete('restrict');
             $table->unique(['picture', 'barberId']);
-            $table->timestamps();
         });
     }
 

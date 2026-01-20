@@ -9,4 +9,5 @@ class Barber extends Model
 {
     /** @use HasFactory<\Database\Factories\BarberFactory> */
     use HasFactory;
+    public $timestamps = false;
 }

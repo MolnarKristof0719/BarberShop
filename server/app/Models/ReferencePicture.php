@@ -9,4 +9,6 @@ class ReferencePicture extends Model
 {
     /** @use HasFactory<\Database\Factories\ReferencePictureFactory> */
     use HasFactory;
+    public $timestamps = false;
+
 }

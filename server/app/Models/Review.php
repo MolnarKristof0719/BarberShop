@@ -9,4 +9,5 @@ class Review extends Model
 {
     /** @use HasFactory<\Database\Factories\ReviewFactory> */
     use HasFactory;
+    public $timestamps = false;
 }
