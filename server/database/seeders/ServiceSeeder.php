@@ -13,6 +13,10 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
 
-      //
+      $fileName = 'csv/sports.csv';
+        $delimiter = ';';
+
+        $data = CsvReader::csvToArray($fileName, $delimiter);
+        Sports::factory()->createMany($data);
     }
 }
