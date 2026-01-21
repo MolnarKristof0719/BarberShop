@@ -90,9 +90,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //region Barber
     Route::middleware('isBarber')->group(function () {
-        Route::get('/off-days', [BarberOffDayController::class, 'index']);
-        Route::post('/off-days', [BarberOffDayController::class, 'store']);
-        Route::delete('/off-days/{id}', [BarberOffDayController::class, 'destroy']);
+        Route::get('/barber_off_days', [BarberOffDayController::class, 'index']);
+        Route::post('/barber_off_days', [BarberOffDayController::class, 'store']);
+        Route::delete('/barber_off_days/{id}', [BarberOffDayController::class, 'destroy']);
     });
     //endregion
 
@@ -116,9 +116,15 @@ Route::middleware('auth:sanctum')->group(function () {
     //endregion
 
     //region Reference Pictures
+    Route::get('/reference_pictures', [ReferencePictureController::class, 'index']);
     Route::post('/reference_pictures', [ReferencePictureController::class, 'store']);
-    Route::put('/reference_pictures/{id}', [ReferencePictureController::class, 'update']);
     Route::delete('/reference_pictures/{id}', [ReferencePictureController::class, 'destroy']);
+    //endregion
+
+    //region Offdays
+    Route::get('/barber_off_days', [BarberOffDayController::class, 'index']);
+    Route::post('/barber_off_days', [BarberOffDayController::class, 'store']);
+    Route::delete('/barber_off_days/{id}', [BarberOffDayController::class, 'destroy']);
     //endregion
 });
 

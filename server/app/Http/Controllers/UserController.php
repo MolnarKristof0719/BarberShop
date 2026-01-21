@@ -56,29 +56,35 @@ class UserController extends Controller
         $role = $user->role;
         $name = "1day-role:$role";
         switch ($role) {
-            case 1:
+            case User::ROLE_ADMIN:
                 //Admin
                 $abilities = ['*'];
                 break;
-            case 2:
-                //Raktáros
+            case User::ROLE_BARBER:
+                //Barber
                 $abilities = [
                     'usersme:delete',
                     'usersme:patch',
                     'usersme:updatePassword',
                     'usersme:get',
-                    'products:create',
-                    'products:delete',
-                    'products:update',
+                    'reference_pictures:create',
+                    'reference_pictures:delete',
+                    'barber_off_days:get',
+                    'barber_off_days:post',
+                    'barber_off_days:delete',
+                    'barbers:get'
                 ];
                 break;
             default:
-                //Vásárló
+                //Customer
                 $abilities = [
                     'usersme:delete',
                     'usersme:patch',
                     'usersme:updatePassword',
                     'usersme:get',
+                    'barbers:get',
+                    'appointments:post',
+                    'appointments:delete',
                 ];
                 break;
         }
