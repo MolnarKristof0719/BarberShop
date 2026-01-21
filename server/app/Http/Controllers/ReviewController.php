@@ -14,13 +14,12 @@ class ReviewController extends Controller
 
         abort_unless($appointment->userId === auth()->id(), 403);
 
+        abort_unless(!Review::where('appointmentId', $appointmentId)->exists(), 409);
+
         $data = $request->validate([
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
             'comment' => ['nullable', 'string'],
         ]);
-
-        // 1 review / appointment védelem (ha nincs unique a DB-ben)
-        abort_unless(!Review::where('appointmentId', $appointmentId)->exists(), 409);
 
         return Review::create([
             'appointmentId' => $appointmentId,

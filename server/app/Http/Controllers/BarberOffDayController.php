@@ -11,7 +11,10 @@ class BarberOffDayController extends Controller
     {
         $barberId = auth()->user()->barber->id;
 
-        return BarberOffDay::query()->where('barberId', $barberId)->orderBy('offDay')->get();
+        return BarberOffDay::query()
+            ->where('barberId', $barberId)
+            ->orderBy('offDay')
+            ->get();
     }
 
     public function store(Request $request)

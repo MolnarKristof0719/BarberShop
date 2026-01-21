@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "customer@example.com",
+    "email": "admin@example.com",
     "password": "123"
 }
 
@@ -136,9 +136,68 @@ Authorization: Bearer {{token}}
 ### get services
 GET {{host}}/api/services
 Accept: application/json
+Content-Type: application/json
 Authorization: Bearer {{token}}
 
+//-------------------------------
+//BARBERS
+//-------------------------------
+
+### get barbers (public)
+GET {{host}}/api/barbers
+Accept: application/json
+
+### get barber by id
+GET {{host}}/api/barbers/1
+Accept: application/json
+
+//-------------------------------
+//OFFDAYS
+//-------------------------------
+
+### get off days (barber)
+GET {{host}}/api/barber_off_days
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### post off day
+POST {{host}}/api/barber_off_days
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "offDay": "2026-02-10"
+}
+
+### delete off day
+DELETE {{host}}/api/barber_off_days/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+//-------------------------------
+//APPOINTMENTS
+//-------------------------------
+
 ### post appointment (1 service)
+
+### get my appointments
+GET {{host}}/api/appointments
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### get appointment by id
+GET {{host}}/api/appointments/2
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### delete appointment (cancel)
+DELETE {{host}}/api/appointments/201
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### idopont foglalasa
 POST {{host}}/api/appointments
 Content-Type: application/json
 Accept: application/json

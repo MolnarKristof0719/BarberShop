@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppointmentServiceController;
+use App\Http\Controllers\ReferencePictureController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -64,7 +65,7 @@ Route::get('usersme', [UserController::class, 'indexSelf'])
 //region Public Data
 Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/barbers', [BarberController::class, 'index']);
-Route::get('/barbers/{id}', [BarberController::class, 'show']);
+
 //endregion
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -106,12 +107,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointment_services', [AppointmentServiceController::class, 'index']);
     Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show']);
     //endregion
-    
+
     //region Reviews
     Route::post(
         '/appointments/{appointmentId}/review',
         [ReviewController::class, 'store']
     );
+    //endregion
+
+    //region Reference Pictures
+    Route::post('/reference_pictures', [ReferencePictureController::class, 'store']);
+    Route::put('/reference_pictures/{id}', [ReferencePictureController::class, 'update']);
+    Route::delete('/reference_pictures/{id}', [ReferencePictureController::class, 'destroy']);
     //endregion
 });
 

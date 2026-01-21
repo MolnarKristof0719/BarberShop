@@ -29,14 +29,15 @@ class BarberController extends Controller
 
     public function show(int $id)
     {
-        return Barber::findOrFail($id);
+        return Barber::query()
+            ->with(['referencePictures', 'reviews', 'user'])
+            ->findOrFail($id);
     }
 
     public function update(UpdateBarberRequest $request, int $id)
     {
         $barber = Barber::findOrFail($id);
 
-        // admin VAGY a saját barber profilja
         $user = auth()->user();
         abort_unless(
             $user?->isAdmin() || ($user?->isBarber() && $user?->barber?->id === $barber->id),
@@ -45,16 +46,18 @@ class BarberController extends Controller
 
         $data = $request->validated();
 
-        // bárki frissítheti a saját profil adatát
         $barber->fill([
             'profilePicture' => $data['profilePicture'] ?? $barber->profilePicture,
             'introduction' => $data['introduction'] ?? $barber->introduction,
         ]);
 
-        // admin-only mezők (ha így akarjátok)
         if ($user?->isAdmin()) {
-            if (array_key_exists('isActive', $data)) $barber->isActive = (bool)$data['isActive'];
-            if (array_key_exists('userId', $data)) $barber->userId = (int)$data['userId'];
+            if (array_key_exists('isActive', $data)) {
+                $barber->isActive = (bool) $data['isActive'];
+            }
+            if (array_key_exists('userId', $data)) {
+                $barber->userId = (int) $data['userId'];
+            }
         }
 
         $barber->save();

@@ -3,79 +3,93 @@
 namespace App\Http\Controllers;
 
 use App\Models\ReferencePicture;
-use App\Http\Requests\StoreReferencePictureRequest;
-use App\Http\Requests\UpdateReferencePictureRequest;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class ReferencePictureController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        try {
-            //code...
-            $rows = ReferencePicture::all();
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $rows
-            ];
-        } catch (\Exception $e) {
-            $status = 500;
-            $data = [
-                'message' => "Server error: {$e->getCode()}",
-                'data' => $rows
-            ];
+        // Opcionális szűrés: /reference-pictures?barberId=1
+        $query = ReferencePicture::query();
+
+        if ($request->filled('barberId')) {
+            $query->where('barberId', (int) $request->barberId);
         }
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+
+        return $query->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreReferencePictureRequest $request)
+    public function store(Request $request)
     {
-        //
+        // barber vagy admin
+        $user = auth()->user();
+        abort_unless($user?->isAdmin() || $user?->isBarber(), 403);
+
+        $data = $request->validate([
+            // ha admin is tölthet fel más barbernek:
+            'barberId' => ['nullable', 'integer', 'exists:barbers,id'],
+            // ezt igazítsd a mezőnevetekhez (imageUrl / path / url):
+            'imageUrl' => ['required', 'string', 'max:255'],
+        ]);
+
+        $barberId = $user->isAdmin()
+            ? (int) ($data['barberId'] ?? 0)
+            : $user->barber->id;
+
+        // admin esetén barberId kötelező
+        if ($user->isAdmin() && empty($barberId)) {
+            return response()->json([
+                'message' => 'barberId kötelező admin feltöltésnél.',
+                'data' => null
+            ], 422, options: JSON_UNESCAPED_UNICODE);
+        }
+
+        return ReferencePicture::create([
+            'barberId' => $barberId,
+            'imageUrl' => $data['imageUrl'],
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(int $id)
     {
-        $row = ReferencePicture::find($id);
-        if ($row) {
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $row
-            ];
-        } else {
-            $status = 404;
-            $data = [
-                'message' => "Not_Found id: $id ",
-                'data' => null
-            ];
-        }
-
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+        return ReferencePicture::findOrFail($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateReferencePictureRequest $request, ReferencePicture $referencePicture)
+    public function update(Request $request, int $id)
     {
-        //
+        $row = ReferencePicture::findOrFail($id);
+
+        $user = auth()->user();
+        abort_unless(
+            $user?->isAdmin() ||
+            ($user?->isBarber() && $user->barber?->id === $row->barberId),
+            403
+        );
+
+        $data = $request->validate([
+            'imageUrl' => ['required', 'string', 'max:255'],
+        ]);
+
+        $row->update([
+            'imageUrl' => $data['imageUrl'],
+        ]);
+
+        return $row;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ReferencePicture $referencePicture)
+    public function destroy(int $id)
     {
-        //
+        $row = ReferencePicture::findOrFail($id);
+
+        $user = auth()->user();
+        abort_unless(
+            $user?->isAdmin() ||
+            ($user?->isBarber() && $user->barber?->id === $row->barberId),
+            403
+        );
+
+        $row->delete();
+
+        return response()->noContent();
     }
 }
