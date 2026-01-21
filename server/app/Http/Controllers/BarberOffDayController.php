@@ -15,7 +15,22 @@ class BarberOffDayController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            //code...
+            $rows = barberOffDay::all();
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $rows
+            ];
+        } catch (\Exception $e) {
+            $status = 500;
+            $data = [
+                'message' => "Server error: {$e->getCode()}",
+                'data' => $rows
+            ];
+        }
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**

@@ -13,7 +13,22 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            //code...
+            $rows = Appointment::all();
+            $status =  200;
+            $data = [
+                'message' => 'OK',
+                'data' => $rows
+            ];
+        } catch (\Exception $e) {
+            $status =  500;
+            $data = [
+                'message' => "Server error: {$e->getCode()}",
+                'data' => $rows
+            ];
+        }
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -56,7 +71,7 @@ class AppointmentController extends Controller
             if ($e->getCode() === '23000') {
                 return response()->json([
                     'message' => 'Ez az időpont már foglalt ennél a borbélynál.'
-                ], 409);
+                ], 409, options: JSON_UNESCAPED_UNICODE);
             }
 
             throw $e;
