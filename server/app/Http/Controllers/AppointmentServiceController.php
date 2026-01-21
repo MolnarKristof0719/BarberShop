@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AppointmentService;
 use App\Http\Requests\StoreAppointmentServiceRequest;
 use App\Http\Requests\UpdateAppointmentServiceRequest;
+use Illuminate\Support\Facades\DB;
 
 class AppointmentServiceController extends Controller
 {
@@ -42,9 +43,24 @@ class AppointmentServiceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(AppointmentService $appointmentService)
+    public function show(int $id)
     {
-        //
+        $row = AppointmentService::find($id);
+        if ($row) {
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $row
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Not_Found id: $id ",
+                'data' => null
+            ];
+        }
+
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
+use Illuminate\Support\Facades\DB;
 
 class AppointmentController extends Controller
 {
@@ -16,13 +17,13 @@ class AppointmentController extends Controller
         try {
             //code...
             $rows = Appointment::all();
-            $status =  200;
+            $status = 200;
             $data = [
                 'message' => 'OK',
                 'data' => $rows
             ];
         } catch (\Exception $e) {
-            $status =  500;
+            $status = 500;
             $data = [
                 'message' => "Server error: {$e->getCode()}",
                 'data' => $rows
@@ -83,17 +84,47 @@ class AppointmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Appointment $appointment)
+    public function show(int $id)
     {
-        //
+        $row = Appointment::find($id);
+        if ($row) {
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $row
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Not_Found id: $id ",
+                'data' => null
+            ];
+        }
+
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAppointmentRequest $request, Appointment $appointment)
+    public function update(UpdateAppointmentRequest $request, Appointment $appointment, int $id)
     {
-        //
+        $row = $appointment::find($id);
+        if ($row) {
+            $status = 200;
+            $row->update($request->all());
+            $data = [
+                'message' => 'OK',
+                'data' => [$row]
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Patch error. Not_Found id: $id ",
+                'data' => null
+            ];
+        }
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**

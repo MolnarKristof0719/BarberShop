@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barber;
 use App\Http\Requests\StoreBarberRequest;
 use App\Http\Requests\UpdateBarberRequest;
+use Illuminate\Support\Facades\DB;
 
 class BarberController extends Controller
 {
@@ -42,9 +43,24 @@ class BarberController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Barber $barber)
+    public function show(int $id)
     {
-        //
+        $row = Barber::find($id);
+        if ($row) {
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $row
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Not_Found id: $id ",
+                'data' => null
+            ];
+        }
+
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**

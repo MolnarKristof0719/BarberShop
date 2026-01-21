@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\barberOffDay;
 use App\Http\Requests\StorebarberOffDayRequest;
 use App\Http\Requests\UpdatebarberOffDayRequest;
-
 use Illuminate\Support\Facades\DB;
 
 class BarberOffDayController extends Controller
@@ -48,7 +47,7 @@ class BarberOffDayController extends Controller
             // 1) Off day beszúrás (unique miatt insertOrIgnore)
             DB::table('barber_off_days')->insertOrIgnore([
                 'barberId' => $data['barberId'],
-                'offDay'   => $data['offDay'],
+                'offDay' => $data['offDay'],
             ]);
 
             // 2) Minden azon a napon lévő foglalás -> barber cancelled
@@ -71,9 +70,24 @@ class BarberOffDayController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(barberOffDay $barberOffDay)
+    public function show(int $id)
     {
-        //
+        $row = barberOffDay::find($id);
+        if ($row) {
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $row
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Not_Found id: $id ",
+                'data' => null
+            ];
+        }
+
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**

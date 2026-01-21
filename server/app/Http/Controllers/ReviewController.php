@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
+use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
@@ -13,7 +14,22 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            //code...
+            $rows = Review::all();
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $rows
+            ];
+        } catch (\Exception $e) {
+            $status = 500;
+            $data = [
+                'message' => "Server error: {$e->getCode()}",
+                'data' => $rows
+            ];
+        }
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -27,9 +43,24 @@ class ReviewController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Review $review)
+    public function show(int $id)
     {
-        //
+        $row = Review::find($id);
+        if ($row) {
+            $status = 200;
+            $data = [
+                'message' => 'OK',
+                'data' => $row
+            ];
+        } else {
+            $status = 404;
+            $data = [
+                'message' => "Not_Found id: $id ",
+                'data' => null
+            ];
+        }
+
+        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
     /**
