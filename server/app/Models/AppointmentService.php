@@ -7,12 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class AppointmentService extends Model
 {
-    /** @use HasFactory<\Database\Factories\AppointmentServiceFactory> */
     use HasFactory;
+
     public $timestamps = false;
 
     protected $fillable = [
         'appointmentId',
         'serviceId',
     ];
+
+    public function appointment()
+    {
+        return $this->belongsTo(Appointment::class, 'appointmentId');
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'serviceId');
+    }
 }

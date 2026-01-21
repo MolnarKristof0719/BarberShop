@@ -57,16 +57,16 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return (int)$this->role === self::ROLE_ADMIN;
+        return (int) $this->role === self::ROLE_ADMIN;
     }
 
     public function isBarber(): bool
     {
-        return (int)$this->role === self::ROLE_BARBER;
+        return (int) $this->role === self::ROLE_BARBER;
     }
 
     public function isCustomer(): bool
     {
-        return (int)$this->role === self::ROLE_CUSTOMER;
+        return (int) $this->role === self::ROLE_CUSTOMER;
     }
 }

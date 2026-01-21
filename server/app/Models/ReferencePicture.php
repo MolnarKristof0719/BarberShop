@@ -7,8 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReferencePicture extends Model
 {
-    /** @use HasFactory<\Database\Factories\ReferencePictureFactory> */
     use HasFactory;
+
     public $timestamps = false;
 
+    protected $fillable = [
+        'picture',
+        'barberId',
+    ];
+
+    public function barber()
+    {
+        return $this->belongsTo(Barber::class, 'barberId');
+    }
 }
