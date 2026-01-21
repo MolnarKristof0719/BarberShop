@@ -2,107 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\barberOffDay;
-use App\Http\Requests\StorebarberOffDayRequest;
-use App\Http\Requests\UpdatebarberOffDayRequest;
-use Illuminate\Support\Facades\DB;
+use App\Models\BarberOffDay;
+use Illuminate\Http\Request;
 
 class BarberOffDayController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        try {
-            //code...
-            $rows = barberOffDay::all();
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $rows
-            ];
-        } catch (\Exception $e) {
-            $status = 500;
-            $data = [
-                'message' => "Server error: {$e->getCode()}",
-                'data' => $rows
-            ];
-        }
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+        $barberId = auth()->user()->barber->id;
+
+        return BarberOffDay::query()->where('barberId', $barberId)->orderBy('offDay')->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorebarberOffDayRequest $request)
+    public function store(Request $request)
     {
+        $barberId = auth()->user()->barber->id;
+
         $data = $request->validate([
-            'barberId' => ['required', 'exists:barbers,id'],
             'offDay' => ['required', 'date'],
         ]);
 
-        DB::transaction(function () use ($data) {
-
-            // 1) Off day beszúrás (unique miatt insertOrIgnore)
-            DB::table('barber_off_days')->insertOrIgnore([
-                'barberId' => $data['barberId'],
-                'offDay' => $data['offDay'],
-            ]);
-
-            // 2) Minden azon a napon lévő foglalás -> barber cancelled
-            // Életszerű: csak a booked-ot mondjuk le (completed-et általában nem piszkálunk)
-            DB::table('appointments')
-                ->where('barberId', $data['barberId'])
-                ->where('appointmentDate', $data['offDay'])
-                ->where('status', 'booked')
-                ->update([
-                    'status' => 'cancelled',
-                    'cancelledBy' => 'barber',
-                ]);
-        });
-
-        return response()->json([
-            'message' => 'Szabadnap mentve. Az érintett foglalások lemondva.'
-        ], 201);
+        return BarberOffDay::create([
+            'barberId' => $barberId,
+            'offDay' => $data['offDay'],
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(int $id)
+    public function destroy(int $id)
     {
-        $row = barberOffDay::find($id);
-        if ($row) {
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $row
-            ];
-        } else {
-            $status = 404;
-            $data = [
-                'message' => "Not_Found id: $id ",
-                'data' => null
-            ];
-        }
+        $row = BarberOffDay::findOrFail($id);
 
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
-    }
+        abort_unless($row->barberId === auth()->user()->barber->id, 403);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatebarberOffDayRequest $request, barberOffDay $barberOffDay)
-    {
-        //
-    }
+        $row->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(barberOffDay $barberOffDay)
-    {
-        //
+        return response()->noContent();
     }
 }

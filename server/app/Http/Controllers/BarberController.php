@@ -5,77 +5,75 @@ namespace App\Http\Controllers;
 use App\Models\Barber;
 use App\Http\Requests\StoreBarberRequest;
 use App\Http\Requests\UpdateBarberRequest;
-use Illuminate\Support\Facades\DB;
 
 class BarberController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        try {
-            //code...
-            $rows = Barber::all();
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $rows
-            ];
-        } catch (\Exception $e) {
-            $status = 500;
-            $data = [
-                'message' => "Server error: {$e->getCode()}",
-                'data' => $rows
-            ];
-        }
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+        return Barber::query()->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreBarberRequest $request)
     {
-        //
+        $this->authorizeAdmin();
+
+        $data = $request->validated();
+
+        return Barber::create([
+            'userId' => $data['userId'],
+            'profilePicture' => $data['profilePicture'] ?? null,
+            'introduction' => $data['introduction'] ?? null,
+            'isActive' => $data['isActive'] ?? true,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(int $id)
     {
-        $row = Barber::find($id);
-        if ($row) {
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $row
-            ];
-        } else {
-            $status = 404;
-            $data = [
-                'message' => "Not_Found id: $id ",
-                'data' => null
-            ];
+        return Barber::findOrFail($id);
+    }
+
+    public function update(UpdateBarberRequest $request, int $id)
+    {
+        $barber = Barber::findOrFail($id);
+
+        // admin VAGY a saját barber profilja
+        $user = auth()->user();
+        abort_unless(
+            $user?->isAdmin() || ($user?->isBarber() && $user?->barber?->id === $barber->id),
+            403
+        );
+
+        $data = $request->validated();
+
+        // bárki frissítheti a saját profil adatát
+        $barber->fill([
+            'profilePicture' => $data['profilePicture'] ?? $barber->profilePicture,
+            'introduction' => $data['introduction'] ?? $barber->introduction,
+        ]);
+
+        // admin-only mezők (ha így akarjátok)
+        if ($user?->isAdmin()) {
+            if (array_key_exists('isActive', $data)) $barber->isActive = (bool)$data['isActive'];
+            if (array_key_exists('userId', $data)) $barber->userId = (int)$data['userId'];
         }
 
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+        $barber->save();
+
+        return $barber->fresh();
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateBarberRequest $request, Barber $barber)
+    public function destroy(int $id)
     {
-        //
+        $this->authorizeAdmin();
+
+        $barber = Barber::findOrFail($id);
+        $barber->delete();
+
+        return response()->noContent();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Barber $barber)
+    private function authorizeAdmin(): void
     {
-        //
+        abort_unless(auth()->user()?->isAdmin(), 403);
     }
 }

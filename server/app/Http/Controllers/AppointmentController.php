@@ -3,46 +3,67 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use App\Http\Requests\StoreAppointmentRequest;
-use App\Http\Requests\UpdateAppointmentRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 class AppointmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        try {
-            //code...
-            $rows = Appointment::all();
-            $status = 200;
-            $data = [
+        $user = auth()->user();
+
+        // Barber: a saját foglalásai (neki hasznos látni a usert is)
+        if ($user?->isBarber()) {
+            $rows = Appointment::query()
+                ->where('barberId', $user->barber->id)
+                ->orderByDesc('appointmentDate')
+                ->orderByDesc('appointmentTime')
+                ->with(['services', 'user'])
+                ->get();
+
+            return response()->json([
                 'message' => 'OK',
                 'data' => $rows
-            ];
-        } catch (\Exception $e) {
-            $status = 500;
-            $data = [
-                'message' => "Server error: {$e->getCode()}",
-                'data' => $rows
-            ];
+            ], 200, options: JSON_UNESCAPED_UNICODE);
         }
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+
+        // Admin: mindent láthat (ha ezt akarjátok)
+        if ($user?->isAdmin()) {
+            $rows = Appointment::query()
+                ->orderByDesc('appointmentDate')
+                ->orderByDesc('appointmentTime')
+                ->with(['services', 'user', 'barber'])
+                ->get();
+
+            return response()->json([
+                'message' => 'OK',
+                'data' => $rows
+            ], 200, options: JSON_UNESCAPED_UNICODE);
+        }
+
+        // User: saját foglalásai
+        $rows = Appointment::query()
+            ->where('userId', $user->id)
+            ->orderByDesc('appointmentDate')
+            ->orderByDesc('appointmentTime')
+            ->with(['services', 'barber'])
+            ->get();
+
+        return response()->json([
+            'message' => 'OK',
+            'data' => $rows
+        ], 200, options: JSON_UNESCAPED_UNICODE);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAppointmentRequest $request)
+    public function store(Request $request)
     {
         $data = $request->validate([
-            'barberId' => ['required', 'exists:barbers,id'],
-            'userId' => ['required', 'exists:users,id'],
+            'barberId' => ['required', 'integer', 'exists:barbers,id'],
             'appointmentDate' => ['required', 'date'],
-            // ha nálad "13:30" jön, akkor date_format:H:i; ha "13:30:00", akkor H:i:s
-            'appointmentTime' => ['required', 'date_format:H:i:s'],
+            'appointmentTime' => ['required', 'date_format:H:i'], // ✅ H:i
+            'services' => ['required', 'array', 'min:1'],
+            'services.*' => ['integer', 'exists:services,id'],
         ]);
 
         // 1) OFF DAY tiltás
@@ -53,85 +74,88 @@ class AppointmentController extends Controller
 
         if ($isOffDay) {
             return response()->json([
-                'message' => 'A barber ezen a napon szabadságon van, nem foglalható időpont.'
-            ], 422);
+                'message' => 'A barber ezen a napon szabadságon van, nem foglalható időpont.',
+                'data' => null
+            ], 422, options: JSON_UNESCAPED_UNICODE);
         }
 
-        // 2) Foglalás mentése (unique ütközést kezeljük)
+        // 2) Mentés + pivot egy tranzakcióban
         try {
-            $appointment = Appointment::create([
-                'barberId' => $data['barberId'],
-                'userId' => $data['userId'],
-                'appointmentDate' => $data['appointmentDate'],
-                'appointmentTime' => $data['appointmentTime'],
-                'status' => 'booked',
-                'cancelledBy' => 'none',
-            ]);
+            $appointment = DB::transaction(function () use ($data) {
+                $appointment = Appointment::create([
+                    'barberId' => $data['barberId'],
+                    'userId' => auth()->id(),          // ✅ userId nem jön requestből
+                    'appointmentDate' => $data['appointmentDate'],
+                    'appointmentTime' => $data['appointmentTime'],
+                    'status' => 'booked',
+                    'cancelledBy' => 'none',           // ✅ DB miatt kell
+                ]);
+
+                $appointment->services()->sync($data['services']);
+
+                return $appointment->load(['services', 'barber']);
+            });
+
+            return response()->json([
+                'message' => 'Created',
+                'data' => $appointment
+            ], 201, options: JSON_UNESCAPED_UNICODE);
+
         } catch (QueryException $e) {
-            // MySQL unique violation tipikusan 23000
-            if ($e->getCode() === '23000') {
+            // ✅ csak a 1062 = Duplicate entry (unique) legyen "foglalt"
+            $mysqlCode = $e->errorInfo[1] ?? null;
+
+            if ($mysqlCode === 1062) {
                 return response()->json([
-                    'message' => 'Ez az időpont már foglalt ennél a borbélynál.'
+                    'message' => 'Ez az időpont már foglalt ennél a borbélynál.',
+                    'data' => null
                 ], 409, options: JSON_UNESCAPED_UNICODE);
             }
 
             throw $e;
         }
-
-        return response()->json($appointment, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(int $id)
     {
-        $row = Appointment::find($id);
-        if ($row) {
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $row
-            ];
-        } else {
-            $status = 404;
-            $data = [
-                'message' => "Not_Found id: $id ",
-                'data' => null
-            ];
-        }
+        $appointment = Appointment::query()
+            ->with(['services', 'barber', 'user'])
+            ->findOrFail($id);
 
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+        $user = auth()->user();
+
+        abort_unless(
+            $user?->isAdmin() ||
+            $appointment->userId === $user->id ||
+            ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
+            403
+        );
+
+        return response()->json([
+            'message' => 'OK',
+            'data' => $appointment
+        ], 200, options: JSON_UNESCAPED_UNICODE);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAppointmentRequest $request, Appointment $appointment, int $id)
+    public function destroy(int $id)
     {
-        $row = $appointment::find($id);
-        if ($row) {
-            $status = 200;
-            $row->update($request->all());
-            $data = [
-                'message' => 'OK',
-                'data' => [$row]
-            ];
-        } else {
-            $status = 404;
-            $data = [
-                'message' => "Patch error. Not_Found id: $id ",
-                'data' => null
-            ];
-        }
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
-    }
+        $appointment = Appointment::findOrFail($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Appointment $appointment)
-    {
-        //
+        $user = auth()->user();
+
+        abort_unless(
+            $user?->isAdmin() ||
+            $appointment->userId === $user->id ||
+            ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
+            403
+        );
+
+        // Egyszerű: törlés. (Ha inkább "status=cancelled" kell, szólj és átírjuk.)
+        $appointment->delete();
+
+        return response()->json([
+            'message' => 'Cancelled',
+            'data' => null
+        ], 200, options: JSON_UNESCAPED_UNICODE);
     }
 }

@@ -2,80 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
 use App\Models\Review;
-use App\Http\Requests\StoreReviewRequest;
-use App\Http\Requests\UpdateReviewRequest;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(Request $request, int $appointmentId)
     {
-        try {
-            //code...
-            $rows = Review::all();
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $rows
-            ];
-        } catch (\Exception $e) {
-            $status = 500;
-            $data = [
-                'message' => "Server error: {$e->getCode()}",
-                'data' => $rows
-            ];
-        }
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
-    }
+        $appointment = Appointment::findOrFail($appointmentId);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreReviewRequest $request)
-    {
-        //
-    }
+        abort_unless($appointment->userId === auth()->id(), 403);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(int $id)
-    {
-        $row = Review::find($id);
-        if ($row) {
-            $status = 200;
-            $data = [
-                'message' => 'OK',
-                'data' => $row
-            ];
-        } else {
-            $status = 404;
-            $data = [
-                'message' => "Not_Found id: $id ",
-                'data' => null
-            ];
-        }
+        $data = $request->validate([
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['nullable', 'string'],
+        ]);
 
-        return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
-    }
+        // 1 review / appointment védelem (ha nincs unique a DB-ben)
+        abort_unless(!Review::where('appointmentId', $appointmentId)->exists(), 409);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateReviewRequest $request, Review $review)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Review $review)
-    {
-        //
+        return Review::create([
+            'appointmentId' => $appointmentId,
+            'barberId' => $appointment->barberId,
+            'userId' => auth()->id(),
+            'rating' => $data['rating'],
+            'comment' => $data['comment'] ?? null,
+        ]);
     }
 }

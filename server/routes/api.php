@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\AppointmentServiceController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ReferencePictureController;
 use App\Http\Controllers\UserController;
-use Database\Seeders\ServiceSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\BarberController;
+use App\Http\Controllers\BarberOffDayController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ReviewController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -24,6 +28,9 @@ Route::get('/x', function () {
 Route::post('users/login', [UserController::class, 'login']);
 Route::post('users/logout', [UserController::class, 'logout']);
 Route::post('users', [UserController::class, 'store']);
+Route::get('/barbers', [BarberController::class, 'index']);
+Route::get('/barbers/{id}', [BarberController::class, 'show']);
+Route::get('/services', [ServiceController::class, 'index']);
 
 //Admin: 
 //minden user lekérdezése
@@ -53,79 +60,58 @@ Route::get('usersme', [UserController::class, 'indexSelf'])
     ->middleware('auth:sanctum', 'ability:usersme:get');
 //endregion
 
-//region Services
-Route::get('services', [ServiceSeeder::class, 'index']);
-Route::get('services/{id}', [ServiceSeeder::class, 'show']);
-Route::post('services', [ServiceSeeder::class, 'store'])
-    ->middleware(['auth:sanctum', 'ability:services:post']);
-Route::patch('services/{id}', [ServiceSeeder::class, 'update'])
-    ->middleware(['auth:sanctum', 'ability:services:patch']);
-Route::delete('services/{id}', [ServiceSeeder::class, 'destroy'])
-    ->middleware(['auth:sanctum', 'ability:services:delete']);
+
+//region Public Data
+Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/barbers', [BarberController::class, 'index']);
+Route::get('/barbers/{id}', [BarberController::class, 'show']);
 //endregion
 
-//region Barbers
-Route::get('barbers', [BarberController::class, 'index']);
-Route::get('barbers/{id}', [BarberController::class, 'show']);
-Route::post('barbers', [BarberController::class, 'store'])
-    ->middleware(['auth:sanctum', 'ability:barbers:post']);
-Route::patch('barbers/{id}', [BarberController::class, 'update'])
-    ->middleware(['auth:sanctum', 'ability:barbers:patch']);
-Route::delete('barbers/{id}', [BarberController::class, 'destroy'])
-    ->middleware(['auth:sanctum', 'ability:barbers:delete']);
-//endregion
+Route::middleware('auth:sanctum')->group(function () {
 
-//region Appointments
-Route::get('appointments', [AppointmentController::class, 'index']);
-Route::get('appointments/{id}', [AppointmentController::class, 'show']);
-Route::post('appointments', [AppointmentController::class, 'store'])
-    ->middleware(['auth:sanctum', 'ability:appointments:post']);
-Route::patch('appointments/{id}', [AppointmentController::class, 'update'])
-    ->middleware(['auth:sanctum', 'ability:appointments:patch']);
-Route::delete('appointments/{id}', [AppointmentController::class, 'destroy'])
-    ->middleware(['auth:sanctum', 'ability:appointments:delete']);
-//endregion
+    //region Auth User
+    Route::get('/me', function (Request $request) {
+        return $request->user();
+    });
+    //endregion
 
-//region AppointmentServices 
-Route::get('appointment_services', [AppointmentServiceController::class, 'index']);
-Route::get('appointment_services/{id}', [AppointmentServiceController::class, 'show']);
-Route::post('appointment_services', [AppointmentServiceController::class, 'store'])
-    ->middleware(['auth:sanctum', 'ability:appointment_services:post']);
-Route::patch('appointment_services/{id}', [AppointmentServiceController::class, 'update'])
-    ->middleware(['auth:sanctum', 'ability:appointment_services:patch']);
-Route::delete('appointment_services/{id}', [AppointmentServiceController::class, 'destroy'])
-    ->middleware(['auth:sanctum', 'ability:appointment_services:delete']);
-//endregion
+    //region Admin
+    Route::middleware('isAdmin')->group(function () {
+        Route::post('/services', [ServiceController::class, 'store']);
+        Route::put('/services/{id}', [ServiceController::class, 'update']);
+        Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
 
-//region BarberOffDays
-Route::get('barber_off_days', [BarberOffDayController::class, 'index']);
-Route::get('barber_off_days/{id}', [BarberOffDayController::class, 'show']);
-Route::post('barber_off_days', [BarberOffDayController::class, 'store'])
-    ->middleware(['auth:sanctum', 'ability:barber_off_days:post']);
-Route::patch('barber_off_days/{id}', [BarberOffDayController::class, 'update'])
-    ->middleware(['auth:sanctum', 'ability:barber_off_days:patch']);
-Route::delete('barber_off_days/{id}', [BarberOffDayController::class, 'destroy'])
-    ->middleware(['auth:sanctum', 'ability:barber_off_days:delete']);
-//endregion
+        Route::post('/barbers', [BarberController::class, 'store']);
+        Route::put('/barbers/{id}', [BarberController::class, 'update']);
+        Route::delete('/barbers/{id}', [BarberController::class, 'destroy']);
+    });
+    //endregion
 
-//region ReferencePictures
-Route::get('reference_pictures', [ReferencePictureController::class, 'index']);
-Route::get('reference_pictures/{id}', [ReferencePictureController::class, 'show']);
-Route::post('reference_pictures', [ReferencePictureController::class, 'store'])
-    ->middleware(['auth:sanctum', 'ability:reference_pictures:post']);
-Route::patch('reference_pictures/{id}', [ReferencePictureController::class, 'update'])
-    ->middleware(['auth:sanctum', 'ability:reference_pictures:patch']);
-Route::delete('reference_pictures/{id}', [ReferencePictureController::class, 'destroy'])
-    ->middleware(['auth:sanctum', 'ability:reference_pictures:delete']);
-//endregion
+    //region Barber
+    Route::middleware('isBarber')->group(function () {
+        Route::get('/off-days', [BarberOffDayController::class, 'index']);
+        Route::post('/off-days', [BarberOffDayController::class, 'store']);
+        Route::delete('/off-days/{id}', [BarberOffDayController::class, 'destroy']);
+    });
+    //endregion
 
-//region Review
-Route::get('reviews', [ReviewController::class, 'index']);
-Route::get('reviews/{id}', [ReviewController::class, 'show']);
-Route::post('reviews', [ReviewController::class, 'store'])
-    ->middleware(['auth:sanctum', 'ability:reviews:post']);
-Route::patch('reviews/{id}', [ReviewController::class, 'update'])
-    ->middleware(['auth:sanctum', 'ability:reviews:patch']);
-Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])
-    ->middleware(['auth:sanctum', 'ability:reviews:delete']);
-//endregion
+    //region Appointments
+    Route::get('/appointments', [AppointmentController::class, 'index']);
+    Route::post('/appointments', [AppointmentController::class, 'store']);
+    Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
+    Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy']);
+    //endregion
+
+    //region Appointment Services
+    Route::get('/appointment_services', [AppointmentServiceController::class, 'index']);
+    Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show']);
+    //endregion
+    
+    //region Reviews
+    Route::post(
+        '/appointments/{appointmentId}/review',
+        [ReviewController::class, 'store']
+    );
+    //endregion
+});
+
