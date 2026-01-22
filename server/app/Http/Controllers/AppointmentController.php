@@ -124,6 +124,7 @@ class AppointmentController extends Controller
             ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
             403
         );
+        
 
         $appointment->delete();
 

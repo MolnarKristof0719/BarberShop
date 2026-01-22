@@ -1,130 +1,107 @@
 <?php
 
-use App\Http\Controllers\AppointmentServiceController;
-use App\Http\Controllers\ReferencePictureController;
-use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\BarberController;
 use App\Http\Controllers\BarberOffDayController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReferencePictureController;
+use App\Http\Controllers\AppointmentServiceController;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+Route::get('/x', fn() => 'API');
 
-//endpoint
-Route::get('/x', function () {
-    return 'API';
-});
-
-
-//region users
-//User kezelés, login, logout
-//Mindenki
+// --- PUBLIC ---
 Route::post('users/login', [UserController::class, 'login']);
-Route::post('users/logout', [UserController::class, 'logout']);
-Route::post('users', [UserController::class, 'store']);
-Route::get('/barbers', [BarberController::class, 'index']);
-Route::get('/barbers/{id}', [BarberController::class, 'show']);
-Route::get('/services', [ServiceController::class, 'index']);
+Route::post('users', [UserController::class, 'store']); // regisztráció
 
-//Admin: 
-//minden user lekérdezése
-Route::get('users', [UserController::class, 'index'])
-    ->middleware('auth:sanctum', 'ability:admin');
-//Egy user lekérése    
-Route::get('users/{id}', [UserController::class, 'show'])
-    ->middleware('auth:sanctum', 'ability:admin');
-//User adatok módosítása      
-Route::patch('users/{id}', [UserController::class, 'update'])
-    ->middleware('auth:sanctum', 'ability:admin');
-//User törlés
-Route::delete('users/{id}', [UserController::class, 'destroy'])
-    ->middleware('auth:sanctum', 'ability:admin');
+Route::get('/services', [ServiceController::class, 'index']); // public
 
-//User self (Amit a user önmagával csinálhat) parancsok
-Route::delete('usersme', [UserController::class, 'destroySelf'])
-    ->middleware('auth:sanctum', 'ability:usersme:delete');
+// Ha nálatok a barberek listája PUBLIC legyen, hagyd így:
+// Route::get('/barbers', [BarberController::class, 'index']);
+// Route::get('/barbers/{id}', [BarberController::class, 'show']);
 
-Route::patch('usersme', [UserController::class, 'updateSelf'])
-    ->middleware('auth:sanctum', 'ability:usersme:patch');
+// Ha NEM public, akkor csak auth + ability:barbers:get alatt lesz (lent).
 
-Route::patch('usersmeupdatepassword', [UserController::class, 'updatePassword'])
-    ->middleware('auth:sanctum', 'ability:usersme:updatePassword');
-
-Route::get('usersme', [UserController::class, 'indexSelf'])
-    ->middleware('auth:sanctum', 'ability:usersme:get');
-//endregion
-
-
-//region Public Data
-Route::get('/services', [ServiceController::class, 'index']);
-Route::get('/barbers', [BarberController::class, 'index']);
-
-//endregion
+// Reference képek listázása lehet public (barber profilhoz)
+Route::get('/reference_pictures', [ReferencePictureController::class, 'index']);
+Route::get('/reference_pictures/{id}', [ReferencePictureController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    //region Auth User
+    // --- COMMON AUTH ---
+    Route::post('users/logout', [UserController::class, 'logout']);
+
     Route::get('/me', function (Request $request) {
         return $request->user();
     });
-    //endregion
 
-    //region Admin
-    Route::middleware('isAdmin')->group(function () {
-        Route::post('/services', [ServiceController::class, 'store']);
-        Route::put('/services/{id}', [ServiceController::class, 'update']);
-        Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+    // --- USERSME (mindenki, akinek usersme:* ability megvan) ---
+    Route::middleware('ability:usersme:get')->get('usersme', [UserController::class, 'indexSelf']);
+    Route::middleware('ability:usersme:patch')->patch('usersme', [UserController::class, 'updateSelf']);
+    Route::middleware('ability:usersme:updatePassword')->patch('usersmeupdatepassword', [UserController::class, 'updatePassword']);
+    Route::middleware('ability:usersme:delete')->delete('usersme', [UserController::class, 'destroySelf']);
 
-        Route::post('/barbers', [BarberController::class, 'store']);
-        Route::put('/barbers/{id}', [BarberController::class, 'update']);
-        Route::delete('/barbers/{id}', [BarberController::class, 'destroy']);
+    Route::middleware('auth:sanctum')->group(function () {
+
+        Route::get('usersme/appointments', [UserController::class, 'myAppointments'])
+            ->middleware('ability:usersme:get');
+
+        Route::get('usersme/appointments/{id}', [UserController::class, 'myAppointmentShow'])
+            ->middleware('ability:usersme:get');
+
+        Route::delete('usersme/appointments/{id}', [UserController::class, 'myAppointmentCancel'])
+            ->middleware('ability:appointments:delete');
     });
-    //endregion
 
-    //region Barber
-    Route::middleware('isBarber')->group(function () {
-        Route::get('/barber_off_days', [BarberOffDayController::class, 'index']);
-        Route::post('/barber_off_days', [BarberOffDayController::class, 'store']);
-        Route::delete('/barber_off_days/{id}', [BarberOffDayController::class, 'destroy']);
-    });
-    //endregion
+    // --- ADMIN USERS CRUD ---
+    Route::get('users', [UserController::class, 'index'])->middleware('ability:*');
+    Route::get('users/{id}', [UserController::class, 'show'])->middleware('ability:*');
+    Route::patch('users/{id}', [UserController::class, 'update'])->middleware('ability:*');
+    Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('ability:*');
 
-    //region Appointments
-    Route::get('/appointments', [AppointmentController::class, 'index']);
-    Route::post('/appointments', [AppointmentController::class, 'store']);
-    Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
-    Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy']);
-    //endregion
+    // --- SERVICES ADMIN CRUD (ha kell adminnak) ---
+    Route::post('/services', [ServiceController::class, 'store'])->middleware('ability:*');
+    Route::put('/services/{id}', [ServiceController::class, 'update'])->middleware('ability:*');
+    Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->middleware('ability:*');
 
-    //region Appointment Services
-    Route::get('/appointment_services', [AppointmentServiceController::class, 'index']);
-    Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show']);
-    //endregion
+    // --- BARBERS (ability:barbers:get) ---
+    Route::get('/barbers', [BarberController::class, 'index'])->middleware('ability:barbers:get');
+    Route::get('/barbers/{id}', [BarberController::class, 'show'])->middleware('ability:barbers:get');
 
-    //region Reviews
-    Route::post(
-        '/appointments/{appointmentId}/review',
-        [ReviewController::class, 'store']
-    );
-    //endregion
+    // Admin barber CRUD (ha van ilyen controller funkció)
+    Route::post('/barbers', [BarberController::class, 'store'])->middleware('ability:*');
+    Route::put('/barbers/{id}', [BarberController::class, 'update'])->middleware('ability:*');
+    Route::delete('/barbers/{id}', [BarberController::class, 'destroy'])->middleware('ability:*');
 
-    //region Reference Pictures
-    Route::get('/reference_pictures', [ReferencePictureController::class, 'index']);
-    Route::post('/reference_pictures', [ReferencePictureController::class, 'store']);
-    Route::delete('/reference_pictures/{id}', [ReferencePictureController::class, 'destroy']);
-    //endregion
+    // --- OFF DAYS (csak barber, abilities alapján) ---
+    Route::get('/barber_off_days', [BarberOffDayController::class, 'index'])->middleware('ability:barber_off_days:get');
+    Route::post('/barber_off_days', [BarberOffDayController::class, 'store'])->middleware('ability:barber_off_days:post');
+    Route::delete('/barber_off_days/{id}', [BarberOffDayController::class, 'destroy'])->middleware('ability:barber_off_days:delete');
 
-    //region Offdays
-    Route::get('/barber_off_days', [BarberOffDayController::class, 'index']);
-    Route::post('/barber_off_days', [BarberOffDayController::class, 'store']);
-    Route::delete('/barber_off_days/{id}', [BarberOffDayController::class, 'destroy']);
-    //endregion
+    // --- REFERENCE PICTURES (csak barber, abilities alapján) ---
+    Route::post('/reference_pictures', [ReferencePictureController::class, 'store'])->middleware('ability:reference_pictures:create');
+    Route::put('/reference_pictures/{id}', [ReferencePictureController::class, 'update'])->middleware('ability:reference_pictures:create'); // ha update is kell, adhatsz külön ability-t
+    Route::delete('/reference_pictures/{id}', [ReferencePictureController::class, 'destroy'])->middleware('ability:reference_pictures:delete');
+
+    // --- APPOINTMENTS ---
+    // Nálad customer kap: appointments:post és appointments:delete
+    // GET-hez NINCS ability a loginban -> vagy public, vagy add hozzá: appointments:get
+    Route::get('/appointments', [AppointmentController::class, 'index'])->middleware('ability:appointments:get'); // vagy 'appointments:get' ha bevezeted
+    Route::get('/appointments/{id}', [AppointmentController::class, 'show'])->middleware('ability:*'); // vagy 'appointments:get'
+
+    Route::post('/appointments', [AppointmentController::class, 'store'])->middleware('ability:appointments:post');
+    Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->middleware('ability:appointments:delete');
+
+    // --- REVIEWS ---
+    // Customer jelenleg nem kap reviews:create ability-t a te loginodban!
+    // Ha akarsz review-t, add hozzá a customer abilities listához: 'reviews:post'
+    Route::post('/appointments/{appointmentId}/review', [ReviewController::class, 'store'])->middleware('ability:*');
+
+    // --- PIVOT DEBUG (admin) ---
+    Route::get('/appointment_services', [AppointmentServiceController::class, 'index'])->middleware('ability:*');
+    Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show'])->middleware('ability:*');
 });
-

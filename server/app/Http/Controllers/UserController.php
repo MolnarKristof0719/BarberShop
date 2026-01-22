@@ -6,6 +6,7 @@ use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\UpdateUserSelfRequest;
+use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -83,6 +84,7 @@ class UserController extends Controller
                     'usersme:updatePassword',
                     'usersme:get',
                     'barbers:get',
+                    'appointments:get',
                     'appointments:post',
                     'appointments:delete',
                 ];
@@ -391,5 +393,72 @@ class UserController extends Controller
             ]
         ];
         return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
+    }
+
+    public function myAppointments(Request $request)
+    {
+        $user = $request->user();
+
+        $rows = Appointment::query()
+            ->where('userId', $user->id)
+            ->with(['services', 'barber'])
+            ->orderByDesc('appointmentDate')
+            ->orderByDesc('appointmentTime')
+            ->get();
+
+        return response()->json([
+            'message' => 'OK',
+            'data' => $rows
+        ], 200, options: JSON_UNESCAPED_UNICODE);
+    }
+
+    public function myAppointmentShow(Request $request, int $id)
+    {
+        $user = $request->user();
+
+        $row = Appointment::query()
+            ->where('id', $id)
+            ->where('userId', $user->id)
+            ->with(['services', 'barber'])
+            ->first();
+
+        if (!$row) {
+            return response()->json([
+                'message' => "Not found (or not yours) id: $id",
+                'data' => null
+            ], 404, options: JSON_UNESCAPED_UNICODE);
+        }
+
+        return response()->json([
+            'message' => 'OK',
+            'data' => $row
+        ], 200, options: JSON_UNESCAPED_UNICODE);
+    }
+
+    public function myAppointmentCancel(Request $request, int $id)
+    {
+        $user = $request->user();
+
+        $appointment = Appointment::query()
+            ->where('id', $id)
+            ->where('userId', $user->id)
+            ->first();
+
+        if (!$appointment) {
+            return response()->json([
+                'message' => "Not found (or not yours) id: $id",
+                'data' => null
+            ], 404, options: JSON_UNESCAPED_UNICODE);
+        }
+
+        // pivot sorok törlése, hogy ne legyen 1451
+        $appointment->services()->detach();
+
+        $appointment->delete();
+
+        return response()->json([
+            'message' => 'Cancelled',
+            'data' => null
+        ], 200, options: JSON_UNESCAPED_UNICODE);
     }
 }

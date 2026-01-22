@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "admin@example.com",
+    "email": "customer2@example.com",
     "password": "123"
 }
 
@@ -25,6 +25,10 @@ POST  {{host}}/api/users/logout
 Accept: application/json
 Authorization: Bearer {{token}}
 
+### me 
+GET {{host}}/api/me
+Accept: application/json
+Authorization: Bearer {{token}}
 
 ### get users
 GET  {{host}}/api/users
@@ -120,18 +124,6 @@ Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-###appointments
-POST {{host}}/api/appointments
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "barberId": 1,
-    "appointmentDate": "2026-02-01",
-    "appointmentTime": "13:30",
-    "services": [1]
-}
 
 ### get services
 GET {{host}}/api/services
@@ -146,10 +138,14 @@ Authorization: Bearer {{token}}
 ### get barbers (public)
 GET {{host}}/api/barbers
 Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 ### get barber by id
-GET {{host}}/api/barbers/1
+GET {{host}}/api/barbers/2
 Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 //-------------------------------
 //OFFDAYS
@@ -158,6 +154,7 @@ Accept: application/json
 ### get off days (barber)
 GET {{host}}/api/barber_off_days
 Accept: application/json
+Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### post off day
@@ -167,7 +164,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "offDay": "2026-02-10"
+    "offDay": "2026-02-02"
 }
 
 ### delete off day
@@ -188,12 +185,12 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### get appointment by id
-GET {{host}}/api/appointments/2
+GET {{host}}/api/appointments/107
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### delete appointment (cancel)
-DELETE {{host}}/api/appointments/201
+DELETE {{host}}/api/appointments/205
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -205,7 +202,22 @@ Authorization: Bearer {{token}}
 
 {
   "barberId": 1,
-  "appointmentDate": "2026-05-01",
+  "appointmentDate": "2026-05-02",
   "appointmentTime": "13:00",
   "services": [1,2]
 }
+
+### my appointments (self)
+GET {{host}}/api/usersme/appointments
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### my appointment by id (self)
+GET {{host}}/api/usersme/appointments/202
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### cancel my appointment (self)
+DELETE {{host}}/api/usersme/appointments/202
+Accept: application/json
+Authorization: Bearer {{token}}
