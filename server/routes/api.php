@@ -102,6 +102,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/appointments/{appointmentId}/review', [ReviewController::class, 'store'])->middleware('ability:reviews:post');
 
     Route::get('/reviews', [ReviewController::class, 'index'])->middleware('ability:reviews:get');
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->middleware('ability:reviews:delete');
+
     // --- PIVOT DEBUG (admin) ---
     Route::get('/appointment_services', [AppointmentServiceController::class, 'index'])->middleware('ability:*');
     Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show'])->middleware('ability:*');

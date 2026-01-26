@@ -142,7 +142,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### get barber by id
-GET {{host}}/api/barbers/6
+GET {{host}}/api/barbers/2
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -164,7 +164,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "offDay": "2026-02-14"
+    "offDay": "2026-01-29"
 }
 
 ### delete off day
@@ -201,10 +201,10 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "barberId": 3,
-  "appointmentDate": "2026-01-24",
+  "barberId": 2,
+  "appointmentDate": "2026-01-21",
   "appointmentTime": "16:00",
-  "services": [1]
+  "services": [1,2]
 }
 
 ### my appointments (self)
@@ -228,7 +228,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### review post
-POST {{host}}/api/appointments/202/review
+POST {{host}}/api/appointments/201/review
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
@@ -237,3 +237,8 @@ Authorization: Bearer {{token}}
   "rating": 5,
   "comment": "jo lett kiraj"
 }
+
+### review delete
+DELETE {{host}}/api/reviews/3
+Accept: application/json
+Authorization: Bearer {{token}}

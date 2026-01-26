@@ -90,7 +90,8 @@ class UserController extends Controller
                     'appointments:post',
                     'appointments:delete',
                     'reviews:post',
-                    'reviews:get'
+                    'reviews:get',
+                    'reviews:delete'
                     
 
                 ];
