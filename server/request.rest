@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "barber@example.com",
+    "email": "customer@example.com",
     "password": "123"
 }
 
@@ -202,7 +202,7 @@ Authorization: Bearer {{token}}
 
 {
   "barberId": 3,
-  "appointmentDate": "2026-01-23",
+  "appointmentDate": "2026-01-24",
   "appointmentTime": "16:00",
   "services": [1]
 }
@@ -226,3 +226,14 @@ Authorization: Bearer {{token}}
 GET {{host}}/api/reviews
 Accept: application/json
 Authorization: Bearer {{token}}
+
+### review post
+POST {{host}}/api/appointments/202/review
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "rating": 5,
+  "comment": "jo lett kiraj"
+}

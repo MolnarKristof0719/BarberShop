@@ -99,8 +99,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- REVIEWS ---
     // Customer jelenleg nem kap reviews:create ability-t a te loginodban!
     // Ha akarsz review-t, add hozzá a customer abilities listához: 'reviews:post'
-    Route::post('/appointments/{appointmentId}/review', [ReviewController::class, 'store'])->middleware('ability:*');
+    Route::post('/appointments/{appointmentId}/review', [ReviewController::class, 'store'])->middleware('ability:reviews:post');
 
+    Route::get('/reviews', [ReviewController::class, 'index'])->middleware('ability:reviews:get');
     // --- PIVOT DEBUG (admin) ---
     Route::get('/appointment_services', [AppointmentServiceController::class, 'index'])->middleware('ability:*');
     Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show'])->middleware('ability:*');
