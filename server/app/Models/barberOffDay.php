@@ -17,6 +17,8 @@ class BarberOffDay extends Model
     ];
 
     protected $casts = [
+        'id' => 'integer',
+        'barberId' => 'integer', 
         'offDay' => 'date',
     ];
 

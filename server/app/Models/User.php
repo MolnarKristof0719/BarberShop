@@ -50,6 +50,18 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'userId');
     }
 
+    public function barber_off_days()
+    {
+        return $this->hasManyThrough(
+            BarberOffDay::class,
+            Barber::class,
+            'userId',  // Barber tábla: userId
+            'barberId', // BarberOffDay tábla: barberId
+            'id',       // User: id
+            'id'        // Barber: id
+        );
+    }
+
     // --- Roles (javaslat) ---
     public const ROLE_ADMIN = 1;
     public const ROLE_BARBER = 2;

@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "admin@example.com",
+    "email": "barber@example.com",
     "password": "123"
 }
 
@@ -142,7 +142,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### get barber by id
-GET {{host}}/api/barbers/2
+GET {{host}}/api/barbers/6
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -164,11 +164,11 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "offDay": "2026-02-02"
+    "offDay": "2026-02-14"
 }
 
 ### delete off day
-DELETE {{host}}/api/barber_off_days/1
+DELETE {{host}}/api/barber_off_days/40
 Accept: application/json
 Authorization: Bearer {{token}}
 

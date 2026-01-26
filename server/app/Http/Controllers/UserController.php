@@ -73,7 +73,8 @@ class UserController extends Controller
                     'barber_off_days:get',
                     'barber_off_days:post',
                     'barber_off_days:delete',
-                    'barbers:get'
+                    'barbers:get',
+                    'reviews:delete'
                 ];
                 break;
             default:
@@ -87,6 +88,8 @@ class UserController extends Controller
                     'appointments:get',
                     'appointments:post',
                     'appointments:delete',
+                    'reviews:post'
+
                 ];
                 break;
         }
