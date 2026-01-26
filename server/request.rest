@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "customer2@example.com",
+    "email": "admin@example.com",
     "password": "123"
 }
 
@@ -201,10 +201,10 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "barberId": 1,
-  "appointmentDate": "2026-05-02",
-  "appointmentTime": "13:00",
-  "services": [1,2]
+  "barberId": 3,
+  "appointmentDate": "2026-01-23",
+  "appointmentTime": "16:00",
+  "services": [1]
 }
 
 ### my appointments (self)
@@ -213,11 +213,16 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### my appointment by id (self)
-GET {{host}}/api/usersme/appointments/202
+GET {{host}}/api/usersme/appointments/102
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### cancel my appointment (self)
-DELETE {{host}}/api/usersme/appointments/202
+DELETE {{host}}/api/usersme/appointments/107
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### review
+GET {{host}}/api/reviews
 Accept: application/json
 Authorization: Bearer {{token}}
