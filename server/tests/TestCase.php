@@ -2,10 +2,9 @@
 
 namespace Tests;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-class UserTest extends TestCase
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
 {
-    //Tranzakciókezelés bekapcsolása
-    use DatabaseTransactions;
-    //...
+    //
 }
