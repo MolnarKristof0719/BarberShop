@@ -70,14 +70,16 @@ class UserTest extends TestCase
     //Megvan-e a user id alapján?
     public function test_check_if_users_getting_fetched_with_id(): void
     {
-        $this->markTestSkipped('Ideiglenesen kiiktatva, a teszt nem létező usert kezres.');
-        $response = DB::table("users")->find(1);
-        // $response = User::find(3);
-        //dd($response->id);
-        //Adott mező értékének ellenőrzése
-        $this->assertEquals(1, $response->id);
-        $this->assertEquals('adminx@example.com', $response->email);
+        $user = User::factory()->create([
+            'email' => 'teszt@example.com'
+        ]);
+
+        $response = DB::table("users")->find($user->id);
+
+        $this->assertEquals($user->id, $response->id);
+        $this->assertEquals('teszt@example.com', $response->email);
     }
+
 
     //A users tábla rekorjainak száma
     public function test_users_table_record_number()
