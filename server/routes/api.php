@@ -26,9 +26,6 @@ Route::get('/services', [ServiceController::class, 'index']); // public
 
 // Ha NEM public, akkor csak auth + ability:barbers:get alatt lesz (lent).
 
-// Reference képek listázása lehet public (barber profilhoz)
-Route::get('/reference_pictures', [ReferencePictureController::class, 'index']);
-Route::get('/reference_pictures/{id}', [ReferencePictureController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
 

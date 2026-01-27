@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "customer@example.com",
+    "email": "admin@example.com",
     "password": "123"
 }
 
@@ -242,3 +242,4 @@ Authorization: Bearer {{token}}
 DELETE {{host}}/api/reviews/3
 Accept: application/json
 Authorization: Bearer {{token}}
+

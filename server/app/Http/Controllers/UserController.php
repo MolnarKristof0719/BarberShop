@@ -76,6 +76,7 @@ class UserController extends Controller
                     'barbers:get',
                     'reviews:delete',
                     'reviews:get',
+                    
                 ];
                 break;
             default:
