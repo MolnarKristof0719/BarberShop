@@ -2,87 +2,94 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BarberOffDay;
+use App\Models\BarberOffDay as CurrentModel;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BarberOffDayController extends Controller
 {
-    // Index: lekéri a szabadnapokat a bejelentkezett barberhez
+    // Index: admin -> mindet, barber -> saját (barbers.id alapján)
     public function index()
     {
-        $user = auth()->user();
+        return $this->apiResponse(function () {
+            $user = auth()->user();
 
-        if ($user->isAdmin()) {
-            // Admin: minden barber szabadnapját látja
-            $offDays = BarberOffDay::orderBy('barberId')->orderBy('offDay')->get();
-        } elseif ($user->isBarber()) {
-            // Barber: csak a saját szabadnapjai
-            $offDays = BarberOffDay::where('barberId', $user->id)
-                ->orderBy('offDay')
-                ->get();
-        } else {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+            if ($user?->isAdmin()) {
+                return CurrentModel::query()
+                    ->orderBy('barberId')
+                    ->orderBy('offDay')
+                    ->get();
+            }
 
-        return response()->json($offDays);
+            if ($user?->isBarber()) {
+                $barberId = $user->barber?->id;
+                abort_unless($barberId, 403);
+
+                return CurrentModel::query()
+                    ->where('barberId', $barberId)
+                    ->orderBy('offDay')
+                    ->get();
+            }
+
+            abort(403);
+        });
     }
 
-    // Store: új szabadnap hozzáadása
+    // Store: csak barber adhat hozzá off day-t (barbers.id)
     public function store(Request $request)
     {
-        $user = auth()->user();
+        return $this->apiResponse(function () use ($request) {
+            $user = auth()->user();
 
-        if (!$user->isBarber()) {
-            return response()->json(['error' => 'Only barbers can add off days'], 403);
-        }
+            abort_unless($user?->isBarber(), 403);
 
-        $data = $request->validate([
-            'offDay' => ['required', 'date'],
-        ]);
+            $barberId = $user->barber?->id;
+            abort_unless($barberId, 403);
 
-        $exists = BarberOffDay::where('barberId', $user->id)
-            ->where('offDay', $data['offDay'])
-            ->exists();
+            $data = $request->validate([
+                'offDay' => ['required', 'date'],
+            ]);
 
-        if ($exists) {
-            return response()->json(['error' => 'This day is already marked as off'], 422);
-        }
+            $exists = CurrentModel::query()
+                ->where('barberId', $barberId)
+                ->where('offDay', $data['offDay'])
+                ->exists();
 
-        $newDay = BarberOffDay::create([
-            'barberId' => $user->id,
-            'offDay' => $data['offDay'],
-        ]);
+            if ($exists) {
+                // üzleti validáció
+                throw new HttpException(422, 'This day is already marked as off');
+            }
 
-        return response()->json($newDay, 201);
+            return CurrentModel::create([
+                'barberId' => $barberId,
+                'offDay' => $data['offDay'],
+            ]);
+        });
     }
 
-    // Destroy: szabadnap törlése
+    // Destroy: admin törölhet bármit, barber csak a sajátját (barbers.id)
     public function destroy(int $id)
     {
-        $user = auth()->user();
+        return $this->apiResponse(function () use ($id) {
+            $user = auth()->user();
 
-        // Próbáljuk lekérni a rekordot, ha nincs → 404 JSON hiba
-        $row = BarberOffDay::find($id);
+            $row = CurrentModel::findOrFail($id);
 
-        if (!$row) {
-            return response()->json([
-                'error' => 'Off day not found'
-            ], 404);
-        }
+            if ($user?->isAdmin()) {
+                $row->delete();
+                return ['id' => $id];
+            }
 
-        // Csak a saját barber szabadnapját lehet törölni, admin bármelyiket
-        if ($user->isBarber() && $row->barberId !== $user->id) {
-            return response()->json([
-                'error' => 'Forbidden: You cannot delete this off day'
-            ], 403);
-        }
+            abort_unless($user?->isBarber(), 403);
 
-        // Törlés
-        $row->delete();
+            $barberId = $user->barber?->id;
+            abort_unless($barberId, 403);
 
-        return response()->json([
-            'message' => 'Off day deleted successfully',
-            'id' => $id
-        ], 200);
+            abort_unless($row->barberId === $barberId, 403);
+
+            $row->delete();
+
+            return ['id' => $id];
+        });
     }
 }
