@@ -80,8 +80,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/barber_off_days/{id}', [BarberOffDayController::class, 'destroy'])->middleware('ability:barber_off_days:delete');
 
     // --- REFERENCE PICTURES (csak barber, abilities alapján) ---
-    Route::post('/reference_pictures', [ReferencePictureController::class, 'store'])->middleware('ability:reference_pictures:create');
-    Route::put('/reference_pictures/{id}', [ReferencePictureController::class, 'update'])->middleware('ability:reference_pictures:create'); // ha update is kell, adhatsz külön ability-t
+    Route::get('/reference_pictures', [ReferencePictureController::class, 'index'])->middleware('ability:reference_pictures:get');
+    Route::post('/reference_pictures', [ReferencePictureController::class, 'store'])->middleware('ability:reference_pictures:post');
     Route::delete('/reference_pictures/{id}', [ReferencePictureController::class, 'destroy'])->middleware('ability:reference_pictures:delete');
 
     // --- APPOINTMENTS ---

@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "admin@example.com",
+    "email": "barber@example.com",
     "password": "123"
 }
 
@@ -142,7 +142,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### get barber by id
-GET {{host}}/api/barbers/6
+GET {{host}}/api/barbers/5
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -248,3 +248,19 @@ DELETE {{host}}/api/reviews/3
 Accept: application/json
 Authorization: Bearer {{token}}
 
+
+### refence pictures post
+POST  {{host}}/api/reference_pictures
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "picture": "picture.png"
+}
+
+### refence pictures get
+GET  {{host}}/api/reference_pictures
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
