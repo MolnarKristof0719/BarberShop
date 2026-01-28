@@ -2,94 +2,110 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ReferencePicture;
+use App\Models\ReferencePicture as CurrentModel;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ReferencePictureController extends Controller
 {
     public function index(Request $request)
     {
-        // Opcionális szűrés: /reference-pictures?barberId=1
-        $query = ReferencePicture::query();
+        return $this->apiResponse(function () use ($request) {
+            $query = CurrentModel::query();
 
-        if ($request->filled('barberId')) {
-            $query->where('barberId', (int) $request->barberId);
-        }
+            // Opcionális szűrés: /reference-pictures?barberId=1
+            if ($request->filled('barberId')) {
+                $query->where('barberId', (int) $request->barberId);
+            }
 
-        return $query->get();
+            return $query->get();
+        });
     }
 
     public function store(Request $request)
     {
-        // barber vagy admin
-        $user = auth()->user();
-        abort_unless($user?->isAdmin() || $user?->isBarber(), 403);
+        return $this->apiResponse(function () use ($request) {
+            $user = auth()->user();
 
-        $data = $request->validate([
-            // ha admin is tölthet fel más barbernek:
-            'barberId' => ['nullable', 'integer', 'exists:barbers,id'],
-            // ezt igazítsd a mezőnevetekhez (imageUrl / path / url):
-            'imageUrl' => ['required', 'string', 'max:255'],
-        ]);
+            if (!$user?->isAdmin() && !$user?->isBarber()) {
+                throw new HttpException(403, 'Nincs jogosultságod referenciaképet feltölteni.');
+            }
 
-        $barberId = $user->isAdmin()
-            ? (int) ($data['barberId'] ?? 0)
-            : $user->barber->id;
+            $data = $request->validate([
+                // admin tölthet fel más barbernek is
+                'barberId' => ['nullable', 'integer', 'exists:barbers,id'],
+                'picture' => ['required', 'string', 'max:255'],
+            ]);
 
-        // admin esetén barberId kötelező
-        if ($user->isAdmin() && empty($barberId)) {
-            return response()->json([
-                'message' => 'barberId kötelező admin feltöltésnél.',
-                'data' => null
-            ], 422, options: JSON_UNESCAPED_UNICODE);
-        }
+            if ($user?->isAdmin()) {
+                $barberId = (int) ($data['barberId'] ?? 0);
 
-        return ReferencePicture::create([
-            'barberId' => $barberId,
-            'imageUrl' => $data['imageUrl'],
-        ]);
+                if ($barberId <= 0) {
+                    throw new HttpException(422, 'barberId kötelező admin feltöltésnél.');
+                }
+            } else {
+                $barberId = $user->barber?->id;
+                if (!$barberId) {
+                    throw new HttpException(403, 'Barber profil nem található ehhez a felhasználóhoz.');
+                }
+            }
+
+            return CurrentModel::create([
+                'barberId' => $barberId,
+                'picture' => $data['picture'],
+            ]);
+        });
     }
 
     public function show(int $id)
     {
-        return ReferencePicture::findOrFail($id);
+        return $this->apiResponse(function () use ($id) {
+            return CurrentModel::findOrFail($id);
+        });
     }
 
     public function update(Request $request, int $id)
     {
-        $row = ReferencePicture::findOrFail($id);
+        return $this->apiResponse(function () use ($request, $id) {
+            $row = CurrentModel::findOrFail($id);
 
-        $user = auth()->user();
-        abort_unless(
-            $user?->isAdmin() ||
-            ($user?->isBarber() && $user->barber?->id === $row->barberId),
-            403
-        );
+            $user = auth()->user();
+            if (
+                !$user?->isAdmin() &&
+                !($user?->isBarber() && $user->barber?->id === $row->barberId)
+            ) {
+                throw new HttpException(403, 'Nincs jogosultságod a referenciakép módosításához.');
+            }
 
-        $data = $request->validate([
-            'imageUrl' => ['required', 'string', 'max:255'],
-        ]);
+            $data = $request->validate([
+                'picture' => ['required', 'string', 'max:255'],
+            ]);
 
-        $row->update([
-            'imageUrl' => $data['imageUrl'],
-        ]);
+            $row->update([
+                'picture' => $data['picture'],
+            ]);
 
-        return $row;
+            return $row->fresh();
+        });
     }
 
     public function destroy(int $id)
     {
-        $row = ReferencePicture::findOrFail($id);
+        return $this->apiResponse(function () use ($id) {
+            $row = CurrentModel::findOrFail($id);
 
-        $user = auth()->user();
-        abort_unless(
-            $user?->isAdmin() ||
-            ($user?->isBarber() && $user->barber?->id === $row->barberId),
-            403
-        );
+            $user = auth()->user();
+            if (
+                !$user?->isAdmin() &&
+                !($user?->isBarber() && $user->barber?->id === $row->barberId)
+            ) {
+                throw new HttpException(403, 'Nincs jogosultságod a referenciakép törléséhez.');
+            }
 
-        $row->delete();
+            $row->delete();
 
-        return response()->noContent();
+            // apiResponse egységes JSON-t ad vissza
+            return ['id' => $id];
+        });
     }
 }
