@@ -75,6 +75,7 @@ class UserController extends Controller
                     'barber_off_days:post',
                     'barber_off_days:delete',
                     'appointments:get',
+                    'appointments:show',
                     'appointments:post',
                     'appointments:delete',
                     'barbers:get',
