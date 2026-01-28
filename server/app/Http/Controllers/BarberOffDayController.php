@@ -41,7 +41,13 @@ class BarberOffDayController extends Controller
         return $this->apiResponse(function () use ($request) {
             $user = auth()->user();
 
-            abort_unless($user?->isBarber(), 403);
+            if ($user?->isAdmin()) {
+                throw new HttpException(403, 'Adminként nem adhatsz hozzá szabadnapot.');
+            }
+
+            if (!$user?->isBarber()) {
+                throw new HttpException(403, 'Csak borbély adhat hozzá szabadnapot.');
+            }
 
             $barberId = $user->barber?->id;
             abort_unless($barberId, 403);
@@ -56,8 +62,7 @@ class BarberOffDayController extends Controller
                 ->exists();
 
             if ($exists) {
-                // üzleti validáció
-                throw new HttpException(422, 'This day is already marked as off');
+                throw new HttpException(422, 'Ez a nap már szabadnapként szerepel.');
             }
 
             return CurrentModel::create([
@@ -66,6 +71,7 @@ class BarberOffDayController extends Controller
             ]);
         });
     }
+
 
     // Destroy: admin törölhet bármit, barber csak a sajátját (barbers.id)
     public function destroy(int $id)
