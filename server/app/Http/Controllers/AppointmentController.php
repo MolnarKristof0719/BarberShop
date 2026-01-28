@@ -104,13 +104,13 @@ class AppointmentController extends Controller
 
             $user = auth()->user();
 
-            abort_unless(
-                $user?->isAdmin() ||
-                $appointment->userId === $user?->id ||
-                ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
-                403,
-                'Nincs jogosultságod ehhez az időponthoz.'
-            );
+            // abort_unless(
+            //     $user?->isAdmin() ||
+            //     $appointment->userId === $user?->id ||
+            //     ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
+            //     403,
+            //     'Nincs jogosultságod ehhez az időponthoz.'
+            // );
 
             return $appointment;
         });
