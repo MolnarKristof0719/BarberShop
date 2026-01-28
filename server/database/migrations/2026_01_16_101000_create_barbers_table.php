@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('barbers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('userId')->constrained('users')->onDelete('restrict');
+            $table->foreignId('userId')->constrained('users')->onDelete('cascade');
             $table->string('profilePicture',125);
             $table->unique(['userId', 'profilePicture']);
             $table->text('introduction');

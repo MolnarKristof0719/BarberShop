@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('reference_pictures', function (Blueprint $table) {
             $table->id();
             $table->string('picture',125);
-            $table->foreignId('barberId')->constrained('barbers')->onDelete('restrict');
+            $table->foreignId('barberId')->constrained('barbers')->onDelete('cascade');
             $table->unique(['picture', 'barberId']);
         });
     }

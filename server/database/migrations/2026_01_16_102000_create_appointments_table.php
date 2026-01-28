@@ -12,11 +12,11 @@ return new class extends Migration {
 
             $table->foreignId('barberId')
                 ->constrained('barbers')
-                ->onDelete('restrict');
+                ->onDelete('cascade');
 
             $table->foreignId('userId')
                 ->constrained('users')
-                ->onDelete('restrict');
+                ->onDelete('cascade');
 
             $table->date('appointmentDate');
             $table->time('appointmentTime');
