@@ -2,77 +2,92 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Barber;
-use App\Http\Requests\StoreBarberRequest;
-use App\Http\Requests\UpdateBarberRequest;
+use App\Models\Barber as CurrentModel;
+use App\Http\Requests\StoreBarberRequest as StoreCurrentModelRequest;
+use App\Http\Requests\UpdateBarberRequest as UpdateCurrentModelRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class BarberController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
-        return Barber::query()->get();
+        return $this->apiResponse(function () {
+            return CurrentModel::query()->get();
+        });
     }
 
-    public function store(StoreBarberRequest $request)
+    public function store(StoreCurrentModelRequest $request)
     {
-        $this->authorizeAdmin();
+        return $this->apiResponse(function () use ($request) {
+            $this->authorizeAdmin();
 
-        $data = $request->validated();
+            $data = $request->validated();
 
-        return Barber::create([
-            'userId' => $data['userId'],
-            'profilePicture' => $data['profilePicture'] ?? null,
-            'introduction' => $data['introduction'] ?? null,
-            'isActive' => $data['isActive'] ?? true,
-        ]);
+            return CurrentModel::create([
+                'userId' => $data['userId'],
+                'profilePicture' => $data['profilePicture'] ?? null,
+                'introduction' => $data['introduction'] ?? null,
+                'isActive' => $data['isActive'] ?? true,
+            ]);
+        });
     }
 
     public function show(int $id)
     {
-        return Barber::query()
-            ->with(['referencePictures', 'reviews', 'user'])
-            ->findOrFail($id);
+        return $this->apiResponse(function () use ($id) {
+            return CurrentModel::query()
+                ->with(['referencePictures', 'reviews', 'user'])
+                ->findOrFail($id);
+        });
     }
 
-    public function update(UpdateBarberRequest $request, int $id)
+    public function update(UpdateCurrentModelRequest $request, int $id)
     {
-        $barber = Barber::findOrFail($id);
+        return $this->apiResponse(function () use ($request, $id) {
+            $barber = CurrentModel::findOrFail($id);
 
-        $user = auth()->user();
-        abort_unless(
-            $user?->isAdmin() || ($user?->isBarber() && $user?->barber?->id === $barber->id),
-            403
-        );
+            $user = auth()->user();
+            abort_unless(
+                $user?->isAdmin() || ($user?->isBarber() && $user?->barber?->id === $barber->id),
+                403
+            );
 
-        $data = $request->validated();
+            $data = $request->validated();
 
-        $barber->fill([
-            'profilePicture' => $data['profilePicture'] ?? $barber->profilePicture,
-            'introduction' => $data['introduction'] ?? $barber->introduction,
-        ]);
+            $barber->fill([
+                'profilePicture' => $data['profilePicture'] ?? $barber->profilePicture,
+                'introduction' => $data['introduction'] ?? $barber->introduction,
+            ]);
 
-        if ($user?->isAdmin()) {
-            if (array_key_exists('isActive', $data)) {
-                $barber->isActive = (bool) $data['isActive'];
+            if ($user?->isAdmin()) {
+                if (array_key_exists('isActive', $data)) {
+                    $barber->isActive = (bool) $data['isActive'];
+                }
+                if (array_key_exists('userId', $data)) {
+                    $barber->userId = (int) $data['userId'];
+                }
             }
-            if (array_key_exists('userId', $data)) {
-                $barber->userId = (int) $data['userId'];
-            }
-        }
 
-        $barber->save();
+            $barber->save();
 
-        return $barber->fresh();
+            return $barber->fresh()->load(['referencePictures', 'reviews', 'user']);
+        });
     }
 
     public function destroy(int $id)
     {
-        $this->authorizeAdmin();
+        return $this->apiResponse(function () use ($id) {
+            $this->authorizeAdmin();
 
-        $barber = Barber::findOrFail($id);
-        $barber->delete();
+            $barber = CurrentModel::findOrFail($id);
+            $barber->delete();
 
-        return response()->noContent();
+            // Egységes "data" szerkezetet adunk vissza.
+            // Ha ragaszkodsz a 204 No Content-hez, azt lentebb írom.
+            return ['id' => $id];
+        });
     }
 
     private function authorizeAdmin(): void
