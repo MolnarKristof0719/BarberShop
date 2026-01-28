@@ -142,9 +142,14 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### get barber by id
-GET {{host}}/api/barbers/2
+GET {{host}}/api/barbers/6
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### delete barber 
+DELETE {{host}}/api/barbers/6
+Accept: application/json
 Authorization: Bearer {{token}}
 
 //-------------------------------
