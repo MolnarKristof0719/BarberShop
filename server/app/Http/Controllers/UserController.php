@@ -92,7 +92,6 @@ class UserController extends Controller
                     'usersme:updatePassword',
                     'usersme:get',
                     'barbers:get',
-                    'appointments:get',
                     'appointments:post',
                     'appointments:delete',
                     'reviews:post',

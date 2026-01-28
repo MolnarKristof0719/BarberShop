@@ -102,7 +102,7 @@ class AppointmentController extends Controller
 
             abort_if(!$appointment, 404, 'Az időpont nem található.');
 
-            $user = auth()->user();
+            // $user = auth()->user();
 
             // abort_unless(
             //     $user?->isAdmin() ||
