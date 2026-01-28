@@ -57,38 +57,6 @@ class ReferencePictureController extends Controller
         });
     }
 
-    public function show(int $id)
-    {
-        return $this->apiResponse(function () use ($id) {
-            return CurrentModel::findOrFail($id);
-        });
-    }
-
-    public function update(Request $request, int $id)
-    {
-        return $this->apiResponse(function () use ($request, $id) {
-            $row = CurrentModel::findOrFail($id);
-
-            $user = auth()->user();
-            if (
-                !$user?->isAdmin() &&
-                !($user?->isBarber() && $user->barber?->id === $row->barberId)
-            ) {
-                throw new HttpException(403, 'Nincs jogosultságod a referenciakép módosításához.');
-            }
-
-            $data = $request->validate([
-                'picture' => ['required', 'string', 'max:255'],
-            ]);
-
-            $row->update([
-                'picture' => $data['picture'],
-            ]);
-
-            return $row->fresh();
-        });
-    }
-
     public function destroy(int $id)
     {
         return $this->apiResponse(function () use ($id) {
