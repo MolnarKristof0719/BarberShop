@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
+use App\Models\Appointment as CurrentModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
@@ -11,126 +11,125 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        return $this->apiResponse(function () {
+            $user = auth()->user();
 
-        if ($user?->isBarber()) {
-            return Appointment::query()
-                ->where('barberId', $user->barber->id)
+            if ($user?->isBarber()) {
+                $barberId = $user->barber?->id;
+                abort_unless((bool) $barberId, 403);
+
+                return CurrentModel::query()
+                    ->where('barberId', $barberId)
+                    ->orderByDesc('appointmentDate')
+                    ->orderByDesc('appointmentTime')
+                    ->with(['services', 'user'])
+                    ->get();
+            }
+
+            if ($user?->isAdmin()) {
+                return CurrentModel::query()
+                    ->orderByDesc('appointmentDate')
+                    ->orderByDesc('appointmentTime')
+                    ->with(['services', 'user', 'barber'])
+                    ->get();
+            }
+
+            abort_unless((bool) $user, 403);
+
+            return CurrentModel::query()
+                ->where('userId', $user->id)
                 ->orderByDesc('appointmentDate')
                 ->orderByDesc('appointmentTime')
-                ->with(['services', 'user'])
+                ->with(['services', 'barber'])
                 ->get();
-        }
-
-        if ($user?->isAdmin()) {
-            return Appointment::query()
-                ->orderByDesc('appointmentDate')
-                ->orderByDesc('appointmentTime')
-                ->with(['services', 'user', 'barber'])
-                ->get();
-        }
-
-        return Appointment::query()
-            ->where('userId', $user->id)
-            ->orderByDesc('appointmentDate')
-            ->orderByDesc('appointmentTime')
-            ->with(['services', 'barber'])
-            ->get();
+        });
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'barberId' => ['required', 'integer', 'exists:barbers,id'],
-            'appointmentDate' => ['required', 'date'],
-            'appointmentTime' => ['required', 'date_format:H:i'],
-            'services' => ['required', 'array', 'min:1'],
-            'services.*' => ['integer', 'exists:services,id'],
-        ]);
+        return $this->apiResponse(function () use ($request) {
+            $data = $request->validate([
+                'barberId' => ['required', 'integer', 'exists:barbers,id'],
+                'appointmentDate' => ['required', 'date'],
+                'appointmentTime' => ['required', 'date_format:H:i'],
+                'services' => ['required', 'array', 'min:1'],
+                'services.*' => ['integer', 'exists:services,id'],
+            ]);
 
-        $isOffDay = DB::table('barber_off_days')
-            ->where('barberId', $data['barberId'])
-            ->where('offDay', $data['appointmentDate'])
-            ->exists();
+            $isOffDay = DB::table('barber_off_days')
+                ->where('barberId', $data['barberId'])
+                ->where('offDay', $data['appointmentDate'])
+                ->exists();
 
-        if ($isOffDay) {
-            return response()->json([
-                'message' => 'A barber ezen a napon szabadságon van.',
-                'data' => null
-            ], 422, options: JSON_UNESCAPED_UNICODE);
-        }
-
-        try {
-            $appointment = DB::transaction(function () use ($data) {
-                $appointment = Appointment::create([
-                    'barberId' => $data['barberId'],
-                    'userId' => auth()->id(),
-                    'appointmentDate' => $data['appointmentDate'],
-                    'appointmentTime' => $data['appointmentTime'],
-                    'status' => 'booked',
-                    'cancelledBy' => 'none',
-                ]);
-
-                $appointment->services()->sync($data['services']);
-
-                return $appointment->load(['services', 'barber']);
-            });
-
-            return response()->json([
-                'message' => 'Created',
-                'data' => $appointment
-            ], 201, options: JSON_UNESCAPED_UNICODE);
-
-        } catch (QueryException $e) {
-            $mysqlCode = $e->errorInfo[1] ?? null;
-
-            if ($mysqlCode === 1062) {
-                return response()->json([
-                    'message' => 'Ez az időpont már foglalt ennél a borbélynál.',
-                    'data' => null
-                ], 409, options: JSON_UNESCAPED_UNICODE);
+            if ($isOffDay) {
+                // 422, és a base Controllered HttpException-ként kezeli
+                abort(422, 'A barber ezen a napon szabadságon van.');
             }
 
-            throw $e;
-        }
+            try {
+                return DB::transaction(function () use ($data) {
+                    $appointment = CurrentModel::create([
+                        'barberId' => $data['barberId'],
+                        'userId' => auth()->id(),
+                        'appointmentDate' => $data['appointmentDate'],
+                        'appointmentTime' => $data['appointmentTime'],
+                        'status' => 'booked',
+                        'cancelledBy' => 'none',
+                    ]);
+
+                    $appointment->services()->sync($data['services']);
+
+                    return $appointment->load(['services', 'barber']);
+                });
+            } catch (QueryException $e) {
+                $mysqlCode = $e->errorInfo[1] ?? null;
+
+                if ($mysqlCode === 1062) {
+                    abort(409, 'Ez az időpont már foglalt ennél a borbélynál.');
+                }
+
+                throw $e;
+            }
+        });
     }
 
     public function show(int $id)
     {
-        $appointment = Appointment::query()
-            ->with(['services', 'barber', 'user'])
-            ->findOrFail($id);
+        return $this->apiResponse(function () use ($id) {
+            $appointment = CurrentModel::query()
+                ->with(['services', 'barber', 'user'])
+                ->findOrFail($id);
 
-        $user = auth()->user();
+            $user = auth()->user();
 
-        abort_unless(
-            $user?->isAdmin() ||
-            $appointment->userId === $user->id ||
-            ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
-            403
-        );
+            abort_unless(
+                $user?->isAdmin() ||
+                $appointment->userId === $user?->id ||
+                ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
+                403
+            );
 
-        return $appointment;
+            return $appointment;
+        });
     }
 
     public function destroy(int $id)
     {
-        $appointment = Appointment::findOrFail($id);
-        $user = auth()->user();
+        return $this->apiResponse(function () use ($id) {
+            $appointment = CurrentModel::findOrFail($id);
+            $user = auth()->user();
 
-        abort_unless(
-            $user?->isAdmin() ||
-            $appointment->userId === $user->id ||
-            ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
-            403
-        );
-        
+            abort_unless(
+                $user?->isAdmin() ||
+                $appointment->userId === $user?->id ||
+                ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
+                403
+            );
 
-        $appointment->delete();
+            $appointment->delete();
 
-        return response()->json([
-            'message' => 'Cancelled',
-            'data' => null
-        ], 200, options: JSON_UNESCAPED_UNICODE);
+            // Ha ragaszkodsz a régihez: return null; és akkor data=null lesz
+            return null;
+        });
     }
 }
