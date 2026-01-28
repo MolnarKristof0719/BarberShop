@@ -98,7 +98,9 @@ class AppointmentController extends Controller
         return $this->apiResponse(function () use ($id) {
             $appointment = CurrentModel::query()
                 ->with(['services', 'barber', 'user'])
-                ->findOrFail($id);
+                ->find($id);
+
+            abort_if(!$appointment, 404, 'Az időpont nem található.');
 
             $user = auth()->user();
 
@@ -106,12 +108,14 @@ class AppointmentController extends Controller
                 $user?->isAdmin() ||
                 $appointment->userId === $user?->id ||
                 ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
-                403
+                403,
+                'Nincs jogosultságod ehhez az időponthoz.'
             );
 
             return $appointment;
         });
     }
+
 
     public function destroy(int $id)
     {
