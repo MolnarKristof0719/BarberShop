@@ -68,8 +68,9 @@ class UserController extends Controller
                     'usersme:patch',
                     'usersme:updatePassword',
                     'usersme:get',
-                    'reference_pictures:create',
+                    'reference_pictures:post',
                     'reference_pictures:delete',
+                    'reference_pictures:get',
                     'barber_off_days:get',
                     'barber_off_days:post',
                     'barber_off_days:delete',
@@ -92,7 +93,8 @@ class UserController extends Controller
                     'appointments:delete',
                     'reviews:post',
                     'reviews:get',
-                    'reviews:delete'
+                    'reviews:delete',
+                    'reference_pictures:get'
                     
 
                 ];
