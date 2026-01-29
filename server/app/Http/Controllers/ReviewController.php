@@ -3,81 +3,97 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use App\Models\Review;
+use App\Models\Review as CurrentModel;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
     public function index()
     {
-        $reviews = Review::orderBy('barberId')->orderBy('id')->get();
-
-        return response()->json($reviews);
+        return $this->apiResponse(function () {
+            return CurrentModel::query()
+                ->orderBy('barberId')
+                ->orderBy('id')
+                ->get();
+        });
     }
+
     public function store(Request $request, int $appointmentId)
     {
+        return $this->apiResponse(function () use ($request, $appointmentId) {
+            $user = auth()->user();
+            abort_unless((bool) $user, 403, 'Unauthorized');
 
-        $user = auth()->user();
+            // Ne findOrFail: stabil 404 üzenet
+            $appointment = Appointment::query()->find($appointmentId);
+            abort_if(!$appointment, 404, 'Appointment not found');
 
-        $appointment = Appointment::findOrFail($appointmentId);
+            abort_unless(
+                $appointment->userId === $user->id,
+                403,
+                'You are not authorized to review this appointment'
+            );
 
-        if ($appointment->userId !== $user->id) {
-            return response()->json([
-                'error' => 'You are not authorized to review this appointment'
-            ], 403);
-        }
+            $exists = CurrentModel::query()
+                ->where('appointmentId', $appointmentId)
+                ->exists();
 
-        if (Review::where('appointmentId', $appointmentId)->exists()) {
-            return response()->json([
-                'error' => 'Review for this appointment already exists'
-            ], 409);
-        }
-        $data = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'comment' => ['nullable', 'string'],
-        ]);
+            abort_unless(
+                !$exists,
+                409,
+                'Review for this appointment already exists'
+            );
 
-        $newReview = Review::create([
-            'appointmentId' => $appointmentId,
-            'barberId' => $appointment->barberId,
-            'userId' => $user->id,
-            'rating' => $data['rating'],
-            'comment' => $data['comment'] ?? null,
-        ]);
-        return response()->json($newReview, 201);
+            $data = $request->validate([
+                'rating' => ['required', 'integer', 'min:1', 'max:5'],
+                'comment' => ['nullable', 'string'],
+            ]);
+
+            return CurrentModel::create([
+                'appointmentId' => $appointmentId,
+                'barberId' => $appointment->barberId,
+                'userId' => $user->id,
+                'rating' => $data['rating'],
+                'comment' => $data['comment'] ?? null,
+            ]);
+        });
     }
 
     public function destroy(int $id)
     {
-        $user = auth()->user();
+        return $this->apiResponse(function () use ($id) {
+            $user = auth()->user();
+            abort_unless((bool) $user, 403, 'Unauthorized');
 
-        $row = Review::find($id);
+            // Ne findOrFail: stabil 404 üzenet
+            $row = CurrentModel::query()->find($id);
+            abort_if(!$row, 404, 'Review not found');
 
-        if (!$row) {
-            return response()->json([
-                'error' => 'Review not found'
-            ], 404);
-        }
+            if ($user->isAdmin()) {
+                // admin mindent törölhet
+            } elseif ($user->isBarber()) {
+                // FIGYELEM: a reviews.barberId a barbers.id (nem users.id)
+                $barberId = $user->barber?->id;
+                abort_unless((bool) $barberId, 403, 'Barber profile not found');
 
-        // Ellenőrzés role szerint
-        if ($user->isAdmin()) {
-            // Admin mindent törölhet
-        } elseif ($user->isBarber() && $row->barberId !== $user->id) {
-            return response()->json([
-                'error' => 'Forbidden: You cannot delete this review'
-            ], 403);
-        } elseif ($user->isCustomer() && $row->userId !== $user->id) {
-            return response()->json([
-                'error' => 'Forbidden: You cannot delete this review'
-            ], 403);
-        }
+                abort_unless(
+                    $row->barberId === $barberId,
+                    403,
+                    'Forbidden: You cannot delete this review'
+                );
+            } elseif ($user->isCustomer()) {
+                abort_unless(
+                    $row->userId === $user->id,
+                    403,
+                    'Forbidden: You cannot delete this review'
+                );
+            } else {
+                abort(403, 'Forbidden');
+            }
 
-        // Törlés
-        $row->delete();
+            $row->delete();
 
-        return response()->json([
-            'message' => 'Review deleted successfully',
-            'id' => $id
-        ], 200);
+            return ['id' => $id];
+        });
     }
 }
