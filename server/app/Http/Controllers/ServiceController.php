@@ -2,70 +2,93 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Service;
+use App\Models\Service as CurrentModel;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ServiceController extends Controller
 {
     //region index
     public function index()
     {
-        return Service::query()->orderBy('service')->get();
+        return $this->apiResponse(function () {
+            return CurrentModel::query()
+                ->orderBy('service')
+                ->get();
+        });
     }
     //endregion
 
     //region store
     public function store(Request $request)
     {
-        $this->authorizeAdmin();
+        return $this->apiResponse(function () use ($request) {
+            $this->authorizeAdmin();
 
-        $data = $request->validate([
-            'service' => ['required', 'string', 'max:255'],
-        ]);
+            $data = $request->validate([
+                'service' => ['required', 'string', 'max:255'],
+            ]);
 
-        return Service::create($data);
+            return CurrentModel::create($data);
+        });
     }
     //endregion
 
     //region show
     public function show(int $id)
     {
-        return Service::findOrFail($id);
+        return $this->apiResponse(function () use ($id) {
+            // Stabil 404 üzenet (ne findOrFail, mert néha üres message-t ad)
+            $row = CurrentModel::query()->find($id);
+            abort_if(!$row, 404, 'Service not found');
+
+            return $row;
+        });
     }
     //endregion
 
     //region update
     public function update(Request $request, int $id)
     {
-        $this->authorizeAdmin();
+        return $this->apiResponse(function () use ($request, $id) {
+            $this->authorizeAdmin();
 
-        $service = Service::findOrFail($id);
+            $row = CurrentModel::query()->find($id);
+            abort_if(!$row, 404, 'Service not found');
 
-        $data = $request->validate([
-            'service' => ['required', 'string', 'max:255'],
-        ]);
+            $data = $request->validate([
+                'service' => ['required', 'string', 'max:255'],
+            ]);
 
-        $service->update($data);
+            $row->update($data);
 
-        return $service;
+            return $row->fresh();
+        });
     }
     //endregion
 
     //region destroy
     public function destroy(int $id)
     {
-        $this->authorizeAdmin();
+        return $this->apiResponse(function () use ($id) {
+            $this->authorizeAdmin();
 
-        $service = Service::findOrFail($id);
-        $service->delete();
+            $row = CurrentModel::query()->find($id);
+            abort_if(!$row, 404, 'Service not found');
 
-        return response()->noContent();
+            $row->delete();
+
+            // apiResponse miatt egységes JSON (nem 204)
+            return ['id' => $id];
+        });
     }
     //endregion
 
     //region authorizeAdmin
     private function authorizeAdmin(): void
     {
+        // Ha szeretnél szöveges üzenetet is:
+        // abort_unless(auth()->user()?->isAdmin(), 403, 'Admin jogosultság szükséges.');
         abort_unless(auth()->user()?->isAdmin(), 403);
     }
     //endregion
