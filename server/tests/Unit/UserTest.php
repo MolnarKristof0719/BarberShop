@@ -17,6 +17,7 @@ class UserTest extends TestCase
         'id' => 'bigint',
         'name' => 'varchar',
         'email' => 'varchar',
+        'phoneNumber' => 'varchar',
         'password' => 'varchar',
         'created_at' => 'timestamp',
         'updated_at' => 'timestamp',
