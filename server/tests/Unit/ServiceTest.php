@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class ServicesTest extends TestCase
+class ServiceTest extends TestCase
 {
     protected $table = 'services';
 
