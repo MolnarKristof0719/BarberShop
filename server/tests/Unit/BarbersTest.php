@@ -6,19 +6,17 @@ use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
-class StudentTest extends TestCase
+class BarbersTest extends TestCase
 {
    
-    protected $table = 'students';
+    protected $table = 'barbers';
     public static function expectedSchemaDataProvider()
     {
         return [
-            'id oszlop' => ['id', 'bigint'],
-            'appointmentId oszlop' => ['appointmentId', 'bigint'],
-            'barberId oszlop' => ['barberId', 'bigint'],
             'userId oszlop' => ['userId', 'bigint'],
-            'rating oszlop' => ['rating', 'integer'],
-            'comment oszlop' => ['comment', 'text'],
+            'profilePicture oszlop' => ['profilePicture', 'varchar'],
+            'introduction oszlop' => ['introduction', 'text'],
+            'isActive oszlop' => ['isActive', 'tinyint'],
         ];
     }
 
