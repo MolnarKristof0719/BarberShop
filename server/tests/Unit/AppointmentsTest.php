@@ -16,20 +16,20 @@ class AppointmentsTest extends TestCase
         'userId' => 'bigint',
         'appointmentDate' => 'date',
         'appointmentTime' => 'time',
-        'status' => 'varchar',
-        'cancelledBy' => 'varchar',
+        'status' => 'enum',
+        'cancelledBy' => 'enum',
     ];
 
     public static function expectedSchemaDataProvider(): array
     {
         return [
             'id oszlop' => ['id', 'bigint'],
-            'barberId oszlop' => ['barberId', 'bigint'],
-            'userId oszlop' => ['userId', 'bigint'],
-            'appointmentDate oszlop' => ['appointmentDate', 'date'],
-            'appointmentTime oszlop' => ['appointmentTime', 'time'],
-            'status oszlop' => ['status', 'varchar'],
-            'cancelledBy oszlop' => ['cancelledBy', 'varchar'],
+            'barber id oszlop' => ['barberId', 'bigint'],
+            'user id oszlop' => ['userId', 'bigint'],
+            'appointment date oszlop' => ['appointmentDate', 'date'],
+            'appointment time oszlop' => ['appointmentTime', 'time'],
+            'status oszlop' => ['status', 'enum'],
+            'cancelled by oszlop' => ['cancelledBy', 'enum'],
         ];
     }
 
@@ -46,27 +46,19 @@ class AppointmentsTest extends TestCase
     {
         $this->assertTrue(
             Schema::hasColumn($this->table, $expectedColumn),
-            "A '{$expectedColumn}' oszlop nem letezik"
+            "A '{$expectedColumn}' oszlop nem létezik"
         );
     }
 
     #[DataProvider('expectedSchemaDataProvider')]
     public function test_the_appointments_table_columns_have_the_expected_types(string $expectedColumn, string $expectedType): void
     {
-        $columns = Schema::getColumnListing($this->table);
+        $actualType = Schema::getColumnType($this->table, $expectedColumn);
 
-        $this->assertEmpty(
-            array_diff(array_keys($this->expectedSchema), $columns),
-            'Hiányzó oszlopok az appointments táblában.'
+        $this->assertSame(
+            $expectedType,
+            $actualType,
+            "A '{$expectedColumn}' oszlop típusa nem egyezik. Várt: '{$expectedType}', Kapott: '{$actualType}'."
         );
-
-        foreach ($this->expectedSchema as $expectedColumn => $expectedType) {
-            $actualDbSqlType = Schema::getColumnType($this->table, $expectedColumn);
-
-            $this->assertTrue(
-                $actualDbSqlType == $expectedType,
-                "A '{$expectedColumn}' oszlop típusa nem egyezik. Várt: '{$expectedType}', Kapott DB-típus: '{$actualDbSqlType}'."
-            );
-        }
     }
 }
