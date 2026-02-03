@@ -7,8 +7,11 @@
 <h3>Foglalás részletei:</h3>
 
 <ul>
-    <li><strong>Dátum:</strong> {{ $appointment->appointmentDate }}</li>
-    <li><strong>Idő:</strong> {{ \Carbon\Carbon::parse($appointment->appointmentTime)->format('H:i') }}</li>
+    <li>
+        <strong>Időpont:</strong>
+        {{ \Carbon\Carbon::parse($appointment->appointmentDate)->format('Y. m. d.') }}
+        {{ \Carbon\Carbon::parse($appointment->appointmentTime)->format('H:i') }}
+    </li>
     <li><strong>Barber:</strong> {{ $appointment->barber->user->name }}</li>
 </ul>
 
