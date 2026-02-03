@@ -80,7 +80,7 @@ class UserController extends Controller
                     'appointments:delete',
                     'barbers:get',
                     'reviews:delete',
-                    'reviews:get',
+                    'reviews:get'
                     
                 ];
                 break;

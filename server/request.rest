@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "barber@example.com",
+    "email": "admin@example.com",
     "password": "123"
 }
 
@@ -36,7 +36,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### get user by id
-GET  {{host}}/api/users/1
+GET  {{host}}/api/users/2
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -93,7 +93,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-     "name": "admin1"
+     "profilePicture": "asd.jpg"
 }
 
 ### A bejelnkezett felhasználó jelszó cseréje
@@ -142,7 +142,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### get barber by id
-GET {{host}}/api/barbers/2
+GET {{host}}/api/barbers/1
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -151,6 +151,7 @@ Authorization: Bearer {{token}}
 DELETE {{host}}/api/barbers/6
 Accept: application/json
 Authorization: Bearer {{token}}
+
 
 //-------------------------------
 //OFFDAYS
