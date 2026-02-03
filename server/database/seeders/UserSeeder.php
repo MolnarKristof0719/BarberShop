@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Customer',
-            'email' => 'customer@example.com',
+            'email' => 'kristofm500@gmail.com',
             'password' => Hash::make('123'),
             'phoneNumber' => fake()->phoneNumber(),
             'role' => 3

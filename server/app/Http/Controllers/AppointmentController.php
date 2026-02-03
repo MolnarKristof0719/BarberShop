@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment as CurrentModel;
+use App\Mail\BookingCreatedMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
@@ -79,8 +81,15 @@ class AppointmentController extends Controller
 
                     $appointment->services()->sync($data['services']);
 
-                    return $appointment->load(['services', 'barber']);
+                    $appointment->load(['services', 'barber.user', 'user']);
+
+                    // EMAIL
+                    Mail::to($appointment->user->email)
+                        ->send(new BookingCreatedMail($appointment));
+
+                    return $appointment;
                 });
+
             } catch (QueryException $e) {
                 $mysqlCode = $e->errorInfo[1] ?? null;
 
