@@ -152,6 +152,15 @@ DELETE {{host}}/api/barbers/6
 Accept: application/json
 Authorization: Bearer {{token}}
 
+### patch barber
+PATCH {{host}}/api/barbers/2
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "profilePicture":"asd.pjg"
+}
 
 //-------------------------------
 //OFFDAYS

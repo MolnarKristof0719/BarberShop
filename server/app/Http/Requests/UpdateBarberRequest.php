@@ -22,7 +22,7 @@ class UpdateBarberRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'profilePicture' => ['sometimes', 'string'],
         ];
     }
 }

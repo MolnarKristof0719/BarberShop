@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin barber CRUD (ha van ilyen controller funkció)
     Route::post('/barbers', [BarberController::class, 'store'])->middleware('ability:*');
+    Route::patch('/barbers/{id}', [BarberController::class, 'update'])->middleware('ability:*');
     Route::put('/barbers/{id}', [BarberController::class, 'update'])->middleware('ability:*');
     Route::delete('/barbers/{id}', [BarberController::class, 'destroy'])->middleware('ability:*');
 
