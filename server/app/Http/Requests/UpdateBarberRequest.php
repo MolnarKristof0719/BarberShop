@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBarberRequest extends FormRequest
 {
@@ -22,7 +23,27 @@ class UpdateBarberRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'profilePicture' => ['sometimes', 'string'],
+            'userId' => [
+                'sometimes',
+                'integer',
+                'exists:users,id',
+            ],
+            'profilePicture' => [
+                'sometimes',
+                'string',
+                'max:125',
+                Rule::unique('barbers', 'profilePicture')
+                    ->where(fn ($query) => $query->where('userId', $this->userId))
+                    ->ignore($this->route('id')),
+            ],
+            'introduction' => [
+                'sometimes',
+                'string',
+            ],
+            'isActive' => [
+                'sometimes',
+                'boolean',
+            ],
         ];
     }
 }

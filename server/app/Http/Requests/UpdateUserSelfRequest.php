@@ -28,37 +28,31 @@ class UpdateUserSelfRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                'required_without_all:email' // Ha nincs email, akkor a név kötelező
+                'required_without_all:email,phoneNumber'
             ],
             'email' => [
                 'sometimes',
                 'required',
                 'email',
-                'required_without_all:name',  // Ha nincs név, akkor az email kötelező
-                // Fontos: az egyediség ellenőrzésekor hagyd figyelmen kívül a jelenlegi felhasználót!
-                // 'unique:users,email,' . $this->user()->id
-                Rule::unique('users')->ignore($this->user()->id),
+                'max:191',
+                'required_without_all:name,phoneNumber',
+                Rule::unique('users')
+                    ->where(fn ($query) => $query
+                        ->where('email', $this->email)
+                        ->where('phoneNumber', $this->phoneNumber)
+                    )
+                    ->ignore($this->user()->id),
             ],
-            // Tiltott mező: Ha a role mező megérkezik a kérésben, a validáció elbukik.
+            'phoneNumber' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:20',
+                'required_without_all:name,email',
+            ],
             'role' => 'prohibited',
             'password' => 'prohibited',
         ];
-        // return [
-        //     'name' => 'nullable|string',
-        //     'email' => 'nullable|email',
-        //     'password' => [
-        //         'nullable',
-        //         'string',
-        //         Password::min(10) // Minimum 10 karakter
-        //             ->mixedCase() // Kevert kis- és nagybetű
-        //             ->letters()   // Legalább egy betű
-        //             ->numbers()   // Legalább egy szám
-        //             ->symbols()   // Legalább egy szimbólum
-        //             ->uncompromised(), // Ne legyen kiszivárgott
-        //     ],
-        //     // Tiltott mező: Ha a role mező megérkezik a kérésben, a validáció elbukik.
-        //     'role' => 'prohibited',
-        // ];
-
     }
 }
+

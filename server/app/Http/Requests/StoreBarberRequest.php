@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreBarberRequest extends FormRequest
 {
@@ -22,7 +23,26 @@ class StoreBarberRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'userId' => [
+                'required',
+                'integer',
+                'exists:users,id',
+            ],
+            'profilePicture' => [
+                'required',
+                'string',
+                'max:125',
+                Rule::unique('barbers', 'profilePicture')
+                    ->where(fn ($query) => $query->where('userId', $this->userId)),
+            ],
+            'introduction' => [
+                'required',
+                'string',
+            ],
+            'isActive' => [
+                'sometimes',
+                'boolean',
+            ],
         ];
     }
 }

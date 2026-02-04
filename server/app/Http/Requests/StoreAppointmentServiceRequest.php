@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAppointmentServiceRequest extends FormRequest
 {
@@ -22,7 +23,18 @@ class StoreAppointmentServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'appointmentId' => [
+                'required',
+                'integer',
+                'exists:appointments,id',
+                Rule::unique('appointment_services')
+                    ->where(fn ($query) => $query->where('serviceId', $this->serviceId)),
+            ],
+            'serviceId' => [
+                'required',
+                'integer',
+                'exists:services,id',
+            ],
         ];
     }
 }

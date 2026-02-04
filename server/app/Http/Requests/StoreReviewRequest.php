@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreReviewRequest extends FormRequest
 {
@@ -22,7 +23,35 @@ class StoreReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'appointmentId' => [
+                'required',
+                'integer',
+                'exists:appointments,id',
+                Rule::unique('reviews')
+                    ->where(fn ($query) => $query
+                        ->where('appointmentId', $this->appointmentId)
+                        ->where('barberId', $this->barberId)
+                        ->where('userId', $this->userId)
+                    ),
+            ],
+            'barberId' => [
+                'required',
+                'integer',
+                'exists:barbers,id',
+            ],
+            'userId' => [
+                'required',
+                'integer',
+                'exists:users,id',
+            ],
+            'rating' => [
+                'required',
+                'integer',
+            ],
+            'comment' => [
+                'required',
+                'string',
+            ],
         ];
     }
 }

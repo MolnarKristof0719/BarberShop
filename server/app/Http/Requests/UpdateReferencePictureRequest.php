@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateReferencePictureRequest extends FormRequest
 {
@@ -22,7 +23,19 @@ class UpdateReferencePictureRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'barberId' => [
+                'sometimes',
+                'integer',
+                'exists:barbers,id',
+            ],
+            'picture' => [
+                'sometimes',
+                'string',
+                'max:125',
+                Rule::unique('reference_pictures', 'picture')
+                    ->where(fn ($query) => $query->where('barberId', $this->barberId))
+                    ->ignore($this->route('id')),
+            ],
         ];
     }
 }

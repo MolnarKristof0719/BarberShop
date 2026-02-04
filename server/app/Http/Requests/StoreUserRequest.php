@@ -23,15 +23,34 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required',
+            'name' => [
+                'required',
+                'string',
+            ],
+            'email' => [
+                'required',
+                'email',
+                'max:191',
+                Rule::unique('users')
+                    ->where(fn ($query) => $query
+                        ->where('email', $this->email)
+                        ->where('phoneNumber', $this->phoneNumber)
+                    ),
+            ],
             'phoneNumber' => [
-            Rule::requiredIf(fn () => in_array($this->role, [2, 3])), // barber, customer
-            'string',
-            'min:6'
-        ],
-            
+                'nullable',
+                'string',
+                'max:20',
+            ],
+            'password' => [
+                'required',
+                'string',
+            ],
+            'role' => [
+                'sometimes',
+                'integer',
+                Rule::in([1, 2, 3]),
+            ],
         ];
     }
 }

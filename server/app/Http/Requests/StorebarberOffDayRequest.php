@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorebarberOffDayRequest extends FormRequest
 {
@@ -22,7 +23,17 @@ class StorebarberOffDayRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'barberId' => [
+                'required',
+                'integer',
+                'exists:barbers,id',
+            ],
+            'offDay' => [
+                'required',
+                'date',
+                Rule::unique('barber_off_days', 'offDay')
+                    ->where(fn ($query) => $query->where('barberId', $this->barberId)),
+            ],
         ];
     }
 }

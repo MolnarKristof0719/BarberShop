@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -22,11 +23,40 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'nullable|string',
-            'email' => 'nullable|email',
-            'password' => 'nullable',
-            'role' => 'nullable',
-            
+            'name' => [
+                'sometimes',
+                'nullable',
+                'string',
+            ],
+            'email' => [
+                'sometimes',
+                'nullable',
+                'email',
+                'max:191',
+                Rule::unique('users')
+                    ->where(fn ($query) => $query
+                        ->where('email', $this->email)
+                        ->where('phoneNumber', $this->phoneNumber)
+                    )
+                    ->ignore($this->route('id')),
+            ],
+            'phoneNumber' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:20',
+            ],
+            'password' => [
+                'sometimes',
+                'nullable',
+                'string',
+            ],
+            'role' => [
+                'sometimes',
+                'nullable',
+                'integer',
+                Rule::in([1, 2, 3]),
+            ],
         ];
     }
 }

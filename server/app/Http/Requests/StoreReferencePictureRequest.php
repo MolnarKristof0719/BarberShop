@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreReferencePictureRequest extends FormRequest
 {
@@ -22,7 +23,18 @@ class StoreReferencePictureRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'barberId' => [
+                'required',
+                'integer',
+                'exists:barbers,id',
+            ],
+            'picture' => [
+                'required',
+                'string',
+                'max:125',
+                Rule::unique('reference_pictures', 'picture')
+                    ->where(fn ($query) => $query->where('barberId', $this->barberId)),
+            ],
         ];
     }
 }
