@@ -266,7 +266,8 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "picture": "picture.png"
+    "barberId": 3,
+    "picture": "asd.jpg"
 }
 
 ### refence pictures get

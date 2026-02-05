@@ -32,9 +32,8 @@ class ReferencePictureController extends Controller
             }
 
             $data = $request->validate([
-                // admin tölthet fel más barbernek is
                 'barberId' => ['nullable', 'integer', 'exists:barbers,id'],
-                'picture' => ['required', 'string', 'max:255'],
+                'picture' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'], // max 2MB
             ]);
 
             if ($user?->isAdmin()) {
@@ -50,9 +49,14 @@ class ReferencePictureController extends Controller
                 }
             }
 
+            if ($request->hasFile('picture')) {
+                $file = $request->file('picture');
+                $path = $file->store('references', 'public');
+            }
+
             return CurrentModel::create([
                 'barberId' => $barberId,
-                'picture' => $data['picture'],
+                'picture' => $path,
             ]);
         });
     }
