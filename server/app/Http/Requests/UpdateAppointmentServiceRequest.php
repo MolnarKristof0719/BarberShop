@@ -28,7 +28,7 @@ class UpdateAppointmentServiceRequest extends FormRequest
                 'integer',
                 'exists:appointments,id',
                 Rule::unique('appointment_services')
-                    ->where(fn ($query) => $query->where('serviceId', $this->serviceId))
+                    ->where(fn($query) => $query->where('serviceId', $this->serviceId))
                     ->ignore($this->route('id')),
             ],
             'serviceId' => [
@@ -36,6 +36,16 @@ class UpdateAppointmentServiceRequest extends FormRequest
                 'integer',
                 'exists:services,id',
             ],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'appointmentId.integer' => 'A foglalás azonosító egész szám kell legyen!',
+            'appointmentId.exists' => 'A megadott foglalás nem létezik!',
+            'appointmentId.unique' => 'Ehhez a foglaláshoz ez a szolgáltatás már hozzá van adva!',
+            'serviceId.integer' => 'A szolgáltatás azonosító egész szám kell legyen!',
+            'serviceId.exists' => 'A megadott szolgáltatás nem létezik!',
         ];
     }
 }

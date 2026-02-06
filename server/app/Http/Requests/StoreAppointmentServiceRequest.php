@@ -37,4 +37,16 @@ class StoreAppointmentServiceRequest extends FormRequest
             ],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'appointmentId.required' => 'A foglalás azonosító megadása kötelező!',
+            'appointmentId.integer' => 'A foglalás azonosító egész szám kell legyen!',
+            'appointmentId.exists' => 'A megadott foglalás nem létezik!',
+            'appointmentId.unique' => 'Ehhez a foglaláshoz ez a szolgáltatás már hozzá van adva!',
+            'serviceId.required' => 'A szolgáltatás azonosító megadása kötelező!',
+            'serviceId.integer' => 'A szolgáltatás azonosító egész szám kell legyen!',
+            'serviceId.exists' => 'A megadott szolgáltatás nem létezik!',
+        ];
+    }
 }

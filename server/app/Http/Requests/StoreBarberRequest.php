@@ -33,7 +33,7 @@ class StoreBarberRequest extends FormRequest
                 'string',
                 'max:125',
                 Rule::unique('barbers', 'profilePicture')
-                    ->where(fn ($query) => $query->where('userId', $this->userId)),
+                    ->where(fn($query) => $query->where('userId', $this->userId)),
             ],
             'introduction' => [
                 'required',
@@ -43,6 +43,21 @@ class StoreBarberRequest extends FormRequest
                 'sometimes',
                 'boolean',
             ],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'userId.required' => 'A felhasználó azonosító megadása kötelező!',
+            'userId.integer' => 'A felhasználó azonosító egész szám kell legyen!',
+            'userId.exists' => 'A megadott felhasználó nem létezik!',
+            'profilePicture.required' => 'A profilkép megadása kötelező!',
+            'profilePicture.string' => 'A profilkép szöveg kell legyen!',
+            'profilePicture.max' => 'A profilkép hossza max: 125!',
+            'profilePicture.unique' => 'A profilkép már létezik!',
+            'introduction.required' => 'A bemutatkozás megadása kötelező!',
+            'introduction.string' => 'A bemutatkozás szöveg kell legyen!',
+            'isActive.boolean' => 'Az aktív státusz logikai érték kell legyen!',
         ];
     }
 }

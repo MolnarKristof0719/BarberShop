@@ -32,8 +32,19 @@ class StorebarberOffDayRequest extends FormRequest
                 'required',
                 'date',
                 Rule::unique('barber_off_days', 'offDay')
-                    ->where(fn ($query) => $query->where('barberId', $this->barberId)),
+                    ->where(fn($query) => $query->where('barberId', $this->barberId)),
             ],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'barberId.required' => 'A borbély azonosító megadása kötelező!',
+            'barberId.integer' => 'A borbély azonosító egész szám kell legyen!',
+            'barberId.exists' => 'A megadott borbély nem létezik!',
+            'offDay.required' => 'A szabadnap megadása kötelező!',
+            'offDay.date' => 'A szabadnap érvényes dátum kell legyen!',
+            'offDay.unique' => 'Erre a napra már van rögzített szabadnap!',
         ];
     }
 }

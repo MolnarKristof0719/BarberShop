@@ -33,9 +33,19 @@ class UpdateReferencePictureRequest extends FormRequest
                 'string',
                 'max:125',
                 Rule::unique('reference_pictures', 'picture')
-                    ->where(fn ($query) => $query->where('barberId', $this->barberId))
+                    ->where(fn($query) => $query->where('barberId', $this->barberId))
                     ->ignore($this->route('id')),
             ],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'barberId.integer' => 'A borbély azonosító egész szám kell legyen!',
+            'barberId.exists' => 'A megadott borbély nem létezik!',
+            'picture.string' => 'A kép szöveg kell legyen!',
+            'picture.max' => 'A kép hossza max: 125!',
+            'picture.unique' => 'A kép már létezik!',
         ];
     }
 }

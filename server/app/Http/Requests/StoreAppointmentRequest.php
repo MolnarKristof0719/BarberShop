@@ -28,10 +28,11 @@ class StoreAppointmentRequest extends FormRequest
                 'integer',
                 'exists:barbers,id',
                 Rule::unique('appointments')
-                    ->where(fn ($query) => $query
-                        ->where('barberId', $this->barberId)
-                        ->where('appointmentDate', $this->appointmentDate)
-                        ->where('appointmentTime', $this->appointmentTime)
+                    ->where(
+                        fn($query) => $query
+                            ->where('barberId', $this->barberId)
+                            ->where('appointmentDate', $this->appointmentDate)
+                            ->where('appointmentTime', $this->appointmentTime)
                     ),
             ],
             'userId' => [
@@ -55,6 +56,24 @@ class StoreAppointmentRequest extends FormRequest
                 'sometimes',
                 Rule::in(['none', 'barber', 'customer']),
             ],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'barberId.required' => 'A borbély azonosító megadása kötelező!',
+            'barberId.integer' => 'A borbély azonosító egész szám kell legyen!',
+            'barberId.exists' => 'A megadott borbély nem létezik!',
+            'barberId.unique' => 'Erre az időpontra már van foglalás ennél a borbélynál!',
+            'userId.required' => 'A felhasználó azonosító megadása kötelező!',
+            'userId.integer' => 'A felhasználó azonosító egész szám kell legyen!',
+            'userId.exists' => 'A megadott felhasználó nem létezik!',
+            'appointmentDate.required' => 'Az időpont dátumának megadása kötelező!',
+            'appointmentDate.date' => 'Az időpont dátuma érvényes dátum kell legyen!',
+            'appointmentTime.required' => 'Az időpont idejének megadása kötelező!',
+            'appointmentTime.date_format' => 'Az időpont ideje formátuma H:i kell legyen!',
+            'status.in' => 'A státusz értéke nem megengedett!',
+            'cancelledBy.in' => 'A lemondó értéke nem megengedett!',
         ];
     }
 }

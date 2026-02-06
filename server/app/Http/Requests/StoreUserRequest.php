@@ -32,9 +32,10 @@ class StoreUserRequest extends FormRequest
                 'email',
                 'max:191',
                 Rule::unique('users')
-                    ->where(fn ($query) => $query
-                        ->where('email', $this->email)
-                        ->where('phoneNumber', $this->phoneNumber)
+                    ->where(
+                        fn($query) => $query
+                            ->where('email', $this->email)
+                            ->where('phoneNumber', $this->phoneNumber)
                     ),
             ],
             'phoneNumber' => [
@@ -51,6 +52,23 @@ class StoreUserRequest extends FormRequest
                 'integer',
                 Rule::in([1, 2, 3]),
             ],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'A név megadása kötelező!',
+            'name.string' => 'A név szöveg kell legyen!',
+            'email.required' => 'Az email megadása kötelező!',
+            'email.email' => 'Az email formátuma nem megfelelő!',
+            'email.max' => 'Az email hossza max: 191!',
+            'email.unique' => 'Ez az email már foglalt!',
+            'phoneNumber.string' => 'A telefonszám szöveg kell legyen!',
+            'phoneNumber.max' => 'A telefonszám hossza max: 20!',
+            'password.required' => 'A jelszó megadása kötelező!',
+            'password.string' => 'A jelszó szöveg kell legyen!',
+            'role.integer' => 'A szerepkör egész szám kell legyen!',
+            'role.in' => 'A szerepkör értéke nem megengedett!',
         ];
     }
 }

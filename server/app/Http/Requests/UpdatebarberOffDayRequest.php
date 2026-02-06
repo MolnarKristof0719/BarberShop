@@ -32,9 +32,18 @@ class UpdatebarberOffDayRequest extends FormRequest
                 'sometimes',
                 'date',
                 Rule::unique('barber_off_days', 'offDay')
-                    ->where(fn ($query) => $query->where('barberId', $this->barberId))
+                    ->where(fn($query) => $query->where('barberId', $this->barberId))
                     ->ignore($this->route('id')),
             ],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'barberId.integer' => 'A borbély azonosító egész szám kell legyen!',
+            'barberId.exists' => 'A megadott borbély nem létezik!',
+            'offDay.date' => 'A szabadnap érvényes dátum kell legyen!',
+            'offDay.unique' => 'Erre a napra már van rögzített szabadnap!',
         ];
     }
 }

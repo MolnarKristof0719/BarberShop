@@ -31,4 +31,13 @@ class StoreServiceRequest extends FormRequest
             ],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'service.required' => 'A szolgáltatás megadása kötelező!',
+            'service.string' => 'A szolgáltatás szöveg kell legyen!',
+            'service.max' => 'A szolgáltatás hossza max: 50!',
+            'service.unique' => 'A szolgáltatás már létezik!',
+        ];
+    }
 }
