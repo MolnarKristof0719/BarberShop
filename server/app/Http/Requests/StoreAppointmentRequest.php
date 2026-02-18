@@ -50,7 +50,7 @@ class StoreAppointmentRequest extends FormRequest
             ],
             'status' => [
                 'sometimes',
-                Rule::in(['booked', 'cancelled', 'completed']),
+                Rule::in(['booked', 'cancelled', 'completed', 'done']),
             ],
             'cancelledBy' => [
                 'sometimes',
@@ -77,3 +77,4 @@ class StoreAppointmentRequest extends FormRequest
         ];
     }
 }
+

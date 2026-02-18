@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment as CurrentModel;
 use App\Mail\BookingCreatedMail;
-use Illuminate\Support\Facades\Mail;
+use App\Models\Appointment as CurrentModel;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
@@ -58,14 +58,22 @@ class AppointmentController extends Controller
                 'services.*' => ['integer', 'exists:services,id'],
             ]);
 
+            $isBarberActive = DB::table('barbers')
+                ->where('id', $data['barberId'])
+                ->where('isActive', true)
+                ->exists();
+
+            if (!$isBarberActive) {
+                abort(422, 'A barber jelenleg nem aktiv.');
+            }
+
             $isOffDay = DB::table('barber_off_days')
                 ->where('barberId', $data['barberId'])
                 ->where('offDay', $data['appointmentDate'])
                 ->exists();
 
             if ($isOffDay) {
-                // 422, és a base Controllered HttpException-ként kezeli
-                abort(422, 'A barber ezen a napon szabadságon van.');
+                abort(422, 'A barber ezen a napon szabadsagon van.');
             }
 
             try {
@@ -80,21 +88,17 @@ class AppointmentController extends Controller
                     ]);
 
                     $appointment->services()->sync($data['services']);
-
                     $appointment->load(['services', 'barber.user', 'user']);
 
-                    // EMAIL
-                    Mail::to($appointment->user->email)
-                        ->send(new BookingCreatedMail($appointment));
+                    Mail::to($appointment->user->email)->send(new BookingCreatedMail($appointment));
 
                     return $appointment;
                 });
-
             } catch (QueryException $e) {
                 $mysqlCode = $e->errorInfo[1] ?? null;
 
                 if ($mysqlCode === 1062) {
-                    abort(409, 'Ez az időpont már foglalt ennél a borbélynál.');
+                    abort(409, 'Ez az idopont mar foglalt ennel a barbernel.');
                 }
 
                 throw $e;
@@ -109,27 +113,16 @@ class AppointmentController extends Controller
                 ->with(['services', 'barber', 'user'])
                 ->find($id);
 
-            abort_if(!$appointment, 404, 'Az időpont nem található.');
-
-            // $user = auth()->user();
-
-            // abort_unless(
-            //     $user?->isAdmin() ||
-            //     $appointment->userId === $user?->id ||
-            //     ($user?->isBarber() && $user->barber?->id === $appointment->barberId),
-            //     403,
-            //     'Nincs jogosultságod ehhez az időponthoz.'
-            // );
+            abort_if(!$appointment, 404, 'Az idopont nem talalhato.');
 
             return $appointment;
         });
     }
 
-
     public function destroy(int $id)
     {
         return $this->apiResponse(function () use ($id) {
-            $appointment = CurrentModel::findOrFail($id);
+            $appointment = CurrentModel::query()->with(['services', 'barber', 'user'])->findOrFail($id);
             $user = auth()->user();
 
             abort_unless(
@@ -139,10 +132,22 @@ class AppointmentController extends Controller
                 403
             );
 
-            $appointment->delete();
+            if ($appointment->status === 'completed') {
+                abort(422, 'Completed idopont nem mondhato le.');
+            }
 
-            // Ha ragaszkodsz a régihez: return null; és akkor data=null lesz
-            return null;
+            if ($appointment->status !== 'cancelled') {
+                $cancelledBy = $appointment->userId === $user?->id ? 'customer' : 'barber';
+
+                $appointment->update([
+                    'status' => 'cancelled',
+                    'cancelledBy' => $cancelledBy,
+                ]);
+
+                $appointment->refresh()->load(['services', 'barber', 'user']);
+            }
+
+            return $appointment;
         });
     }
 }

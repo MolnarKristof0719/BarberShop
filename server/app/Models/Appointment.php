@@ -22,11 +22,14 @@ class Appointment extends Model
 
     protected $casts = [
         'appointmentDate' => 'date',
-        // time mezőre nincs tökéletes cast, maradhat stringként:
-        // 'appointmentTime' => 'string',
     ];
 
-    // --- Relationships ---
+    public function setStatusAttribute(string $value): void
+    {
+        // Keep DB enum compatibility while accepting "done" from API callers.
+        $this->attributes['status'] = $value === 'done' ? 'completed' : $value;
+    }
+
     public function barber()
     {
         return $this->belongsTo(Barber::class, 'barberId');

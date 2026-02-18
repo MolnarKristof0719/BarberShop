@@ -23,28 +23,28 @@ class UserController extends Controller
 
     public function login(LoginUserRequest $request)
     {
-        //Eltároljuk az adatokat változókba
+        //EltĂˇroljuk az adatokat vĂˇltozĂłkba
         $email = $request->input(('email'));
         $password = $request->input(('password'));
 
-        //Az email alapján megkeressük a usert
+        //Az email alapjĂˇn megkeressĂĽk a usert
         $user = User::where('email', $email)->first();
 
-        //Stimmel-e az email és a jelszó?
+        //Stimmel-e az email Ă©s a jelszĂł?
         if (!$user || !Hash::check($password, $password ? $user->password : '')) {
             return response()->json([
                 'message' => 'invalid email or password'
             ], 401);
         }
 
-        //Jó az email és a jelszó
-        //Kitöröljük az esetleges tokenjeit
+        //JĂł az email Ă©s a jelszĂł
+        //KitĂ¶rĂ¶ljĂĽk az esetleges tokenjeit
         //$user->tokens()->delete();
 
-        //itt adjuk az új tokent időkorlát nélkül
+        //itt adjuk az Ăşj tokent idĹ‘korlĂˇt nĂ©lkĂĽl
         //$user->token = $user->createToken('access')->plainTextToken;
 
-        //Lejárati idővel
+        //LejĂˇrati idĹ‘vel
         // $expirationTime = Carbon::now()->addSeconds(20);
         // $name = "20sec";
         // $expirationTime = Carbon::now()->addMinutes(30);
@@ -126,22 +126,22 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        // Minden tokent töröl (en nem jó, mert egy másik bejelntkezést is kivégez)
+        // Minden tokent tĂ¶rĂ¶l (en nem jĂł, mert egy mĂˇsik bejelntkezĂ©st is kivĂ©gez)
         //---------------------
-        // // Az $request->user() segítségével hozzáférünk a bejelentkezett felhasználóhoz
+        // // Az $request->user() segĂ­tsĂ©gĂ©vel hozzĂˇfĂ©rĂĽnk a bejelentkezett felhasznĂˇlĂłhoz
         // $user = $request->user();
 
-        // // Töröljük a felhasználó összes tokenjét
+        // // TĂ¶rĂ¶ljĂĽk a felhasznĂˇlĂł Ă¶sszes tokenjĂ©t
         // $user->tokens()->delete();
 
         // return response()->json(['message' => 'Successfully logged out']);
 
 
-        //Egy mási módszer
-        // Megkeresi a tokent és törli ---------------------
-        $token = $request->bearerToken(); // Kivonjuk a bearer tokent a kérésből
+        //Egy mĂˇsi mĂłdszer
+        // Megkeresi a tokent Ă©s tĂ¶rli ---------------------
+        $token = $request->bearerToken(); // Kivonjuk a bearer tokent a kĂ©rĂ©sbĹ‘l
 
-        // Megkeressük a token modellt
+        // MegkeressĂĽk a token modellt
         $personalAccessToken = PersonalAccessToken::findToken($token);
 
         if ($personalAccessToken) {
@@ -207,21 +207,21 @@ class UserController extends Controller
                 'message' => 'ok',
                 'data' => $row
             ];
-            // Sikeres válasz: 201 Created kód ajánlott új erőforrás létrehozásakor
+            // Sikeres vĂˇlasz: 201 Created kĂłd ajĂˇnlott Ăşj erĹ‘forrĂˇs lĂ©trehozĂˇsakor
             return response()->json($data, 201, options: JSON_UNESCAPED_UNICODE);
         } catch (QueryException $e) {
-            // Ellenőrizzük, hogy ez egy "Duplicate entry for key" hiba-e (MySQL hibakód: 23000 vagy 1062)
+            // EllenĹ‘rizzĂĽk, hogy ez egy "Duplicate entry for key" hiba-e (MySQL hibakĂłd: 23000 vagy 1062)
             if ($e->getCode() == 23000 || str_contains($e->getMessage(), 'Duplicate entry')) {
                 $data = [
                     'message' => 'Insert error: The given name already exists, please choose another one',
                     'data' => [
-                        'name' => $request->input('name') // Visszaküldhetjük, mi volt a hibás
+                        'name' => $request->input('name') // VisszakĂĽldhetjĂĽk, mi volt a hibĂˇs
                     ]
                 ];
-                // Kliens hiba, ami jelzi a kérés érvénytelenségét
-                return response()->json($data, 409, options: JSON_UNESCAPED_UNICODE); // 409 Conflict ajánlott
+                // Kliens hiba, ami jelzi a kĂ©rĂ©s Ă©rvĂ©nytelensĂ©gĂ©t
+                return response()->json($data, 409, options: JSON_UNESCAPED_UNICODE); // 409 Conflict ajĂˇnlott
             }
-            // Ha nem ez a hiba volt, dobjuk tovább az eredeti kivételt, vagy kezeljük másképp
+            // Ha nem ez a hiba volt, dobjuk tovĂˇbb az eredeti kivĂ©telt, vagy kezeljĂĽk mĂˇskĂ©pp
             throw $e;
         }
     }
@@ -321,35 +321,35 @@ class UserController extends Controller
         return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
-    //Önmagam törlése
+    //Ă–nmagam tĂ¶rlĂ©se
     public function destroySelf(Request $request)
     {
-        //Kivesszük a törlendő user-t
+        //KivesszĂĽk a tĂ¶rlendĹ‘ user-t
         $userToDestroy = $request->user();
-        // A Policy-t használjuk: 
+        // A Policy-t hasznĂˇljuk: 
         $this->authorize('delete', $userToDestroy);
-        // ... törlés logika
-        //A user tokenjeinek törlése
+        // ... tĂ¶rlĂ©s logika
+        //A user tokenjeinek tĂ¶rlĂ©se
         $userToDestroy->tokens()->delete();
-        //A user törlése
+        //A user tĂ¶rlĂ©se
         $userToDestroy->delete();
 
         $status = 404;
         $data = [
-            'message' => "Sikeresen törölted a fiókodat",
+            'message' => "Sikeresen tĂ¶rĂ¶lted a fiĂłkodat",
             'data' => null
         ];
         return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
 
-    //Önmagam módosítása
+    //Ă–nmagam mĂłdosĂ­tĂˇsa
     public function updateSelf(UpdateUserSelfRequest $request)
     {
 
-        //Kivesszük a módosítandó user-t
+        //KivesszĂĽk a mĂłdosĂ­tandĂł user-t
         $userToUpdate = $request->user();
-        // A Policy-t használjuk: 
+        // A Policy-t hasznĂˇljuk: 
         $this->authorize('update', $userToUpdate);
 
         $status = 200;
@@ -366,20 +366,20 @@ class UserController extends Controller
         return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
-    //Önmagam jelszavának módosítása
+    //Ă–nmagam jelszavĂˇnak mĂłdosĂ­tĂˇsa
     public function updatePassword(UpdateUserPasswordRequest $request)
     {
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        // Frissítjük a jelszót (a Laravel 10+ automatikusan hasheli, 
-        // ha a model-ben a 'password' mező 'hashed' cast-ot kapott)
+        // FrissĂ­tjĂĽk a jelszĂłt (a Laravel 10+ automatikusan hasheli, 
+        // ha a model-ben a 'password' mezĹ‘ 'hashed' cast-ot kapott)
         $user->update([
             'password' => Hash::make($request->newpassword)
         ]);
 
         $data = [
-            'message' => 'Jelszó sikeresen módosítva.',
+            'message' => 'JelszĂł sikeresen mĂłdosĂ­tva.',
             'data' => [
                 'user' => $user
             ]
@@ -391,12 +391,12 @@ class UserController extends Controller
 
 
 
-    //Önmagam megnézése
+    //Ă–nmagam megnĂ©zĂ©se
     public function indexSelf(Request $request)
     {
-        //Kivesszük a megmutatandó usert
+        //KivesszĂĽk a megmutatandĂł usert
         $userToGet = $request->user();
-        // A Policy-t használjuk: 
+        // A Policy-t hasznĂˇljuk: 
         $this->authorize('view', $userToGet);
         $status = 200;
         $data = [
@@ -464,14 +464,23 @@ class UserController extends Controller
             ], 404, options: JSON_UNESCAPED_UNICODE);
         }
 
-        // pivot sorok törlése, hogy ne legyen 1451
-        $appointment->services()->detach();
+        if ($appointment->status === 'completed') {
+            return response()->json([
+                'message' => 'Completed appointment cannot be cancelled.',
+                'data' => null
+            ], 422, options: JSON_UNESCAPED_UNICODE);
+        }
 
-        $appointment->delete();
+        if ($appointment->status !== 'cancelled') {
+            $appointment->update([
+                'status' => 'cancelled',
+                'cancelledBy' => 'customer',
+            ]);
+        }
 
         return response()->json([
             'message' => 'Cancelled',
-            'data' => null
+            'data' => $appointment->fresh()->load(['services', 'barber'])
         ], 200, options: JSON_UNESCAPED_UNICODE);
     }
 }
