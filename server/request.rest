@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "admin@example.com",
+    "email": "barber@example.com",
     "password": "123"
 }
 
@@ -82,8 +82,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "vasarlo2",
-    "email": "vasarlo2@example.com"
+    "email": "kristofm500@gmail.com"
 }
 
 ### A bejelentkezett user egy adatát módosítja. A role tiltott
@@ -179,7 +178,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "offDay": "2026-01-29"
+    "offDay": "2027-03-14"
 }
 
 ### delete off day
@@ -216,8 +215,8 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-  "barberId": 2,
-  "appointmentDate": "2026-03-14",
+  "barberId": 1,
+  "appointmentDate": "2027-03-14",
   "appointmentTime": "09:00",
   "services": [1, 2]
 }

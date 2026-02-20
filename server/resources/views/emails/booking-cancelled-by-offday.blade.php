@@ -23,11 +23,11 @@
     <div class="content">
         <p>Szia {{ $appointment->user->name }}!</p>
         <p>
-            A lefoglalt idopontodat le kellett mondanunk, mert a barber erre a napra szabadnapot rogzitett.
+            A lefoglalt időpontodat le kellett mondanunk, mert a barber erre a napra szabadnapot rögzített.
         </p>
 
         <div class="details">
-            <div class="label">Eredeti idopont</div>
+            <div class="label">Eredeti időpont</div>
             <div class="value">
                 {{ \Carbon\Carbon::parse($appointment->appointmentDate)->format('Y. m. d.') }}
                 | {{ \Carbon\Carbon::parse($appointment->appointmentTime)->format('H:i') }}
@@ -37,7 +37,7 @@
             <div class="value">{{ $appointment->barber->user->name }}</div>
         </div>
 
-        <p>Koszonjuk a megertesedet. Kerd uj idopont foglalasat egy masik alkalomra.</p>
+        <p>Köszönjük a megértésedet. Kérd új időpont foglalását egy másik alkalomra.</p>
     </div>
 
     <div class="footer">
