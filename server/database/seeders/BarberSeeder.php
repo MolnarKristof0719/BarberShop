@@ -20,6 +20,7 @@ class BarberSeeder extends Seeder
                 'userId' => $user->id,
                 'profilePicture' => 'https://xsgames.co/randomusers/assets/avatars/male/' . $user->id .'.jpg',
                 'introduction' => fake()->paragraph(3),
+                'isActive' => fake()->boolean(80), 
             ]);
         }
     }

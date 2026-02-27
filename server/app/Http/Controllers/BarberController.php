@@ -52,7 +52,9 @@ class BarberController extends Controller
     public function index()
     {
         return $this->apiResponse(function () {
-            return CurrentModel::query()->get();
+            return CurrentModel::query()
+                ->with(['user:id,name,email'])
+                ->get();
         });
     }
 
