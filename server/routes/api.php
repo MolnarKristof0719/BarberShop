@@ -68,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- BARBERS (ability:barbers:get) ---
     Route::get('/barbers', [BarberController::class, 'index'])->middleware('ability:barbers:get');
     Route::get('/barbers/{id}', [BarberController::class, 'show'])->middleware('ability:barbers:get');
+    Route::get('barberbyid/{barberId}/{column}/{direction}/{search?}', [BarberController::class, 'indexBarbersById']);
 
     // Admin barber CRUD (ha van ilyen controller funkció)
     Route::post('/barbers', [BarberController::class, 'store'])->middleware('ability:*');

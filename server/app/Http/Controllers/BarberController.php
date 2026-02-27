@@ -6,11 +6,49 @@ use App\Models\Barber as CurrentModel;
 use App\Http\Requests\StoreBarberRequest as StoreCurrentModelRequest;
 use App\Http\Requests\UpdateBarberRequest as UpdateCurrentModelRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 
 class BarberController extends Controller
 {
     use AuthorizesRequests;
 
+    public function indexAbc()
+    {
+        return $this->apiResponse(
+            function () {
+                return DB::table('barbers')
+                    ->select('id', 'name')
+                    ->orderBy('name')
+                    ->get();
+            }
+        );
+    }
+
+    public function indexSortSearch($column, $direction, $search = null)
+    {
+        return $this->apiResponse(
+            function () use ($column, $direction, $search) {
+
+                $query = CurrentModel::query();
+
+                // 2. Szűrés (ha van keresőszó)
+                if (!empty($search) && $search !== 'all') {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                        // ->orWhere('description', 'like', "%{$search}%");
+                    });
+                }
+
+                // 3. Sorbarendezés
+                $allowedColumns = ['id', 'name']; // Biztonsági lista
+                $sortColumn = in_array($column, $allowedColumns) ? $column : 'id';
+                $sortDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+                $rows = $query->orderBy($sortColumn, $sortDirection)->get();
+
+                return $rows;
+            }
+        );
+    }
     public function index()
     {
         return $this->apiResponse(function () {

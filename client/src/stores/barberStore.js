@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 // import { useToastStore } from "@/stores/toastStore";
 import { useSearchStore } from "./searchStore";
-import service from "@/api/studentService";
+import service from "@/api/barberService";
 
 // const toast = useToastStore();
 
@@ -9,17 +9,8 @@ import service from "@/api/studentService";
 class Item {
   constructor(
     id = 0,
-    diakNev = "",
-    schoolclassId = null,
-    neme = true,
-    iranyitoszam = "",
-    lakHelyseg = "",
-    lakCim = "",
-    szulHelyseg = "",
-    szulDatum = null,
-    igazolvanyszam = "",
-    atlag = null,
-    osztondij = 0,
+    name = "",
+    
   ) {
     this.id = id;
     this.diakNev = diakNev;
