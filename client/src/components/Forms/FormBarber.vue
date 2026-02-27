@@ -11,7 +11,7 @@
         <!-- név, osztály, neme -->
         <div class="row col-md-12 col-lg-7 ms-0 p-0 mt-3">
           <label for="diakNev" class="col-form-label col-auto pt-1 pe-0"
-            >Név:</label
+            >UserId:</label
           >
           <div class="col">
             <input

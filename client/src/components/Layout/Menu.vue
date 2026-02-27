@@ -3,15 +3,8 @@
     <nav class="navbar navbar-expand-md bg-primary" data-bs-theme="dark">
       <div class="container-fluid">
         <!-- <a class="navbar-brand" href="#">Navbar</a> -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -22,80 +15,45 @@
             <li class="nav-item">
               <RouterLink class="nav-link" to="/about">Rólunk</RouterLink>
             </li>
-            <li class="nav-item dropdown" v-if="hasMenuAccess('/adatok')">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Adatok
-              </a>
-              <ul class="dropdown-menu">
-                <li v-if="hasMenuAccess('/adatok/sport')">
-                  <RouterLink class="dropdown-item" to="/adatok/sport"
-                    >Sportok</RouterLink
-                  >
-                </li>
-                <li v-if="hasMenuAccess('/adatok/schoolclass')">
-                  <RouterLink class="dropdown-item" to="/adatok/schoolclass"
-                    >Osztályok</RouterLink
-                  >
-                </li>
-                <li v-if="hasMenuAccess('/adatok/student')">
-                  <RouterLink class="dropdown-item" to="/adatok/student"
-                    >Tanulók</RouterLink
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li v-if="hasMenuAccess('/adatok/plaingsport')">
-                  <RouterLink class="dropdown-item" to="/adatok/plaingsport"
-                    >Sportolás</RouterLink
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li v-if="hasMenuAccess('/adatok/users')">
-                  <RouterLink class="dropdown-item" to="/adatok/users"
-                    >Userek</RouterLink
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <RouterLink class="nav-link" to="/login" v-if="!isLoggedIn">
-                Login
-              </RouterLink>
-              <div v-if="isLoggedIn" class="d-flex align-items-center">
-                <RouterLink class="nav-link" to="/userprofil">
-                  <i class="bi bi-person"></i>
-                  {{ userNameWithRole }}
-                </RouterLink>
 
-                <!-- logout -->
-                <i
-                  class="bi bi-box-arrow-right ms-2 my-pointer tight-icon"
-                  style="font-size: 2rem"
-                  @click="onClickLogut()"
-                ></i>
-              </div>
+            <li class="nav-item" v-if="hasMenuAccess('/service')">
+              <RouterLink class="nav-link" to="/service">Services</RouterLink>
+            </li>
+
+            <li class="nav-item" v-if="hasMenuAccess('/barber')">
+              <RouterLink class="nav-link" to="/barber">Barberek</RouterLink>
+            </li>
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
+            
+
+            <li class="nav-item" v-if="hasMenuAccess('/users')">
+              <RouterLink class="nav-link" to="/users">Userek</RouterLink>
             </li>
           </ul>
+
+          <li class="nav-item">
+            <RouterLink class="nav-link" to="/login" v-if="!isLoggedIn">
+              Login
+            </RouterLink>
+            <div v-if="isLoggedIn" class="d-flex align-items-center">
+              <RouterLink class="nav-link" to="/userprofil">
+                <i class="bi bi-person"></i>
+                {{ userNameWithRole }}
+              </RouterLink>
+
+              <!-- logout -->
+              <i class="bi bi-box-arrow-right ms-2 my-pointer tight-icon" style="font-size: 2rem"
+                @click="onClickLogut()"></i>
+            </div>
+          </li>
           <form class="d-flex" role="search">
-            <input
-              id="search"
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-              v-model="searchWordInput"
-            />
+            <input id="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+              v-model="searchWordInput" />
 
             <label for="search" class="form-label m-0">
-              <i
-                @click="onClickSearchButton"
-                class="bi bi-search fs-4 my-pointer"
-              ></i>
+              <i @click="onClickSearchButton" class="bi bi-search fs-4 my-pointer"></i>
             </label>
           </form>
         </div>
@@ -144,7 +102,7 @@ export default {
   },
   computed: {
     ...mapState(useSearchStore, ["searchWord"]),
-    ...mapState(useUserLoginLogoutStore, ['isLoggedIn','userNameWithRole'])
+    ...mapState(useUserLoginLogoutStore, ['isLoggedIn', 'userNameWithRole'])
   },
   methods: {
     ...mapActions(useSearchStore, ["resetSearchWord", "setSearchWord"]),
@@ -168,7 +126,7 @@ export default {
         return userStore.canAccess(requiredRoles);
       });
     },
-    async onClickLogut(){
+    async onClickLogut() {
       try {
         await this.logout();
         this.$router.push('/');
@@ -202,8 +160,10 @@ export default {
 .dropdown-item.router-link-active {
   /* background-color: #ffff00 !important; */
   /* color: #000 !important; */
-  background-color: transparent !important; /* Levesszük a teli hátteret */
-  color: #ffff00 !important; /* Csak a szöveg lesz sárga */
+  background-color: transparent !important;
+  /* Levesszük a teli hátteret */
+  color: #ffff00 !important;
+  /* Csak a szöveg lesz sárga */
   font-weight: bold;
 }
 
@@ -215,7 +175,8 @@ export default {
 
 .navbar {
   position: relative;
-  z-index: 1060 !important; /* A Bootstrap modalok 1050-nél kezdődnek */
+  z-index: 1060 !important;
+  /* A Bootstrap modalok 1050-nél kezdődnek */
 }
 
 .dropdown-menu {

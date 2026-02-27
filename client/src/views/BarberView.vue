@@ -10,23 +10,10 @@
           v-if="loading"
           class="bi bi-hourglass-split fs-3 col-auto p-0 pe-1"
         ></i>
-        <!-- új rekord ikon -->
-        <ButtonsCrudCreate v-if="!loading" @create="createHandler" />
+        
         <p class="m-0 ms-2">({{ getItemsLength }})</p>
 
-        <select
-          class="form-select ms-2"
-          aria-label="Default select example"
-          v-model="selectedSchoolclassId"
-        >
-          <option
-            v-for="sItem in schoolClassItems"
-            :key="sItem.id"
-            :value="sItem.id"
-          >
-            {{ sItem.osztalyNev }}
-          </option>
-        </select>
+       
       </div>
     </div>
 
@@ -37,20 +24,12 @@
       :useCollectionStore="useCollectionStore"
       @delete="deleteHandler"
       @update="updateHandler"
-      @create="createHandler"
       @sort="sortHandler"
       v-if="items.length > 0"
     />
     <div v-else style="width: 100px" class="m-auto">Nincs találat</div>
 
-    <!-- Form -->
-    <FormStudent
-      ref="form"
-      :title="title"
-      :item="item"
-      @yesEventForm="yesEventFormHandler"
-    />
-
+   
     <!-- Confirm modal -->
     <ConfirmModal
       :isOpenConfirmModal="isOpenConfirmModal"
@@ -63,65 +42,36 @@
 <script>
 import { mapActions, mapState } from "pinia";
 //módosít
-import { useSchoolclassStore } from "@/stores/schoolclassStore";
-import { useStudentStore } from "@/stores/studentStore";
+import { useBarberStore } from "@/stores/barberStore";
 import { useSearchStore } from "@/stores/searchStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
-import FormStudent from "@/components/Forms/FormStudent.vue";
 export default {
   //módosít
-  name: "StudentView",
+  name: "BarberView",
   components: {
     GenericTable,
     ConfirmModal,
     ButtonsCrudCreate,
-    FormStudent,
   },
-  watch: {
-    searchWord() {
-      this.getStudentsBySchoolclassId(
-        this.selectedSchoolclassId,
-        this.sortColumn,
-        this.sortDirection,
-      );
-    },
-    selectedSchoolclassId(value) {
-      this.getStudentsBySchoolclassId(
-        value,
-        this.sortColumn,
-        this.sortDirection,
-      );
-    },
-  },
+  
+  
   data() {
     return {
       //módosít
-      pageTitle: "Diákok",
-      selectedSchoolclassId: null,
+      pageTitle: "Barber",
       //módosít
       tableColumns: [
         { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
-        { key: "diakNev", label: "---Diáknév---", debug: 2 },
-        {
-          key: "schoolclassId",
-          label: "Osztály ID",
-          debug: import.meta.env.VITE_DEBUG_MODE,
-        },
-        { key: "nemeString", label: "Neme", debug: 2 },
-        { key: "iranyitoszam", label: "Irsz.", debug: 2 },
-        { key: "lakHelyseg", label: "Település", debug: 2 },
-        { key: "lakCim", label: "------Cím------", debug: 2 },
-        { key: "szulHelyseg", label: "Szül. hely", debug: 2 },
-        { key: "szulDatum", label: "Szül. dátum", debug: 2 },
-        { key: "igazolvanyszam", label: "Igazolványszám", debug: 2 },
-        { key: "atlag", label: "Átlag", debug: 2 },
-        { key: "osztondij", label: "Ösztöndíj", debug: 2 },
-        { key: "eletkor", label: "Életkor", debug: 2 },
+        { key: "userId", label: "---UserId---", debug: import.meta.env.VITE_DEBUG_MODE },
+        { key: "profilePicture", label: "Profilkép", debug: 2 },
+        { key: "introduction", label: "Bemutatkozás", debug: 2 },
+        { key: "isActive", label: "Aktív", debug: 2 },
+        
       ],
       //módosít
-      useCollectionStore: useStudentStore,
+      useCollectionStore: useBarberStore,
       isOpenConfirmModal: false,
       toDeleteId: null,
       state: "r", //crud
@@ -129,11 +79,8 @@ export default {
     };
   },
   computed: {
-    //módosít
-    ...mapState(useSchoolclassStore, {
-      schoolClassItems: "items",
-    }),
-    ...mapState(useStudentStore, [
+    
+    ...mapState(useBarberStore, [
       "item",
       "items",
       "loading",
@@ -145,13 +92,11 @@ export default {
   },
   methods: {
     //módosít
-    ...mapActions(useSchoolclassStore, ["getAllAbc"]),
+    ...mapActions(useBarberStore, ["getAll"]),
     ...mapActions(useSearchStore, ["resetSearchWord"]),
-    ...mapActions(useStudentStore, [
-      "getStudentsBySchoolclassId",
+    ...mapActions(useBarberStore, [
       "clearItem",
       "getById",
-      "create",
       "update",
       "delete",
     ]),
@@ -167,13 +112,7 @@ export default {
       this.$refs.form.show();
       // console.log("update:", id);
     },
-    createHandler() {
-      this.state = "c";
-      this.title = "Új adatbevitel";
-      this.clearItem();
-      this.$refs.form.show();
-      // console.log("Create:");
-    },
+    
     sortHandler(column) {
       console.log(column);
       this.getStudentsBySchoolclassId(this.selectedSchoolclassId, column);
@@ -226,12 +165,7 @@ export default {
   },
   async mounted() {
     this.resetSearchWord();
-    //Osztályok betöltése
-    await this.getAllAbc();
-    //az első osztály jelenjen meg
-    this.selectedSchoolclassId = this.schoolClassItems[0].id;
-    //tanulók betöltése
-    await this.getStudentsBySchoolclassId(this.selectedSchoolclassId);
+    await this.getAll();
   },
 };
 </script>

@@ -32,73 +32,53 @@ const router = createRouter({
         breadcrumb: "Rólunk",
       },
     },
+
     {
-      path: "/adatok",
-      name: "adatok",
-      component: () => import("@/views/EmptyWrapperView.vue"),
+      path: "/service",
+      name: "service",
+      component: () => import("@/views/ServiceView.vue"),
+      beforeEnter: [checkIfNotLogged],
       meta: {
-        breadcrumb: "Adatok",
-        disabled: true,
+        title: (route) => "Service",
+        breadcrumb: "Service",
+        roles: [1, 2, 3],
+      },
+    },
+    
+    {
+      path: "/barber",
+      name: "barber",
+      component: () => import("@/views/BarberView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: (route) => "Barber",
+        breadcrumb: "Barber",
+        roles: [1, 2, 3],
+      },
+    },
+    {
+      path: "/plaingsport",
+      name: "plaingsport",
+      component: () => import("@/views/PlayngSportView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: (route) => "Sportolás",
+        breadcrumb: "Sportolás",
         roles: [1, 2],
       },
-      children: [
-        {
-          path: "sport",
-          name: "sport",
-          component: () => import("@/views/SportView.vue"),
-          beforeEnter: [checkIfNotLogged],
-          meta: {
-            title: (route) => "Sport",
-            breadcrumb: "Sport",
-            roles: [1],
-          },
-        },
-        {
-          path: "schoolclass",
-          name: "schoolclass",
-          component: () => import("@/views/SchoolClasssView.vue"),
-          beforeEnter: [checkIfNotLogged],
-          meta: {
-            title: (route) => "Osztály",
-            breadcrumb: "Osztály",
-            roles: [1],
-          },
-        },
-        {
-          path: "student",
-          name: "student",
-          component: () => import("@/views/StudentView.vue"),
-          beforeEnter: [checkIfNotLogged],
-          meta: {
-            title: (route) => "Tanuló",
-            breadcrumb: "Tanuló",
-            roles: [1, 2],
-          },
-        },
-        {
-          path: "plaingsport",
-          name: "plaingsport",
-          component: () => import("@/views/PlayngSportView.vue"),
-          beforeEnter: [checkIfNotLogged],
-          meta: {
-            title: (route) => "Sportolás",
-            breadcrumb: "Sportolás",
-            roles: [1, 2],
-          },
-        },
-        {
-          path: "users",
-          name: "users",
-          component: () => import("@/views/UsersView.vue"),
-          beforeEnter: [checkIfNotLogged],
-          meta: {
-            title: (route) => "Users",
-            breadcrumb: "Users",
-            roles: [1],
-          },
-        },
-      ],
     },
+    {
+      path: "/users",
+      name: "users",
+      component: () => import("@/views/UsersView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: (route) => "Users",
+        breadcrumb: "Users",
+        roles: [1],
+      },
+    },
+
     {
       path: "/login",
       name: "login",
@@ -131,14 +111,13 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
- 
   document.title = "Iskola - " + to.meta.title(to);
   //mehetsz tovább az oldalra
 
   // Megkeressük az összes meta.roles beállítást az útvonal láncban
   // (A to.matched azért jó, mert ha a szülő védett, az egész ág védett lesz)
   const requiredRoles = to.meta.roles;
-  
+
   const userStore = useUserLoginLogoutStore();
   // Használjuk a már megismert logikát
   if (userStore.canAccess(requiredRoles)) {
