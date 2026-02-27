@@ -8,6 +8,25 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ServiceController extends Controller
 {
+    public function indexSortSearch($column, $direction, $search = null)
+    {
+        return $this->apiResponse(function () use ($column, $direction, $search) {
+            $query = CurrentModel::query();
+
+            if (!empty($search) && $search !== 'all') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('service', 'like', "%{$search}%");
+                });
+            }
+
+            $allowedColumns = ['id', 'service'];
+            $sortColumn = in_array($column, $allowedColumns) ? $column : 'id';
+            $sortDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+            return $query->orderBy($sortColumn, $sortDirection)->get();
+        });
+    }
+
     //region index
     public function index()
     {

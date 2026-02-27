@@ -19,6 +19,7 @@ Route::post('users/login', [UserController::class, 'login']);
 Route::post('users', [UserController::class, 'store']); // regisztráció
 
 Route::get('/services', [ServiceController::class, 'index']); // public
+Route::get('/servicessortsearch/{column}/{direction}/{search?}', [ServiceController::class, 'indexSortSearch']);
 
 // Ha nálatok a barberek listája PUBLIC legyen, hagyd így:
 // Route::get('/barbers', [BarberController::class, 'index']);
@@ -67,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- BARBERS (ability:barbers:get) ---
     Route::get('/barbers', [BarberController::class, 'index'])->middleware('ability:barbers:get');
+    Route::get('/barberssortsearch/{column}/{direction}/{search?}', [BarberController::class, 'indexSortSearch'])->middleware('ability:barbers:get');
     Route::get('/barbers/{id}', [BarberController::class, 'show'])->middleware('ability:barbers:get');
     Route::get('barberbyid/{barberId}/{column}/{direction}/{search?}', [BarberController::class, 'indexBarbersById']);
 
@@ -107,3 +109,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointment_services', [AppointmentServiceController::class, 'index'])->middleware('ability:*');
     Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show'])->middleware('ability:*');
 });
+
+

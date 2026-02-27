@@ -1,11 +1,7 @@
 import { defineStore } from "pinia";
-// import { useToastStore } from "@/stores/toastStore";
 import { useSearchStore } from "./searchStore";
 import service from "@/api/barberService";
 
-// const toast = useToastStore();
-
-//változtatás
 class Item {
   constructor(
     id = 0,
@@ -38,17 +34,19 @@ export const useBarberStore = defineStore("barber", {
     },
   },
   actions: {
+    setColumn(column) {
+      this.getAllSortSearch(column);
+    },
+
     clearItem() {
       this.item = new Item();
     },
 
     async getAll() {
-      //   const toast = useToastStore();
       this.loading = true;
       this.error = null;
       try {
         const response = await service.getAll();
-        // this.searchStore.reset();
         this.items = response.data;
       } catch (err) {
         this.error = err;
@@ -58,11 +56,35 @@ export const useBarberStore = defineStore("barber", {
       }
     },
 
-    // READ - Egy adat lekérése
+    async getAllSortSearch(column = "id", direction = null) {
+      this.loading = true;
+      this.error = null;
+      this.sortColumn = column;
+      if (!direction) {
+        direction =
+          this.sortColumn === column && this.sortDirection === "asc"
+            ? "desc"
+            : "asc";
+      }
+      this.sortDirection = direction;
+      try {
+        const response = await service.getAllSortSearch(
+          this.sortColumn,
+          this.sortDirection,
+          this.searchStore.searchWord,
+        );
+        this.items = response.data;
+      } catch (err) {
+        this.error = err;
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async getById(id) {
       this.loading = true;
       this.error = null;
-      //   const toast = useToastStore();
       try {
         const response = await service.getById(id);
         this.item = response.data;
@@ -74,53 +96,61 @@ export const useBarberStore = defineStore("barber", {
       }
     },
 
-    
-
-    // 3. UPDATE - Módosítás (Helyi frissítéssel, újraolvasás nélkül)
-    async update(id, updateData) {
+    async create(data) {
       this.loading = true;
       this.error = null;
       try {
-        const updatedItem = await service.update(id, updateData);
-        // const response = await service.getAll();
+        await service.create(data);
         const response = await service.getAllSortSearch(
           this.sortColumn,
           this.sortDirection,
           this.searchStore.searchWord,
         );
         this.items = response.data;
-        // toast.messages.push(`Sikeresen módosítva`);
-        // toast.show("Success");
         return true;
       } catch (err) {
         this.error = err;
         throw err;
-        return false;
       } finally {
         this.loading = false;
       }
     },
 
-    // 4. DELETE - Törlés
-    async delete(id) {
+    async update(id, updateData) {
       this.loading = true;
       this.error = null;
       try {
-        await service.delete(id);
-        //const response = await service.getAll();
+        await service.update(id, updateData);
         const response = await service.getAllSortSearch(
           this.sortColumn,
           this.sortDirection,
           this.searchStore.searchWord,
         );
         this.items = response.data;
-        // toast.messages.push(`Sikeresen törölve`);
-        // toast.show("Success");
         return true;
       } catch (err) {
         this.error = err;
         throw err;
-        return false;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async delete(id) {
+      this.loading = true;
+      this.error = null;
+      try {
+        await service.delete(id);
+        const response = await service.getAllSortSearch(
+          this.sortColumn,
+          this.sortDirection,
+          this.searchStore.searchWord,
+        );
+        this.items = response.data;
+        return true;
+      } catch (err) {
+        this.error = err;
+        throw err;
       } finally {
         this.loading = false;
       }

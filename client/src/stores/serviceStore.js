@@ -32,13 +32,7 @@ export const useServiceStore = defineStore("services", {
   },
   actions: {
     setColumn(column) {
-      this.sortColumn = column;
-      const direction =
-        this.sortColumn === column && this.sortDirection === "asc"
-          ? "desc"
-          : "asc";
-      this.sortDirection = direction;
-      this.getPaging();
+      this.getAllSortSearch(column);
     },
 
     clearItem() {

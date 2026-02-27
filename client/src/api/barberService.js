@@ -2,6 +2,10 @@ import apiClient from './axiosClient';
 const route = '/barbers';
 
 export default {
+  async getAllSortSearch(column = "id", direction = "asc", search = "") {
+    const currentRoute = `/barberssortsearch/${column}/${direction}/${search}`;
+    return await apiClient.get(currentRoute);
+  },
   
    async getBarberById(barberId,column='id', direction='asc', search='') {
     const route = `/barberbyid/${barberId}/${column}/${direction}/${search}`

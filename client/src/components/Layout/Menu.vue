@@ -2,60 +2,88 @@
   <div>
     <nav class="navbar navbar-expand-md bg-primary" data-bs-theme="dark">
       <div class="container-fluid">
-        <!-- <a class="navbar-brand" href="#">Navbar</a> -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/">Főoldal</RouterLink>
+              <RouterLink class="nav-link" to="/">Fooldal</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">Rólunk</RouterLink>
+              <RouterLink class="nav-link" to="/about">Rolunk</RouterLink>
             </li>
-
             <li class="nav-item" v-if="hasMenuAccess('/service')">
               <RouterLink class="nav-link" to="/service">Services</RouterLink>
             </li>
-
             <li class="nav-item" v-if="hasMenuAccess('/barber')">
               <RouterLink class="nav-link" to="/barber">Barberek</RouterLink>
             </li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-            
 
-            <li class="nav-item" v-if="hasMenuAccess('/users')">
-              <RouterLink class="nav-link" to="/users">Userek</RouterLink>
+            <li class="nav-item dropdown" v-if="hasMenuAccess('/admin')">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                Admin
+              </a>
+              <ul class="dropdown-menu">
+                <li v-if="hasMenuAccess('/admin/users')">
+                  <RouterLink class="dropdown-item" to="/admin/users">
+                    Userek
+                  </RouterLink>
+                </li>
+                <li v-if="hasMenuAccess('/admin/barbers')">
+                  <RouterLink class="dropdown-item" to="/admin/barbers">
+                    Admin Barberek
+                  </RouterLink>
+                </li>
+                <li v-if="hasMenuAccess('/admin/services')">
+                  <RouterLink class="dropdown-item" to="/admin/services">
+                    Admin Services
+                  </RouterLink>
+                </li>
+
+              </ul>
             </li>
           </ul>
 
-          <li class="nav-item">
-            <RouterLink class="nav-link" to="/login" v-if="!isLoggedIn">
-              Login
-            </RouterLink>
-            <div v-if="isLoggedIn" class="d-flex align-items-center">
-              <RouterLink class="nav-link" to="/userprofil">
-                <i class="bi bi-person"></i>
-                {{ userNameWithRole }}
-              </RouterLink>
+          <div class="d-flex align-items-center gap-2 ms-auto">
+            <form class="d-flex" role="search" v-if="showAdminSearch">
+              <input id="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                v-model="searchWordInput" />
+              <label for="search" class="form-label m-0">
+                <i @click="onClickSearchButton" class="bi bi-search fs-4 my-pointer"></i>
+              </label>
+            </form>
 
-              <!-- logout -->
-              <i class="bi bi-box-arrow-right ms-2 my-pointer tight-icon" style="font-size: 2rem"
-                @click="onClickLogut()"></i>
-            </div>
-          </li>
-          <form class="d-flex" role="search">
-            <input id="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
-              v-model="searchWordInput" />
+            <ul class="navbar-nav mb-2 mb-lg-0">
+              <li class="nav-item" v-if="!isLoggedIn">
+                <RouterLink class="nav-link" to="/login">Login</RouterLink>
+              </li>
 
-            <label for="search" class="form-label m-0">
-              <i @click="onClickSearchButton" class="bi bi-search fs-4 my-pointer"></i>
-            </label>
-          </form>
+              <li class="nav-item dropdown" v-else>
+                <a class="nav-link p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="avatar-circle" title="Fiok">
+                    <i class="bi bi-person"></i>
+                  </span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <RouterLink class="dropdown-item" to="/account">Fiok</RouterLink>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <button class="dropdown-item text-danger" type="button" @click="onClickLogout">
+                      Kijelentkezes
+                    </button>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </nav>
@@ -66,16 +94,14 @@
 import { mapActions, mapState } from "pinia";
 import { useSearchStore } from "@/stores/searchStore";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
-import userLoginLogoutService from "@/api/userLoginLogoutService";
+
 export default {
   data() {
     return {
       searchWordInput: "",
-      timeout: null,
     };
   },
   watch: {
-
     searchWordInput(value) {
       if (!value) {
         this.resetSearchWord();
@@ -84,48 +110,48 @@ export default {
     searchWord(value) {
       this.searchWordInput = value;
     },
+    $route() {
+      if (!this.showAdminSearch) {
+        this.searchWordInput = "";
+        this.resetSearchWord();
+      }
+    },
   },
   computed: {
     ...mapState(useSearchStore, ["searchWord"]),
-    ...mapState(useUserLoginLogoutStore, ['isLoggedIn', 'userNameWithRole'])
+    ...mapState(useUserLoginLogoutStore, ["isLoggedIn", "role"]),
+    showAdminSearch() {
+      return this.role === 1 && this.$route.path.startsWith("/admin");
+    },
   },
   methods: {
     ...mapActions(useSearchStore, ["resetSearchWord", "setSearchWord"]),
+    ...mapActions(useUserLoginLogoutStore, ["logout"]),
     onClickSearchButton() {
       this.setSearchWord(this.searchWordInput);
     },
-    ...mapActions(useUserLoginLogoutStore, ['logout']),
     hasMenuAccess(targetPath) {
-      //A jogosultsági szintnek megfelelően engedélyezi, vagy tiltja a menüt
       const userStore = useUserLoginLogoutStore();
       const resolved = this.$router.resolve(targetPath);
-
       if (!resolved || !resolved.matched.length) return false;
-
-      // Végigmeneteltetjük a szabályt az összes szülőn keresztül (adatok -> sports)
-      // Az 'every' akkor igaz, ha minden egyes elemre igaz a feltétel
       return resolved.matched.every((route) => {
         const requiredRoles = route.meta?.roles;
-
-        // A már meglévő Pinia getterünket hívjuk meg minden szinten
         return userStore.canAccess(requiredRoles);
       });
     },
-    async onClickLogut() {
+    async onClickLogout() {
       try {
         await this.logout();
-        this.$router.push('/');
+        this.$router.push("/");
       } catch (error) {
-        console.log('Kijelentkezési hiba!');
+        console.log("Kijelentkezesi hiba!");
       }
-
     },
   },
 };
 </script>
 
 <style scoped>
-/* 1. A sima .active ÉS a router által adott osztály is legyen sárga */
 .nav-link.active,
 .nav-link.router-link-exact-active {
   color: #c5a059 !important;
@@ -133,35 +159,32 @@ export default {
   border-bottom: 2px solid #c5a059;
 }
 
-/* 2. Az "Adatok" gomb sárgítása, ha az alatta lévő listában van aktív elem */
-/* Azt mondjuk: "Színezd a .nav-item-et, ha van benne aktív router-link" */
 .nav-item:has(.dropdown-item.router-link-active) .nav-link.dropdown-toggle {
   color: #ffff00 !important;
   font-weight: bold;
   border-bottom: 2px solid yellow;
 }
 
-/* 3. A lenyíló menüben a konkrét aktív elem (pl. Sportok) kijelölése */
 .dropdown-item.router-link-active {
-  /* background-color: #ffff00 !important; */
-  /* color: #000 !important; */
   background-color: transparent !important;
-  /* Levesszük a teli hátteret */
   color: #ffff00 !important;
-  /* Csak a szöveg lesz sárga */
   font-weight: bold;
 }
 
-.tight-icon {
-  line-height: 1 !important;
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: inline-flex;
-  vertical-align: middle;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  color: #ffffff;
 }
 
 .navbar {
   position: relative;
   z-index: 1060 !important;
-  /* A Bootstrap modalok 1050-nél kezdődnek */
 }
 
 .dropdown-menu {

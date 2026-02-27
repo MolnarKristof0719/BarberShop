@@ -1,176 +1,123 @@
 <template>
-  <div>
-    <!-- oldal fejléc -->
-    <!-- oldal címe -->
-    <div class="d-flex align-items-center m-0 mb-2">
-      <h1>{{ pageTitle }}</h1>
-      <div class="d-flex align-items-center m-0 ms-2">
-        <!-- homokóra -->
+  <section class="service-page">
+    <div class="service-hero d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <p class="hero-kicker mb-1">Barber Shop</p>
+        <h1 class="hero-title mb-1">Szolgaltatasok</h1>
+        <p class="hero-subtitle mb-0">Valaszd ki a neked megfelelo szolgaltatast.</p>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
         <i
           v-if="loading"
-          class="bi bi-hourglass-split fs-3 col-auto p-0 pe-1"
+          class="bi bi-hourglass-split fs-4 text-secondary"
+          aria-hidden="true"
         ></i>
-        <!-- új rekord ikon -->
-        <ButtonsCrudCreate v-if="!loading" @create="createHandler" />
-        <p class="m-0 ms-2">({{ getItemsLength }})</p>
-
-        
+        <span class="count-pill">{{ filteredItems.length }} szolgaltatas</span>
       </div>
     </div>
 
-    <!-- táblázat -->
-    <GenericTable
-      :items="items"
-      :columns="tableColumns"
-      :useCollectionStore="useCollectionStore"
-      @delete="deleteHandler"
-      @update="updateHandler"
-      @create="createHandler"
-      v-if="items.length > 0"
-    />
-    <div v-else style="width: 100px" class="m-auto">Nincs találat</div>
-
-    <!-- Form -->
-    <FormService
-      ref="form"
-      :title="title"
-      :item="item"
-      @yesEventForm="yesEventFormHandler"
-    />
-
-    <!-- Confirm modal -->
-    <ConfirmModal
-      :isOpenConfirmModal="isOpenConfirmModal"
-      @cancel="cancelHandler"
-      @confirm="confirmHandler"
-    />
-  </div>
+    <div class="service-content mt-4" v-if="filteredItems.length > 0">
+      <ServiceCards :items="filteredItems" />
+    </div>
+    <div v-else class="empty-state mt-4">Nincs talalat.</div>
+  </section>
 </template>
 
 <script>
 import { mapActions, mapState } from "pinia";
-//módosít
 import { useServiceStore } from "@/stores/serviceStore";
-import GenericTable from "@/components/Table/GenericTable.vue";
-import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
-import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
-import FormService from "@/components/Forms/FormService.vue";
+import { useSearchStore } from "@/stores/searchStore";
+import ServiceCards from "@/components/Cards/ServiceCards.vue";
+
 export default {
-  //módosít
   name: "ServiceView",
   components: {
-    GenericTable,
-    ConfirmModal,
-    ButtonsCrudCreate,
-    FormService,
-    
-  },
- 
-  data() {
-    return {
-      //módosít
-      pageTitle: "Szolgáltatások",
-      //módosít
-      tableColumns: [
-        { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
-        { key: "service", label: "Szolgáltatás", debug: 2 },
-      ],
-      //módosít
-      useCollectionStore: useServiceStore,
-      isOpenConfirmModal: false,
-      toDeleteId: null,
-      state: "r", //crud
-      title: "",
-    };
+    ServiceCards,
   },
   computed: {
-    //módosít
-    ...mapState(useServiceStore, [
-      "item",
-      "items",
-      "loading",
-      "getItemsLength",
-    ]),
-    
+    ...mapState(useServiceStore, ["items", "loading"]),
+    ...mapState(useSearchStore, ["searchWord"]),
+    filteredItems() {
+      const q = (this.searchWord || "").toLowerCase().trim();
+      if (!q) {
+        return this.items;
+      }
+      return this.items.filter((item) =>
+        String(item.service || "").toLowerCase().includes(q),
+      );
+    },
   },
   methods: {
-    //módosít
-    ...mapActions(useServiceStore, [
-      "getAll",
-      "setColumn",
-      "getById",
-      "create",
-      "update",
-      "delete",
-      "clearItem"
-    ]),
-    deleteHandler(id) {
-      this.state = "d";
-      this.isOpenConfirmModal = true;
-      this.toDeleteId = id;
-    },
-    updateHandler(id) {
-      this.state = "u";
-      this.title = "Adatmódosítás";
-      this.getById(id);
-      this.$refs.form.show();
-      console.log("update:", id);
-    },
-    createHandler() {
-      this.state = "c";
-      this.title = "Új adatbevitel";
-      this.clearItem();
-      this.$refs.form.show();
-      console.log("Create:");
-    },
-    sortHandler(column) {
-      console.log(column);
-      this.setColumn(column);
-    },
-    cancelHandler() {
-      console.log("mégsem törlök");
-      this.isOpenConfirmModal = false;
-      this.state = "r";
-    },
-    async confirmHandler() {
-      try {
-        await this.delete(this.toDeleteId);
-      } catch (error) {}
-      this.isOpenConfirmModal = false;
-      this.state = "r";
-    },
-    async yesEventFormHandler({ item, done }) {
-      //vagy create, vagy update
-      try {
-        if (this.state == "c") {
-          //create
-          await this.create(item);
-        } else {
-          //update
-          await this.update(item.id, item);
-        }
-        //nem volt hiba
-        this.state = "r";
-        done(true);
-      } catch (err) {
-        //hiba volt
-        //nem csukódik le az ablak
-        if (err.response && err.response.status === 422) {
-          // Átadjuk a formnak a konkrét hibaüzeneteket (pl. "min 2 karakter")
-          this.$refs.form.setServerErrors(err.response.data.errors);
-          done(false); // Nyitva tartja a modalt
-        } else {
-          // Minden más hiba (500, 401) esetén is értesítjük a modalt, hogy ne záródjon be
-          done(false);
-        }
-        //átadom a hibát
-      }
-    },
+    ...mapActions(useServiceStore, ["getAll"]),
+    ...mapActions(useSearchStore, ["resetSearchWord"]),
   },
   async mounted() {
+    this.resetSearchWord();
     await this.getAll();
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.service-page {
+  min-height: 100%;
+  padding: 10px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(197, 160, 89, 0.08),
+      rgba(197, 160, 89, 0.08) 2px,
+      transparent 2px,
+      transparent 12px
+    ),
+    #f7f5f1;
+  border-radius: 14px;
+}
+
+.service-hero {
+  border: 1px solid #eadfe1;
+  border-radius: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.hero-kicker {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c5a059;
+  font-weight: 700;
+}
+
+.hero-title {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  color: #111111;
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  color: #6c757d;
+}
+
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #e2d6d8;
+  background: #fff;
+  color: #111111;
+  font-weight: 600;
+}
+
+.empty-state {
+  width: 100%;
+  text-align: center;
+  padding: 30px;
+  border: 1px dashed #d6d9de;
+  border-radius: 12px;
+  color: #6c757d;
+  background: #ffffff;
+}
+</style>

@@ -3,7 +3,6 @@ import HomeView from "@/views/HomeView.vue";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import { useToastStore } from "@/stores/toastStore";
 
-//Azt nézi meg, hogy be van-e valaki jelentkezve
 function checkIfNotLogged() {
   const storeAuth = useUserLoginLogoutStore();
   if (!storeAuth.isLoggedIn) {
@@ -19,8 +18,8 @@ const router = createRouter({
       name: "home",
       component: HomeView,
       meta: {
-        title: (route) => "Főoldal",
-        breadcrumb: "Főoldal",
+        title: () => "Fooldal",
+        breadcrumb: "Fooldal",
       },
     },
     {
@@ -28,30 +27,28 @@ const router = createRouter({
       name: "about",
       component: () => import("@/views/AboutView.vue"),
       meta: {
-        title: (route) => "Rólunk",
-        breadcrumb: "Rólunk",
+        title: () => "Rolunk",
+        breadcrumb: "Rolunk",
       },
     },
-
     {
       path: "/service",
       name: "service",
       component: () => import("@/views/ServiceView.vue"),
       beforeEnter: [checkIfNotLogged],
       meta: {
-        title: (route) => "Service",
+        title: () => "Service",
         breadcrumb: "Service",
         roles: [1, 2, 3],
       },
     },
-    
     {
       path: "/barber",
       name: "barber",
       component: () => import("@/views/BarberView.vue"),
       beforeEnter: [checkIfNotLogged],
       meta: {
-        title: (route) => "Barber",
+        title: () => "Barber",
         breadcrumb: "Barber",
         roles: [1, 2, 3],
       },
@@ -62,29 +59,77 @@ const router = createRouter({
       component: () => import("@/views/PlayngSportView.vue"),
       beforeEnter: [checkIfNotLogged],
       meta: {
-        title: (route) => "Sportolás",
-        breadcrumb: "Sportolás",
+        title: () => "Sportolas",
+        breadcrumb: "Sportolas",
         roles: [1, 2],
       },
     },
+
     {
-      path: "/users",
-      name: "users",
-      component: () => import("@/views/UsersView.vue"),
+      path: "/admin",
+      name: "admin",
+      component: () => import("@/views/EmptyWrapperView.vue"),
+      redirect: "/admin/barbers",
       beforeEnter: [checkIfNotLogged],
       meta: {
-        title: (route) => "Users",
-        breadcrumb: "Users",
+        title: () => "Admin",
+        breadcrumb: "Admin",
         roles: [1],
       },
+      children: [
+        {
+          path: "users",
+          name: "users",
+          component: () => import("@/views/UsersView.vue"),
+          meta: {
+            title: () => "Users",
+            breadcrumb: "Users",
+            roles: [1],
+          },
+        },
+        {
+          path: "barbers",
+          name: "adminBarbers",
+          component: () => import("@/views/AdminBarbersView.vue"),
+          meta: {
+            title: () => "Admin Barberek",
+            breadcrumb: "Admin Barberek",
+            roles: [1],
+          },
+        },
+        {
+          path: "services",
+          name: "adminServices",
+          component: () => import("@/views/AdminServicesView.vue"),
+          meta: {
+            title: () => "Admin Services",
+            breadcrumb: "Admin Services",
+            roles: [1],
+          },
+        },
+      ],
     },
-
+    {
+      path: "/account",
+      name: "account",
+      component: () => import("@/views/AccountView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: () => "Fiok",
+        breadcrumb: "Fiok",
+        roles: [1, 2, 3],
+      },
+    },
+    {
+      path: "/userprofil",
+      redirect: "/account",
+    },
     {
       path: "/login",
       name: "login",
       component: () => import("@/views/LoginView.vue"),
       meta: {
-        title: (route) => "Login",
+        title: () => "Login",
         breadcrumb: "Login",
       },
     },
@@ -93,17 +138,16 @@ const router = createRouter({
       name: "registration",
       component: () => import("@/views/RegistrationView.vue"),
       meta: {
-        title: (route) => "Regisztráció",
-        breadcrumb: "Regisztráció",
+        title: () => "Regisztracio",
+        breadcrumb: "Regisztracio",
       },
     },
-
     {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
       component: () => import("@/views/404.vue"),
       meta: {
-        title: (route) => "404",
+        title: () => "404",
         breadcrumb: "",
       },
     },
@@ -112,33 +156,21 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   document.title = "Iskola - " + to.meta.title(to);
-  //mehetsz tovább az oldalra
 
-  // Megkeressük az összes meta.roles beállítást az útvonal láncban
-  // (A to.matched azért jó, mert ha a szülő védett, az egész ág védett lesz)
   const requiredRoles = to.meta.roles;
-
   const userStore = useUserLoginLogoutStore();
-  // Használjuk a már megismert logikát
+
   if (userStore.canAccess(requiredRoles)) {
-    // 1. eset: Van joga (vagy publikus), mehet tovább
     next();
   } else {
-    // 2. eset: Nincs joga
     if (!userStore.isLoggedIn) {
-      // Ha nincs belépve, küldjük a loginra
       next({ path: "/login" });
     } else {
-      // Ha be van lépve, de ehhez nincs joga (pl. diák admin oldalra téved)
-      // Küldjük a főoldalra vagy egy "Nincs jogosultság" oldalra
-      //alert("Nincs jogosultságod az oldal megtekintéséhez!");
       useToastStore().messages.push("Ehhez az oldalhoz nincs jogod!");
       useToastStore().show("Error");
       next("/");
     }
   }
-
-  // next();
 });
 
 export default router;

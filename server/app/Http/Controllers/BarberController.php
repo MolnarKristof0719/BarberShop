@@ -28,27 +28,35 @@ class BarberController extends Controller
     {
         return $this->apiResponse(
             function () use ($column, $direction, $search) {
+                $columnMap = [
+                    'id' => 'barbers.id',
+                    'userId' => 'barbers.userId',
+                    'userName' => 'users.name',
+                    'userEmail' => 'users.email',
+                    'isActiveLabel' => 'barbers.isActive',
+                    'isActive' => 'barbers.isActive',
+                ];
+                $sortColumn = $columnMap[$column] ?? 'barbers.id';
+                $sortDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
 
-                $query = CurrentModel::query();
+                $query = CurrentModel::query()
+                    ->leftJoin('users', 'users.id', '=', 'barbers.userId')
+                    ->select('barbers.*')
+                    ->with(['user:id,name,email']);
 
-                // 2. Szűrés (ha van keresőszó)
                 if (!empty($search) && $search !== 'all') {
                     $query->where(function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                        // ->orWhere('description', 'like', "%{$search}%");
+                        $q->where('barbers.introduction', 'like', "%{$search}%")
+                            ->orWhere('users.name', 'like', "%{$search}%")
+                            ->orWhere('users.email', 'like', "%{$search}%");
                     });
                 }
 
-                // 3. Sorbarendezés
-                $allowedColumns = ['id', 'name']; // Biztonsági lista
-                $sortColumn = in_array($column, $allowedColumns) ? $column : 'id';
-                $sortDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
-                $rows = $query->orderBy($sortColumn, $sortDirection)->get();
-
-                return $rows;
+                return $query->orderBy($sortColumn, $sortDirection)->get();
             }
         );
     }
+
     public function index()
     {
         return $this->apiResponse(function () {
@@ -124,8 +132,6 @@ class BarberController extends Controller
             $barber = CurrentModel::findOrFail($id);
             $barber->delete();
 
-            // Egységes "data" szerkezetet adunk vissza.
-            // Ha ragaszkodsz a 204 No Content-hez, azt lentebb írom.
             return ['id' => $id];
         });
     }
