@@ -14,14 +14,7 @@
         <ButtonsCrudCreate v-if="!loading" @create="createHandler" />
         <p class="m-0 ms-2">({{ getItemsLength }})</p>
 
-        <!-- sor/oldal -->
-        <SetSelectedPerPage
-         :useCollectionStore="useCollectionStore" 
-        />
-        <!-- Paginátor -->
-         <Pagination
-          :useCollectionStore="useCollectionStore"
-         />
+        
       </div>
     </div>
 
@@ -33,13 +26,12 @@
       @delete="deleteHandler"
       @update="updateHandler"
       @create="createHandler"
-      @sort="sortHandler"
       v-if="items.length > 0"
     />
     <div v-else style="width: 100px" class="m-auto">Nincs találat</div>
 
     <!-- Form -->
-    <FormSport
+    <FormService
       ref="form"
       :title="title"
       :item="item"
@@ -58,41 +50,33 @@
 <script>
 import { mapActions, mapState } from "pinia";
 //módosít
-import { useSportStore } from "@/stores/sporsStore";
-import { useSearchStore } from "@/stores/searchStore";
+import { useServiceStore } from "@/stores/serviceStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
-import FormSport from "@/components/Forms/FormSport.vue";
-import Pagination from "@/components/Pagination/Pagination.vue";
-import SetSelectedPerPage from "@/components/Pagination/SetSelectedPerPage.vue";
+import FormService from "@/components/Forms/FormService.vue";
 export default {
   //módosít
-  name: "SportView",
+  name: "ServiceView",
   components: {
     GenericTable,
     ConfirmModal,
     ButtonsCrudCreate,
-    FormSport,
-    Pagination,
-    SetSelectedPerPage,
+    FormService,
+    
   },
-  watch: {
-    searchWord() {
-      this.getPaging();
-    },
-  },
+ 
   data() {
     return {
       //módosít
-      pageTitle: "Sportok",
+      pageTitle: "Szolgáltatások",
       //módosít
       tableColumns: [
         { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
-        { key: "sportNev", label: "Sportnév", debug: 2 },
+        { key: "service", label: "Szolgáltatás", debug: 2 },
       ],
       //módosít
-      useCollectionStore: useSportStore,
+      useCollectionStore: useServiceStore,
       isOpenConfirmModal: false,
       toDeleteId: null,
       state: "r", //crud
@@ -101,22 +85,18 @@ export default {
   },
   computed: {
     //módosít
-    ...mapState(useSportStore, [
+    ...mapState(useServiceStore, [
       "item",
       "items",
       "loading",
-      "sortColumn",
-      "sortDirection",
       "getItemsLength",
     ]),
-    ...mapState(useSearchStore, ["searchWord"]),
+    
   },
   methods: {
     //módosít
-    ...mapActions(useSportStore, [
+    ...mapActions(useServiceStore, [
       "getAll",
-      "getAllSortSearch",
-      "getPaging",
       "setColumn",
       "getById",
       "create",
@@ -124,7 +104,6 @@ export default {
       "delete",
       "clearItem"
     ]),
-    ...mapActions(useSearchStore, ["resetSearchWord"]),
     deleteHandler(id) {
       this.state = "d";
       this.isOpenConfirmModal = true;
@@ -189,8 +168,7 @@ export default {
     },
   },
   async mounted() {
-    this.resetSearchWord();
-    await this.getPaging(1);
+    await this.getAll();
   },
 };
 </script>

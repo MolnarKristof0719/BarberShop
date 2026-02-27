@@ -1,33 +1,24 @@
 import { defineStore } from "pinia";
 // import { useToastStore } from "@/stores/toastStore";
 import { useSearchStore } from "./searchStore";
-import service from "@/api/sportService";
+import service from "@/api/serviceService";
 
 // const toast = useToastStore();
 
 //változtatás
 class Item {
-  constructor(id = 0, sportNev = "") {
+  constructor(id = 0, service = "") {
     this.id = id;
-    this.sportNev = sportNev;
+    this.service = service;
   }
 }
 
-class Pagination {
-  constructor(current_page = 1, last_page = 1, total = 10) {
-    this.current_page = current_page;
-    this.last_page = last_page;
-    this.total = total;
-  }
-}
 
-export const useSportStore = defineStore("sports", {
+
+export const useServiceStore = defineStore("services", {
   state: () => ({
     item: new Item(),
     items: [new Item()],
-    pagination: new Pagination(),
-    selectedPerPage: 10,
-    selectedPerPageList: [10, 30, 50, 100],
     loading: false,
     error: null,
     sortColumn: "id",
@@ -40,12 +31,6 @@ export const useSportStore = defineStore("sports", {
     },
   },
   actions: {
-    async setSelectedPerPage(value) {
-      this.selectedPerPage = value;
-      this.loading = true;
-      await this.getPaging();
-      this.loading = false;
-    },
     setColumn(column) {
       this.sortColumn = column;
       const direction =

@@ -75,21 +75,6 @@ export default {
     };
   },
   watch: {
-    //Keresőszó késleltetés
-    // searchWordInput(value) {
-    //   //töröljük az éppen futó setTimeout-ot
-    //   //hogy újraindíthassuk
-    //   clearTimeout(this.timeout);
-    //   //x-re kattintva kiürül az kereső input
-    //   if (value === "") {
-    //     this.setSearchWord("");
-    //     return;
-    //   }
-    //   //500ms késleltetés után tárolja
-    //   this.timeout = setTimeout(() => {
-    //     this.setSearchWord(value);
-    //   }, 1000);
-    // },
 
     searchWordInput(value) {
       if (!value) {
@@ -143,9 +128,9 @@ export default {
 /* 1. A sima .active ÉS a router által adott osztály is legyen sárga */
 .nav-link.active,
 .nav-link.router-link-exact-active {
-  color: #ffff00 !important;
+  color: #c5a059 !important;
   font-weight: bold;
-  border-bottom: 2px solid yellow;
+  border-bottom: 2px solid #c5a059;
 }
 
 /* 2. Az "Adatok" gomb sárgítása, ha az alatta lévő listában van aktív elem */
