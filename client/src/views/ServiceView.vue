@@ -3,8 +3,8 @@
     <div class="service-hero d-flex flex-wrap align-items-center justify-content-between gap-3">
       <div>
         <p class="hero-kicker mb-1">Barber Shop</p>
-        <h1 class="hero-title mb-1">Szolgaltatasok</h1>
-        <p class="hero-subtitle mb-0">Valaszd ki a neked megfelelo szolgaltatast.</p>
+        <h1 class="hero-title mb-1">Szolgáltatások</h1>
+        <p class="hero-subtitle mb-0">Válaszd ki a neked megfelelő szolgáltatást.</p>
       </div>
 
       <div class="d-flex align-items-center gap-2">
@@ -13,14 +13,14 @@
           class="bi bi-hourglass-split fs-4 text-secondary"
           aria-hidden="true"
         ></i>
-        <span class="count-pill">{{ filteredItems.length }} szolgaltatas</span>
+        <span class="count-pill">{{ filteredItems.length }} szolgáltatás</span>
       </div>
     </div>
 
     <div class="service-content mt-4" v-if="filteredItems.length > 0">
       <ServiceCards :items="filteredItems" />
     </div>
-    <div v-else class="empty-state mt-4">Nincs talalat.</div>
+    <div v-else class="empty-state mt-4">Nincs találat.</div>
   </section>
 </template>
 

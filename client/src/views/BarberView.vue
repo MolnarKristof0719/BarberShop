@@ -4,7 +4,7 @@
       <div>
         <p class="hero-kicker mb-1">Barber Shop</p>
         <h1 class="hero-title mb-1">Barberek</h1>
-        <p class="hero-subtitle mb-0">Valaszd ki a megfelelo szakembert.</p>
+        <p class="hero-subtitle mb-0">Válaszd ki a megfelelő szakembert.</p>
       </div>
 
       <div class="d-flex align-items-center gap-2">
@@ -19,7 +19,7 @@
 
     <div class="barber-content mt-4">
       <BarberCards :items="items" v-if="items.length > 0" />
-      <div v-else class="empty-state">Nincs talalat.</div>
+      <div v-else class="empty-state">Nincs találat.</div>
     </div>
   </section>
 </template>

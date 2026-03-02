@@ -12,6 +12,7 @@
         <i v-else class="bi bi-person"></i>
       </button>
 
+<<<<<<< HEAD
       <input
         ref="profileFileInput"
         type="file"
@@ -22,17 +23,30 @@
 
       <h1 class="mb-1">{{ item?.name || "-" }}</h1>
       <p class="text-muted mb-4">Bejelentkezett felhasznalo adatai</p>
+=======
+      <h1 class="mb-1">Fiók</h1>
+      <p class="text-muted mb-4">Bejelentkezett felhasznaló adatai</p>
+>>>>>>> 939e8bb930107e91a48824249176f4619bebaec3
 
       <div class="row gy-3">
         <div class="col-12">
           <div class="info-box">
+<<<<<<< HEAD
+=======
+            <small class="label">Név</small>
+            <p class="value mb-0">{{ item?.name || "-" }}</p>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="info-box">
+>>>>>>> 939e8bb930107e91a48824249176f4619bebaec3
             <small class="label">Email</small>
             <p class="value mb-0">{{ item?.email || "-" }}</p>
           </div>
         </div>
         <div class="col-12">
           <div class="info-box">
-            <small class="label">Szerepkor</small>
+            <small class="label">Szerepkör</small>
             <p class="value mb-0">{{ roleLabel }}</p>
           </div>
         </div>

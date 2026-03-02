@@ -3,7 +3,7 @@
     <nav class="navbar navbar-expand-lg menu-bar">
       <div class="container-fluid px-3 px-md-4">
         <RouterLink class="brand-mark" to="/" aria-label="Fooldal">
-          <span>BS</span>
+          <span class="logo-box"><img src="/logo.png" alt="logó" class="logo-img" /></span>
         </RouterLink>
 
         <button
@@ -28,7 +28,7 @@
             </li>
             
             <li class="nav-item" v-if="hasMenuAccess('/service')">
-              <RouterLink class="nav-link menu-link" to="/service">Services</RouterLink>
+              <RouterLink class="nav-link menu-link" to="/service">Szolgáltatások</RouterLink>
             </li>
             <li class="nav-item" v-if="hasMenuAccess('/barber')">
               <RouterLink class="nav-link menu-link" to="/barber">Barberek</RouterLink>
@@ -54,7 +54,7 @@
             </form>
 
             <div class="nav-item" v-if="!isLoggedIn">
-              <RouterLink class="btn menu-btn" to="/login">Bejelentkezes</RouterLink>
+              <RouterLink class="btn menu-btn" to="/login">Bejelentkezés</RouterLink>
             </div>
 
             <ul class="navbar-nav mb-0">
