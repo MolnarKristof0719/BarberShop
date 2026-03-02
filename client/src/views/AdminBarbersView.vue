@@ -22,7 +22,7 @@
       @sort="sortHandler"
       v-if="tableItems.length > 0"
     />
-    <div v-else style="width: 120px" class="m-auto">Nincs talalat</div>
+    <div v-else style="width: 120px" class="m-auto">Nincs találat</div>
 
     <FormAdminBarber
       ref="form"

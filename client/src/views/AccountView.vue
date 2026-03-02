@@ -5,13 +5,13 @@
         <i class="bi bi-person"></i>
       </div>
 
-      <h1 class="mb-1">Fiok</h1>
-      <p class="text-muted mb-4">Bejelentkezett felhasznalo adatai</p>
+      <h1 class="mb-1">Fiók</h1>
+      <p class="text-muted mb-4">Bejelentkezett felhasznaló adatai</p>
 
       <div class="row gy-3">
         <div class="col-12">
           <div class="info-box">
-            <small class="label">Nev</small>
+            <small class="label">Név</small>
             <p class="value mb-0">{{ item?.name || "-" }}</p>
           </div>
         </div>
@@ -23,7 +23,7 @@
         </div>
         <div class="col-12">
           <div class="info-box">
-            <small class="label">Szerepkor</small>
+            <small class="label">Szerepkör</small>
             <p class="value mb-0">{{ roleLabel }}</p>
           </div>
         </div>
