@@ -1,7 +1,7 @@
 <template>
   <nav aria-label="breadcrumb">
     <p v-if="debug">{{ breadcrumbs }}</p>
-    <ol class="breadcrumb m-0">
+    <ol class="breadcrumb m-2">
       <li class="breadcrumb-item">
         <router-link to="/">Kezdőlap</router-link>
       </li>

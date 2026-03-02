@@ -25,6 +25,10 @@
             </li>
             <li class="nav-item">
               <RouterLink class="nav-link menu-link" to="/about">Rolunk</RouterLink>
+              <RouterLink class="nav-link" to="/">Főoldal</RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink class="nav-link" to="/about">Rólunk</RouterLink>
             </li>
             <li class="nav-item" v-if="hasMenuAccess('/service')">
               <RouterLink class="nav-link menu-link" to="/service">Services</RouterLink>
@@ -69,7 +73,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end account-menu">
                   <li>
-                    <RouterLink class="dropdown-item" to="/account">Fiok</RouterLink>
+                    <RouterLink class="dropdown-item" to="/account">Fiók</RouterLink>
                   </li>
                   <template v-if="hasMenuAccess('/admin')">
                     <li>
@@ -90,7 +94,7 @@
                   </li>
                   <li>
                     <button class="dropdown-item text-danger" type="button" @click="onClickLogout">
-                      Kijelentkezes
+                      Kijelentkezés
                     </button>
                   </li>
                 </ul>
