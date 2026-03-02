@@ -9,10 +9,7 @@
         <h5 class="service-title mb-2">{{ item.service }}</h5>
         <p class="service-desc mb-4">{{ descriptionByName(item.service) }}</p>
 
-        <div class="service-meta">
-          <p class="price mb-0">{{ priceById(item.id) }} Ft</p>
-          <p class="time mb-0">{{ durationById(item.id) }} perc</p>
-        </div>
+      
       </article>
     </div>
   </div>
