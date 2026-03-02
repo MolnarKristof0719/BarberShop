@@ -37,12 +37,6 @@
 
           <div class="menu-meta d-flex flex-column flex-lg-row align-items-lg-center ms-lg-4 gap-2 gap-lg-3">
             <div class="menu-contact d-flex align-items-center gap-3">
-              <span class="menu-phone d-none d-xl-inline">(815) 304-4146</span>
-              <div class="d-flex align-items-center gap-2 d-none d-lg-flex">
-                <i class="bi bi-facebook menu-icon"></i>
-                <i class="bi bi-instagram menu-icon"></i>
-                <i class="bi bi-geo-alt-fill menu-icon"></i>
-              </div>
             </div>
 
             <form class="d-flex menu-search" role="search" v-if="showAdminSearch">

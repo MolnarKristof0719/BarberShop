@@ -1,42 +1,48 @@
-import apiClient from './axiosClient'; 
-const route = '/barbers';
+import apiClient from "./axiosClient";
+
+const route = "/barbers";
 
 export default {
   async getAllSortSearch(column = "id", direction = "asc", search = "") {
     const currentRoute = `/barberssortsearch/${column}/${direction}/${search}`;
     return await apiClient.get(currentRoute);
   },
-  
-   async getBarberById(barberId,column='id', direction='asc', search='') {
-    const route = `/barberbyid/${barberId}/${column}/${direction}/${search}`
-    return await apiClient.get(route);
+
+  async getBarberById(barberId, column = "id", direction = "asc", search = "") {
+    const currentRoute = `/barberbyid/${barberId}/${column}/${direction}/${search}`;
+    return await apiClient.get(currentRoute);
   },
 
-  // GET: Összes rekord lekérése
   async getAll() {
     return await apiClient.get(`${route}`);
   },
 
-  // GET: Egy rekord (ID alapján)
   async getById(id) {
-    const url = `${route}/${id}`
-    return await apiClient.get(url);
+    return await apiClient.get(`${route}/${id}`);
   },
 
-  // POST: Új rekord posztolás
   async create(data) {
-    delete data.id; //id kulcsot kiveszi az objektumból
+    delete data.id;
     return await apiClient.post(`${route}`, data);
   },
 
-  // PUT: Módosítás
   async update(id, data) {
-    delete data.id; //id kulcsot kiveszi az objektumból
+    delete data.id;
     return await apiClient.patch(`${route}/${id}`, data);
   },
 
-  // DELETE: Törlés
+  async uploadProfilePicture(id, file) {
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+
+    return await apiClient.post(`${route}/${id}/profile-picture`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+
   async delete(id) {
     return await apiClient.delete(`${route}/${id}`);
-  }
+  },
 };

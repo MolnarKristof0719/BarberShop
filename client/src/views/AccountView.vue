@@ -1,12 +1,28 @@
 <template>
   <section class="account-page">
     <div class="account-card">
-      <div class="avatar-large">
-        <i class="bi bi-person"></i>
-      </div>
+      <button
+        class="avatar-large avatar-button"
+        type="button"
+        @click="onAvatarClick"
+        :disabled="!isBarber || barberLoading || !barberRecordId"
+        :title="isBarber ? 'Profilkep csere' : 'Csak barbernek modosithato'"
+      >
+        <img v-if="avatarImageSrc" :src="avatarImageSrc" alt="Profilkep" class="avatar-image" />
+        <i v-else class="bi bi-person"></i>
+      </button>
 
-      <h1 class="mb-1">Fiók</h1>
+      <input
+        ref="profileFileInput"
+        type="file"
+        class="d-none"
+        accept="image/png,image/jpeg,image/jpg,image/webp"
+        @change="onProfilePictureSelected"
+      />
+
+      <h1 class="mb-1">{{ item?.name || "-" }}</h1>
       <p class="text-muted mb-4">Bejelentkezett felhasznaló adatai</p>
+      
 
       <div class="row gy-3">
         <div class="col-12">
@@ -27,6 +43,18 @@
             <p class="value mb-0">{{ roleLabel }}</p>
           </div>
         </div>
+
+        <div class="col-12" v-if="isBarber">
+          <div class="info-box">
+            <small class="label">Profilkep csere</small>
+            <p class="mb-0 mt-2 helper-text">
+              Kattints az avatarra es valassz egy kepet. A rendszer a regi kepet automatikusan torli.
+            </p>
+            <p class="mb-0 mt-2 selected-file" v-if="selectedFileName">
+              Kivalasztott: {{ selectedFileName }}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -35,11 +63,43 @@
 <script>
 import { mapState } from "pinia";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
+import { useToastStore } from "@/stores/toastStore";
+import barberService from "@/api/barberService";
+import { resolveMediaUrl } from "@/utils/media";
 
 export default {
   name: "AccountView",
+  data() {
+    return {
+      barberRecordId: null,
+      barberProfilePicture: "",
+      barberLoading: false,
+      selectedFileName: "",
+    };
+  },
+  watch: {
+    item: {
+      async handler() {
+        await this.loadBarberProfile();
+      },
+      immediate: true,
+    },
+    role: {
+      async handler() {
+        await this.loadBarberProfile();
+      },
+      immediate: true,
+    },
+  },
   computed: {
     ...mapState(useUserLoginLogoutStore, ["item", "role"]),
+    isBarber() {
+      return this.role === 2;
+    },
+    avatarImageSrc() {
+      if (!this.isBarber || !this.barberProfilePicture) return null;
+      return resolveMediaUrl(this.barberProfilePicture);
+    },
     roleLabel() {
       const labels = {
         1: "Admin",
@@ -47,6 +107,66 @@ export default {
         3: "User",
       };
       return labels[this.role] || "-";
+    },
+  },
+  methods: {
+    resetBarberState() {
+      this.barberRecordId = null;
+      this.barberProfilePicture = "";
+      this.selectedFileName = "";
+    },
+    async loadBarberProfile() {
+      if (!this.isBarber || !this.item?.id) {
+        this.resetBarberState();
+        return;
+      }
+
+      this.barberLoading = true;
+      try {
+        const response = await barberService.getAll();
+        const barberItems = response?.data || [];
+        const currentBarber = barberItems.find(
+          (barber) => Number(barber.userId) === Number(this.item.id),
+        );
+
+        if (!currentBarber) {
+          this.resetBarberState();
+          return;
+        }
+
+        this.barberRecordId = currentBarber.id;
+        this.barberProfilePicture = currentBarber.profilePicture || "";
+      } catch (error) {
+        this.resetBarberState();
+      } finally {
+        this.barberLoading = false;
+      }
+    },
+    onAvatarClick() {
+      if (!this.isBarber || this.barberLoading || !this.barberRecordId) return;
+      this.$refs.profileFileInput?.click();
+    },
+    async onProfilePictureSelected(event) {
+      const file = event?.target?.files?.[0];
+      if (!file || !this.barberRecordId) return;
+
+      this.selectedFileName = file.name;
+      this.barberLoading = true;
+
+      try {
+        const response = await barberService.uploadProfilePicture(this.barberRecordId, file);
+        this.barberProfilePicture = response?.data?.profilePicture || this.barberProfilePicture;
+
+        const toastStore = useToastStore();
+        toastStore.messages.push("Profilkep sikeresen frissitve.");
+        toastStore.show("Success");
+      } catch (error) {
+      } finally {
+        this.barberLoading = false;
+        if (this.$refs.profileFileInput) {
+          this.$refs.profileFileInput.value = "";
+        }
+      }
     },
   },
 };
@@ -71,16 +191,39 @@ export default {
 }
 
 .avatar-large {
-  width: 64px;
-  height: 64px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
   background: #111111;
   color: #c5a059;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 32px;
   margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.avatar-button {
+  border: 2px solid #111111;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avatar-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(17, 17, 17, 0.15);
+}
+
+.avatar-button:disabled {
+  opacity: 0.8;
+  cursor: default;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .info-box {
@@ -97,6 +240,15 @@ export default {
 }
 
 .value {
+  color: #111111;
+  font-weight: 600;
+}
+
+.helper-text {
+  color: #495057;
+}
+
+.selected-file {
   color: #111111;
   font-weight: 600;
 }

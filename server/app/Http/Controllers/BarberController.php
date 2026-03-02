@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Barber as CurrentModel;
 use App\Http\Requests\StoreBarberRequest as StoreCurrentModelRequest;
 use App\Http\Requests\UpdateBarberRequest as UpdateCurrentModelRequest;
+use App\Http\Requests\UploadBarberProfilePictureRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class BarberController extends Controller
 {
@@ -133,6 +136,40 @@ class BarberController extends Controller
             $barber->delete();
 
             return ['id' => $id];
+        });
+    }
+
+    public function uploadProfilePicture(UploadBarberProfilePictureRequest $request, int $id)
+    {
+        return $this->apiResponse(function () use ($request, $id) {
+            $barber = CurrentModel::findOrFail($id);
+            $user = auth()->user();
+
+            abort_unless(
+                $user?->isAdmin() || ($user?->isBarber() && (int) $barber->userId === (int) $user->id),
+                403
+            );
+
+            $file = $request->file('profilePicture');
+            $extension = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+            $fileName = 'barber_' . $barber->id . '_' . Str::uuid() . '.' . $extension;
+            $storedRelativePath = $file->storeAs('barbers/profile-pictures', $fileName, 'public');
+
+            $oldPath = $barber->profilePicture;
+            if (is_string($oldPath) && $oldPath !== '') {
+                $pathOnly = parse_url($oldPath, PHP_URL_PATH) ?: $oldPath;
+                if (str_starts_with($pathOnly, '/storage/')) {
+                    $oldStoragePath = ltrim(str_replace('/storage/', '', $pathOnly), '/');
+                    if ($oldStoragePath !== $storedRelativePath) {
+                        Storage::disk('public')->delete($oldStoragePath);
+                    }
+                }
+            }
+
+            $barber->profilePicture = '/storage/' . $storedRelativePath;
+            $barber->save();
+
+            return $barber->fresh()->load(['user:id,name,email']);
         });
     }
 

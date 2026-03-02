@@ -76,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/barbers', [BarberController::class, 'store'])->middleware('ability:*');
     Route::patch('/barbers/{id}', [BarberController::class, 'update'])->middleware('ability:*');
     Route::put('/barbers/{id}', [BarberController::class, 'update'])->middleware('ability:*');
+    Route::post('/barbers/{id}/profile-picture', [BarberController::class, 'uploadProfilePicture'])->middleware('ability:usersme:patch');
     Route::delete('/barbers/{id}', [BarberController::class, 'destroy'])->middleware('ability:*');
 
     // --- OFF DAYS (csak barber, abilities alapján) ---
@@ -109,5 +110,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointment_services', [AppointmentServiceController::class, 'index'])->middleware('ability:*');
     Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show'])->middleware('ability:*');
 });
-
 
