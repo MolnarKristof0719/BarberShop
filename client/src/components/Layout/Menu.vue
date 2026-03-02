@@ -10,10 +10,10 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/">Fooldal</RouterLink>
+              <RouterLink class="nav-link" to="/">Főoldal</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">Rolunk</RouterLink>
+              <RouterLink class="nav-link" to="/about">Rólunk</RouterLink>
             </li>
             <li class="nav-item" v-if="hasMenuAccess('/service')">
               <RouterLink class="nav-link" to="/service">Services</RouterLink>
@@ -70,14 +70,14 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li>
-                    <RouterLink class="dropdown-item" to="/account">Fiok</RouterLink>
+                    <RouterLink class="dropdown-item" to="/account">Fiók</RouterLink>
                   </li>
                   <li>
                     <hr class="dropdown-divider" />
                   </li>
                   <li>
                     <button class="dropdown-item text-danger" type="button" @click="onClickLogout">
-                      Kijelentkezes
+                      Kijelentkezés
                     </button>
                   </li>
                 </ul>
