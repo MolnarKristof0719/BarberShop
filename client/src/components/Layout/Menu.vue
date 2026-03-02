@@ -21,15 +21,12 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
           <ul class="navbar-nav align-items-lg-center gap-lg-2 mb-2 mb-lg-0">
             <li class="nav-item">
-              <RouterLink class="nav-link menu-link" to="/">Fooldal</RouterLink>
+              <RouterLink class="nav-link menu-link" to="/">Főoldal</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link menu-link" to="/about">Rolunk</RouterLink>
-              <RouterLink class="nav-link" to="/">Főoldal</RouterLink>
+              <RouterLink class="nav-link menu-link" to="/about">Rólunk</RouterLink>
             </li>
-            <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">Rólunk</RouterLink>
-            </li>
+            
             <li class="nav-item" v-if="hasMenuAccess('/service')">
               <RouterLink class="nav-link menu-link" to="/service">Services</RouterLink>
             </li>
