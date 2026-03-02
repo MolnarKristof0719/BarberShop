@@ -98,11 +98,32 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
         const response = await service.getMeRefresh();
         this.item.name = response.data.name;
         this.item.email = response.data.email;
+        this.item.phoneNumber = response.data.phoneNumber;
+        localStorage.setItem("user_data", JSON.stringify(this.item));
         return true;
       } catch (err) {
         this.error = err;
         throw err;
         return false;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateMe(payload) {
+      try {
+        this.error = null;
+        this.loading = true;
+        const response = await service.updateMe(payload);
+        const updatedUser = response?.data?.data || response?.data || {};
+        this.item = {
+          ...(this.item || {}),
+          ...updatedUser,
+        };
+        localStorage.setItem("user_data", JSON.stringify(this.item));
+        return this.item;
+      } catch (err) {
+        this.error = err;
+        throw err;
       } finally {
         this.loading = false;
       }

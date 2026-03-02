@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="account-page">
     <div class="account-card">
       <button
@@ -21,14 +21,12 @@
       />
 
       <h1 class="mb-1">{{ item?.name || "-" }}</h1>
-      <p class="text-muted mb-4">Bejelentkezett felhasznaló adatai</p>
-      
- 
-      
+      <p class="text-muted mb-4">Bejelentkezett felhasznalo adatai</p>
+
       <div class="row gy-3">
         <div class="col-12">
           <div class="info-box">
-            <small class="label">Név</small>
+            <small class="label">Nev</small>
             <p class="value mb-0">{{ item?.name || "-" }}</p>
           </div>
         </div>
@@ -40,8 +38,72 @@
         </div>
         <div class="col-12">
           <div class="info-box">
-            <small class="label">Szerepkör</small>
+            <small class="label">Telefon</small>
+            <p class="value mb-0">{{ item?.phoneNumber || "-" }}</p>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="info-box">
+            <small class="label">Szerepkor</small>
             <p class="value mb-0">{{ roleLabel }}</p>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="info-box">
+            <small class="label">Fiok adatok modositasa</small>
+            <form class="row g-2 mt-1" @submit.prevent="saveProfile">
+              <div class="col-12">
+                <label class="form-label mb-1" for="accountName">Nev</label>
+                <input
+                  id="accountName"
+                  v-model="editForm.name"
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': profileErrors.name }"
+                  @input="clearProfileError('name')"
+                />
+                <div class="invalid-feedback" v-if="profileErrors.name">
+                  {{ profileErrors.name[0] }}
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label mb-1" for="accountEmail">Email</label>
+                <input
+                  id="accountEmail"
+                  v-model="editForm.email"
+                  type="email"
+                  class="form-control"
+                  :class="{ 'is-invalid': profileErrors.email }"
+                  @input="clearProfileError('email')"
+                />
+                <div class="invalid-feedback" v-if="profileErrors.email">
+                  {{ profileErrors.email[0] }}
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label mb-1" for="accountPhone">Telefon (opcionalis)</label>
+                <input
+                  id="accountPhone"
+                  v-model="editForm.phoneNumber"
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': profileErrors.phoneNumber }"
+                  @input="clearProfileError('phoneNumber')"
+                />
+                <div class="invalid-feedback" v-if="profileErrors.phoneNumber">
+                  {{ profileErrors.phoneNumber[0] }}
+                </div>
+              </div>
+
+              <div class="col-12 mt-3">
+                <button class="btn btn-dark" type="submit" :disabled="savingProfile || loading">
+                  {{ savingProfile ? "Mentes..." : "Mentes" }}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -62,7 +124,7 @@
 </template>
 
 <script>
-import { mapState } from "pinia";
+import { mapActions, mapState } from "pinia";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import { useToastStore } from "@/stores/toastStore";
 import barberService from "@/api/barberService";
@@ -76,11 +138,19 @@ export default {
       barberProfilePicture: "",
       barberLoading: false,
       selectedFileName: "",
+      savingProfile: false,
+      profileErrors: {},
+      editForm: {
+        name: "",
+        email: "",
+        phoneNumber: "",
+      },
     };
   },
   watch: {
     item: {
       async handler() {
+        this.syncEditForm();
         await this.loadBarberProfile();
       },
       immediate: true,
@@ -93,7 +163,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(useUserLoginLogoutStore, ["item", "role"]),
+    ...mapState(useUserLoginLogoutStore, ["item", "role", "loading"]),
     isBarber() {
       return this.role === 2;
     },
@@ -111,6 +181,53 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useUserLoginLogoutStore, ["updateMe"]),
+    syncEditForm() {
+      this.editForm.name = this.item?.name || "";
+      this.editForm.email = this.item?.email || "";
+      this.editForm.phoneNumber = this.item?.phoneNumber || "";
+      this.profileErrors = {};
+    },
+    clearProfileError(field) {
+      if (!this.profileErrors[field]) return;
+      this.profileErrors = {
+        ...this.profileErrors,
+        [field]: null,
+      };
+    },
+    async saveProfile() {
+      if (!this.item) return;
+
+      const payload = {
+        name: (this.editForm.name || "").trim(),
+        email: (this.editForm.email || "").trim(),
+      };
+
+      const phoneNumber = (this.editForm.phoneNumber || "").trim();
+      if (phoneNumber) payload.phoneNumber = phoneNumber;
+
+      const noChanges =
+        payload.name === (this.item.name || "") &&
+        payload.email === (this.item.email || "") &&
+        (payload.phoneNumber || "") === (this.item.phoneNumber || "");
+      if (noChanges) return;
+
+      this.savingProfile = true;
+      this.profileErrors = {};
+      try {
+        await this.updateMe(payload);
+        const toastStore = useToastStore();
+        toastStore.messages.push("Profil adatok sikeresen frissitve.");
+        toastStore.show("Success");
+        this.syncEditForm();
+      } catch (error) {
+        if (error?.response?.status === 422) {
+          this.profileErrors = error?.response?.data?.errors || {};
+        }
+      } finally {
+        this.savingProfile = false;
+      }
+    },
     resetBarberState() {
       this.barberRecordId = null;
       this.barberProfilePicture = "";
@@ -126,9 +243,7 @@ export default {
       try {
         const response = await barberService.getAll();
         const barberItems = response?.data || [];
-        const currentBarber = barberItems.find(
-          (barber) => Number(barber.userId) === Number(this.item.id),
-        );
+        const currentBarber = barberItems.find((barber) => Number(barber.userId) === Number(this.item.id));
 
         if (!currentBarber) {
           this.resetBarberState();
@@ -252,5 +367,9 @@ export default {
 .selected-file {
   color: #111111;
   font-weight: 600;
+}
+
+.form-label {
+  color: #343a40;
 }
 </style>
