@@ -23,7 +23,8 @@
       <h1 class="mb-1">{{ item?.name || "-" }}</h1>
       <p class="text-muted mb-4">Bejelentkezett felhasznaló adatai</p>
       
-
+ 
+      
       <div class="row gy-3">
         <div class="col-12">
           <div class="info-box">
