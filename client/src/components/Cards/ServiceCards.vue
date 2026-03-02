@@ -1,10 +1,6 @@
 <template>
   <div class="row g-4">
-    <div
-      v-for="item in items"
-      :key="item.id"
-      class="col-12 col-md-6 col-xl-4"
-    >
+    <div v-for="item in items" :key="item.id" class="col-12 col-md-6 col-xl-4">
       <article class="service-card h-100">
         <div class="service-icon">
           <i class="bi" :class="iconById(item.id)"></i>
@@ -34,7 +30,7 @@ export default {
       return icons[id % icons.length];
     },
     priceById(id) {
-      const prices = [3500, 4500, 5500, 6500, 7500, 8500];
+      const prices = [3500, 5000, 5000, 3000, 4500, 5000];
       return prices[id % prices.length];
     },
     durationById(id) {
@@ -42,7 +38,7 @@ export default {
       return durations[id % durations.length];
     },
     descriptionByName(name) {
-      return `${name} szolgaltatas professzionalis kivitelezessel.`;
+      return `${name} szolgálatás professzionális kivitelezéssel.`;
     },
   },
 };
@@ -55,7 +51,9 @@ export default {
   background: #ffffff;
   padding: 22px;
   box-shadow: 0 8px 20px rgba(17, 17, 17, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .service-card:hover {
