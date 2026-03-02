@@ -9,7 +9,7 @@
         <div class="media-wrap">
           <img
             v-if="item.profilePicture"
-            :src="item.profilePicture"
+            :src="profileImage(item.profilePicture)"
             class="barber-image"
             :alt="`Barber ${item.id}`"
           />
@@ -44,10 +44,17 @@
 </template>
 
 <script>
+import { resolveMediaUrl } from "@/utils/media";
+
 export default {
   name: "BarberCards",
   props: {
     items: { type: Array, required: true },
+  },
+  methods: {
+    profileImage(path) {
+      return resolveMediaUrl(path);
+    },
   },
 };
 </script>
