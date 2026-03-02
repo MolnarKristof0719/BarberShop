@@ -30,7 +30,7 @@ export default {
       return icons[id % icons.length];
     },
     priceById(id) {
-      const prices = [3500, 5000, 5000, 3000, 4500, 5000];
+      const prices = [3500, 5000, 5000, 3000, 4500, 4000];
       return prices[id % prices.length];
     },
     durationById(id) {
