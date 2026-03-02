@@ -83,7 +83,7 @@
                       <RouterLink class="dropdown-item" to="/admin/barbers">Admin - Barberek</RouterLink>
                     </li>
                     <li>
-                      <RouterLink class="dropdown-item" to="/admin/services">Admin - Services</RouterLink>
+                      <RouterLink class="dropdown-item" to="/admin/services">Admin - Szolgáltatások</RouterLink>
                     </li>
                   </template>
                   <li>

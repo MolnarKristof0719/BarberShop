@@ -37,7 +37,7 @@
       </div>
 
       <div class="mb-3 row">
-        <label for="introduction" class="col-form-label col-3">Bemutatkozas</label>
+        <label for="introduction" class="col-form-label col-3">Bemutatkozás</label>
         <div class="col-9">
           <textarea
             id="introduction"
@@ -62,7 +62,7 @@
               type="checkbox"
               class="form-check-input"
             />
-            <label for="isActive" class="form-check-label">Aktiv</label>
+            <label for="isActive" class="form-check-label">Aktív</label>
           </div>
         </div>
       </div>

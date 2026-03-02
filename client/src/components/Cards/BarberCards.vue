@@ -23,7 +23,7 @@
             class="status-chip"
             :class="item.isActive ? 'status-active' : 'status-inactive'"
           >
-            {{ item.isActive ? "Aktiv" : "Inaktiv" }}
+            {{ item.isActive ? "Aktív" : "Inaktív" }}
           </span>
         </div>
 
@@ -35,7 +35,7 @@
             {{ item.user?.email || item.email || "" }}
           </p>
           <p class="intro mb-0 flex-grow-1">
-            {{ item.introduction || "Nincs bemutatkozas." }}
+            {{ item.introduction || "Nincs bemutatkozás." }}
           </p>
         </div>
       </article>
