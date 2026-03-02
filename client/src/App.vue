@@ -2,7 +2,7 @@
   <div class="app-shell container-fluid my-container mt-3">
     <Header class="app-header" />
     <Menu class="app-nav mt-2" />
-    <Breadcrumb class="app-breadcrumb mt-2" />
+    <!-- <Breadcrumb class="app-breadcrumb mt-2" /> -->
 
     <main class="app-main mt-3">
       <RouterView class="app-page" />

@@ -1,57 +1,66 @@
 <template>
-  <section class="home-barbers">
-    <p class="section-title mb-5">MEET THE BARBERS</p>
+  <section class="home-page">
+    <section class="hero-banner" :style="heroStyle">
+      <div class="hero-overlay">
+        <h1 class="hero-title-main">URBAN BARBERSHOP CO.</h1>
+        <RouterLink class="hero-book-btn" to="/service">Book Now</RouterLink>
+      </div>
+    </section>
 
-    <div class="carousel-shell" v-if="activeBarber">
-      <button class="nav-arrow nav-left" type="button" @click="prevBarber" aria-label="Elozo barber">
-        <i class="bi bi-chevron-left"></i>
-      </button>
+    <section class="home-barbers mt-4">
+      <p class="section-title mb-5">MEET THE BARBERS</p>
 
-      <article class="barber-focus-card">
-        <div class="focus-image-wrap">
-          <img
-            v-if="activeBarber.profilePicture"
-            :src="profileImage(activeBarber.profilePicture)"
-            :alt="activeBarber.user?.name || 'Barber kep'"
-            class="focus-image"
-          />
-          <div v-else class="focus-image fallback d-flex align-items-center justify-content-center">
-            <i class="bi bi-person-circle fs-1"></i>
+      <div class="carousel-shell" v-if="activeBarber">
+        <button class="nav-arrow nav-left" type="button" @click="prevBarber" aria-label="Elozo barber">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+
+        <article class="barber-focus-card">
+          <div class="focus-image-wrap">
+            <img
+              v-if="activeBarber.profilePicture"
+              :src="profileImage(activeBarber.profilePicture)"
+              :alt="activeBarber.user?.name || 'Barber kep'"
+              class="focus-image"
+            />
+            <div v-else class="focus-image fallback d-flex align-items-center justify-content-center">
+              <i class="bi bi-person-circle fs-1"></i>
+            </div>
           </div>
-        </div>
 
-        <div class="focus-content">
-          <h2 class="focus-name mb-2">{{ activeBarber.user?.name || `Barber #${activeBarber.id}` }}</h2>
-          <p class="focus-role mb-4">Barber</p>
-          <p class="focus-intro mb-0">
-            {{ activeBarber.introduction || "Nincs bemutatkozas ehhez a barberhez." }}
-          </p>
-        </div>
-      </article>
+          <div class="focus-content">
+            <h2 class="focus-name mb-2">{{ activeBarber.user?.name || `Barber #${activeBarber.id}` }}</h2>
+            <p class="focus-role mb-4">Barber</p>
+            <p class="focus-intro mb-0">
+              {{ activeBarber.introduction || "Nincs bemutatkozas ehhez a barberhez." }}
+            </p>
+          </div>
+        </article>
 
-      <button class="nav-arrow nav-right" type="button" @click="nextBarber" aria-label="Kovetkezo barber">
-        <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
+        <button class="nav-arrow nav-right" type="button" @click="nextBarber" aria-label="Kovetkezo barber">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
 
-    <div class="empty-state" v-else-if="!loading">
-      Jelenleg nincs megjelenitheto barber.
-    </div>
-    <div class="loading-state" v-else>
-      <i class="bi bi-hourglass-split me-2"></i> Betoltes...
-    </div>
+      <div class="empty-state" v-else-if="!loading">
+        Jelenleg nincs megjelenitheto barber.
+      </div>
+      <div class="loading-state" v-else>
+        <i class="bi bi-hourglass-split me-2"></i> Betoltes...
+      </div>
 
-    <div class="dot-nav mt-4" v-if="displayItems.length > 1">
-      <button
-        v-for="(item, index) in displayItems"
-        :key="item.id"
-        class="dot-btn"
-        :class="{ active: index === activeIndex }"
-        type="button"
-        @click="activeIndex = index"
-        :aria-label="`Barber ${index + 1}`"
-      ></button>
-    </div>
+      <div class="dot-nav mt-4" v-if="displayItems.length > 1">
+        <button
+          v-for="(item, index) in displayItems"
+          :key="item.id"
+          class="dot-btn"
+          :class="{ active: index === activeIndex }"
+          type="button"
+          @click="activeIndex = index"
+          :aria-label="`Barber ${index + 1}`"
+        ></button>
+      </div>
+    </section>
   </section>
 </template>
 
@@ -66,10 +75,16 @@ export default {
   data() {
     return {
       activeIndex: 0,
+      heroImageUrl: "/hero/barber-main.jpg",
     };
   },
   computed: {
     ...mapState(useBarberStore, ["items", "loading"]),
+    heroStyle() {
+      return {
+        backgroundImage: `url('${this.heroImageUrl}')`,
+      };
+    },
     displayItems() {
       if (!Array.isArray(this.items)) return [];
       return this.items.filter((item) => item && item.id && item.isActive !== false);
@@ -103,8 +118,57 @@ export default {
 </script>
 
 <style scoped>
-.home-barbers {
+.home-page {
   min-height: 100%;
+}
+
+.hero-banner {
+  position: relative;
+  height: clamp(360px, 48vw, 620px);
+  border-radius: 0;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center center;
+  background-color: #2a2a2a;
+}
+
+.hero-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(232, 226, 216, 0.72);
+  backdrop-filter: blur(2px);
+  padding: 34px 18px 36px;
+  text-align: center;
+}
+
+.hero-title-main {
+  margin: 0;
+  color: #1f1f1f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.8rem, 4vw, 4rem);
+  letter-spacing: 0.03em;
+}
+
+.hero-book-btn {
+  margin-top: 18px;
+  display: inline-block;
+  background: #111111;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid #111111;
+  border-radius: 0;
+  padding: 10px 24px;
+  font-size: 0.95rem;
+}
+
+.hero-book-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.home-barbers {
   background: #d8d8d8;
   border-radius: 14px;
   padding: 42px 18px 30px;
