@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Mail\BookingCreatedMail;
 use App\Models\Appointment as CurrentModel;
+use App\Models\Barber;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +13,10 @@ use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
+    private const WORK_START = '09:00';
+    private const WORK_END = '18:00';
+    private const SLOT_MINUTES = 30;
+
     public function indexSortSearch($column, $direction, $search = null)
     {
         return $this->apiResponse(function () use ($column, $direction, $search) {
@@ -69,13 +75,27 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         return $this->apiResponse(function () use ($request) {
+            $validSlots = $this->generateSlots();
             $data = $request->validate([
                 'barberId' => ['required', 'integer', 'exists:barbers,id'],
                 'appointmentDate' => ['required', 'date'],
-                'appointmentTime' => ['required', 'date_format:H:i'],
+                'appointmentTime' => [
+                    'required',
+                    'date_format:H:i',
+                    function (string $attribute, mixed $value, \Closure $fail) use ($validSlots): void {
+                        if (!in_array($value, $validSlots, true)) {
+                            $fail('Az idopont csak 30 perces sav lehet 09:00 es 17:30 kozott.');
+                        }
+                    }
+                ],
                 'services' => ['required', 'array', 'min:1'],
                 'services.*' => ['integer', 'exists:services,id'],
             ]);
+
+            $appointmentDateTime = Carbon::parse($data['appointmentDate'] . ' ' . $data['appointmentTime']);
+            if ($appointmentDateTime->lt(now())) {
+                abort(422, 'Multbeli idopontra nem lehet foglalni.');
+            }
 
             $isBarberActive = DB::table('barbers')
                 ->where('id', $data['barberId'])
@@ -125,6 +145,166 @@ class AppointmentController extends Controller
         });
     }
 
+    public function availability(Request $request)
+    {
+        return $this->apiResponse(function () use ($request) {
+            $validated = $request->validate([
+                'barberId' => ['required', 'integer', 'exists:barbers,id'],
+                'date' => ['nullable', 'date'],
+                'month' => ['nullable', 'date_format:Y-m'],
+            ]);
+
+            $barberId = (int) $validated['barberId'];
+            $month = $validated['month'] ?? now()->format('Y-m');
+            $selectedDate = $validated['date'] ?? now()->toDateString();
+
+            $monthStart = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+            $monthEnd = $monthStart->copy()->endOfMonth();
+            $slots = $this->generateSlots();
+            $today = now()->startOfDay();
+
+            $bookedRows = CurrentModel::query()
+                ->where('barberId', $barberId)
+                ->whereIn('status', ['booked', 'completed'])
+                ->whereBetween('appointmentDate', [$monthStart->toDateString(), $monthEnd->toDateString()])
+                ->get(['appointmentDate', 'appointmentTime']);
+
+            $bookedByDate = [];
+            foreach ($bookedRows as $row) {
+                $dateKey = Carbon::parse($row->appointmentDate)->toDateString();
+                $timeKey = substr((string) $row->appointmentTime, 0, 5);
+                $bookedByDate[$dateKey][$timeKey] = true;
+            }
+
+            $offDayRows = DB::table('barber_off_days')
+                ->where('barberId', $barberId)
+                ->whereBetween('offDay', [$monthStart->toDateString(), $monthEnd->toDateString()])
+                ->pluck('offDay')
+                ->all();
+
+            $offDaySet = [];
+            foreach ($offDayRows as $offDay) {
+                $offDaySet[(string) $offDay] = true;
+            }
+
+            $fullyBookedDates = [];
+            $cursor = $monthStart->copy();
+            while ($cursor->lte($monthEnd)) {
+                $date = $cursor->toDateString();
+                $bookedSet = $bookedByDate[$date] ?? [];
+                if (!$this->hasAnyAvailableSlot($date, $slots, $bookedSet, $offDaySet, $today)) {
+                    $fullyBookedDates[] = $date;
+                }
+                $cursor->addDay();
+            }
+
+            $selectedBookedSet = $bookedByDate[$selectedDate] ?? [];
+            $selectedSlots = [];
+            foreach ($slots as $time) {
+                $selectedSlots[] = [
+                    'time' => $time,
+                    'available' => $this->isSlotAvailable($selectedDate, $time, $selectedBookedSet, $offDaySet, $today),
+                ];
+            }
+
+            return [
+                'barberId' => $barberId,
+                'month' => $month,
+                'date' => $selectedDate,
+                'workingHours' => [
+                    'start' => self::WORK_START,
+                    'end' => self::WORK_END,
+                    'intervalMinutes' => self::SLOT_MINUTES,
+                ],
+                'offDays' => array_keys($offDaySet),
+                'fullyBookedDates' => $fullyBookedDates,
+                'slots' => $selectedSlots,
+            ];
+        });
+    }
+
+    public function earliestOptions(Request $request)
+    {
+        return $this->apiResponse(function () use ($request) {
+            $validated = $request->validate([
+                'limit' => ['nullable', 'integer', 'min:1', 'max:20'],
+                'daysAhead' => ['nullable', 'integer', 'min:1', 'max:90'],
+                'serviceIds' => ['nullable', 'array'],
+                'serviceIds.*' => ['integer', 'exists:services,id'],
+            ]);
+
+            $limit = (int) ($validated['limit'] ?? 8);
+            $daysAhead = (int) ($validated['daysAhead'] ?? 30);
+            $fromDate = now()->startOfDay();
+            $toDate = $fromDate->copy()->addDays($daysAhead);
+            $slots = $this->generateSlots();
+            $today = now()->startOfDay();
+
+            $barbers = Barber::query()
+                ->where('isActive', true)
+                ->with('user:id,name')
+                ->get(['id', 'userId', 'profilePicture']);
+
+            if ($barbers->isEmpty()) {
+                return [];
+            }
+
+            $barberIds = $barbers->pluck('id')->all();
+            $bookedRows = CurrentModel::query()
+                ->whereIn('barberId', $barberIds)
+                ->whereIn('status', ['booked', 'completed'])
+                ->whereBetween('appointmentDate', [$fromDate->toDateString(), $toDate->toDateString()])
+                ->get(['barberId', 'appointmentDate', 'appointmentTime']);
+
+            $bookedLookup = [];
+            foreach ($bookedRows as $row) {
+                $bookedLookup[$row->barberId][Carbon::parse($row->appointmentDate)->toDateString()][substr((string) $row->appointmentTime, 0, 5)] = true;
+            }
+
+            $offDayRows = DB::table('barber_off_days')
+                ->whereIn('barberId', $barberIds)
+                ->whereBetween('offDay', [$fromDate->toDateString(), $toDate->toDateString()])
+                ->get(['barberId', 'offDay']);
+
+            $offDayLookup = [];
+            foreach ($offDayRows as $row) {
+                $offDayLookup[$row->barberId][(string) $row->offDay] = true;
+            }
+
+            $options = [];
+            foreach ($barbers as $barber) {
+                $cursor = $fromDate->copy();
+                while ($cursor->lte($toDate)) {
+                    $date = $cursor->toDateString();
+                    $bookedSet = $bookedLookup[$barber->id][$date] ?? [];
+                    $offDaySet = $offDayLookup[$barber->id] ?? [];
+
+                    foreach ($slots as $time) {
+                        if ($this->isSlotAvailable($date, $time, $bookedSet, $offDaySet, $today)) {
+                            $options[] = [
+                                'barberId' => (int) $barber->id,
+                                'barberName' => (string) ($barber->user?->name ?? 'Ismeretlen barber'),
+                                'profilePicture' => $barber->profilePicture,
+                                'appointmentDate' => $date,
+                                'appointmentTime' => $time,
+                            ];
+                        }
+                    }
+
+                    $cursor->addDay();
+                }
+            }
+
+            usort($options, function (array $a, array $b): int {
+                $left = $a['appointmentDate'] . ' ' . $a['appointmentTime'];
+                $right = $b['appointmentDate'] . ' ' . $b['appointmentTime'];
+                return strcmp($left, $right);
+            });
+
+            return array_slice($options, 0, $limit);
+        });
+    }
+
     public function show(int $id)
     {
         return $this->apiResponse(function () use ($id) {
@@ -168,5 +348,62 @@ class AppointmentController extends Controller
 
             return $appointment;
         });
+    }
+
+    private function generateSlots(): array
+    {
+        $slots = [];
+        $time = Carbon::createFromFormat('H:i', self::WORK_START);
+        $end = Carbon::createFromFormat('H:i', self::WORK_END);
+
+        while ($time->lt($end)) {
+            $slots[] = $time->format('H:i');
+            $time->addMinutes(self::SLOT_MINUTES);
+        }
+
+        return $slots;
+    }
+
+    private function hasAnyAvailableSlot(
+        string $date,
+        array $slots,
+        array $bookedSet,
+        array $offDaySet,
+        Carbon $today
+    ): bool {
+        foreach ($slots as $time) {
+            if ($this->isSlotAvailable($date, $time, $bookedSet, $offDaySet, $today)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function isSlotAvailable(
+        string $date,
+        string $time,
+        array $bookedSet,
+        array $offDaySet,
+        Carbon $today
+    ): bool {
+        if (isset($offDaySet[$date])) {
+            return false;
+        }
+
+        $dateCarbon = Carbon::parse($date)->startOfDay();
+        if ($dateCarbon->lt($today)) {
+            return false;
+        }
+
+        if (isset($bookedSet[$time])) {
+            return false;
+        }
+
+        $slotDateTime = Carbon::parse($date . ' ' . $time);
+        if ($slotDateTime->lte(now())) {
+            return false;
+        }
+
+        return true;
     }
 }

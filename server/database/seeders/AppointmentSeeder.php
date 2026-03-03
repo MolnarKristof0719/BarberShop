@@ -17,7 +17,7 @@ class AppointmentSeeder extends Seeder
         /** @var TimeSlotService $slotService */
         $slotService = app(TimeSlotService::class);
 
-        $slots = $slotService->generateHalfHourSlots('09:00', '17:00');
+        $slots = $slotService->generateHalfHourSlots('09:00', '18:00');
 
         $barberIds = Barber::query()->pluck('id')->all();
         $userIds   = User::query()->pluck('id')->all();

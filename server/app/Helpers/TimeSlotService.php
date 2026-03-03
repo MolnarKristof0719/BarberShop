@@ -16,7 +16,7 @@ class TimeSlotService
         $endTime = Carbon::createFromTimeString($end);
 
         while ($time < $endTime) {
-            $slots[] = $time->format('H:i:s');
+            $slots[] = $time->format('H:i');
             $time->addMinutes(30);
         }
 

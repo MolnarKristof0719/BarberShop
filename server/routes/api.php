@@ -93,6 +93,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Nálad customer kap: appointments:post és appointments:delete
     // GET-hez NINCS ability a loginban -> vagy public, vagy add hozzá: appointments:get
     Route::get('/appointments', [AppointmentController::class, 'index'])->middleware('ability:appointments:get'); // vagy 'appointments:get' ha bevezeted
+    Route::get('/appointments/availability', [AppointmentController::class, 'availability'])->middleware('ability:appointments:post');
+    Route::get('/appointments/earliest-options', [AppointmentController::class, 'earliestOptions'])->middleware('ability:appointments:post');
     Route::get('/appointments/{id}', [AppointmentController::class, 'show'])->middleware('ability:appointments:show'); // vagy 'appointments:get'
     Route::get('/appointmentssortsearch/{column}/{direction}/{search?}', [AppointmentController::class, 'indexSortSearch']);
 
@@ -111,4 +113,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointment_services', [AppointmentServiceController::class, 'index'])->middleware('ability:*');
     Route::get('/appointment_services/{id}', [AppointmentServiceController::class, 'show'])->middleware('ability:*');
 });
-

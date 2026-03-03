@@ -1,13 +1,17 @@
 import { defineStore } from "pinia";
-// import { useToastStore } from "@/stores/toastStore";
 import { useSearchStore } from "./searchStore";
 import service from "@/api/appointmentService";
 
-// const toast = useToastStore();
-
-//változtatás
 class Item {
-  constructor(id = 0, barberId = "", userId = "", appointmentDate = "", appointmentTime = "", status = "", cancelledBy = "", ) {
+  constructor(
+    id = 0,
+    barberId = "",
+    userId = "",
+    appointmentDate = "",
+    appointmentTime = "",
+    status = "",
+    cancelledBy = "",
+  ) {
     this.id = id;
     this.barberId = barberId;
     this.userId = userId;
@@ -28,18 +32,17 @@ export const useAppointmentStore = defineStore("appointment", {
     sortDirection: "asc",
     searchStore: useSearchStore(),
   }),
-   getters:{
-    getItemsLength(){
+  getters: {
+    getItemsLength() {
       return this.items.length;
-    }
+    },
   },
   actions: {
     clearItem() {
       this.item = new Item();
     },
-    // READ - Összes adat lekérése
+
     async getAllAbc() {
-      //   const toast = useToastStore();
       this.loading = true;
       this.error = null;
       try {
@@ -52,10 +55,8 @@ export const useAppointmentStore = defineStore("appointment", {
         this.loading = false;
       }
     },
-    //Ha a direction meg van aadva, akkor ez lesz a sorrend
-    //Ha nincs megadva, akkor ellentettjére vált
+
     async getAllSortSearch(column = "id", direction = null) {
-      //   const toast = useToastStore();
       this.loading = true;
       this.error = null;
       this.sortColumn = column;
@@ -80,13 +81,12 @@ export const useAppointmentStore = defineStore("appointment", {
         this.loading = false;
       }
     },
+
     async getAll() {
-      //   const toast = useToastStore();
       this.loading = true;
       this.error = null;
       try {
         const response = await service.getAll();
-        // this.searchStore.reset();
         this.items = response.data;
       } catch (err) {
         this.error = err;
@@ -96,11 +96,9 @@ export const useAppointmentStore = defineStore("appointment", {
       }
     },
 
-    // READ - Egy adat lekérése
     async getById(id) {
       this.loading = true;
       this.error = null;
-      //   const toast = useToastStore();
       try {
         const response = await service.getById(id);
         this.item = response.data;
@@ -112,75 +110,64 @@ export const useAppointmentStore = defineStore("appointment", {
       }
     },
 
-    // CREATE - Új elem hozzáadása
     async create(data) {
       this.loading = true;
       this.error = null;
       try {
-        const newItem = await service.create(data);
+        await service.create(data);
         const response = await service.getAllSortSearch(
           this.sortColumn,
           this.sortDirection,
           this.searchStore.searchWord,
         );
         this.items = response.data;
-        // toast.messages.push("Sikeresen létrehozva!");
-        // toast.show("Success");
         return true;
       } catch (err) {
-        this.error = err.response.data.errors.osztalyNev[0];
+        this.error =
+          err?.response?.data?.message ||
+          err?.response?.data?.errors ||
+          "Sikertelen foglalás.";
         throw err;
-        return false;
       } finally {
         this.loading = false;
       }
     },
 
-    // 3. UPDATE - Módosítás (Helyi frissítéssel, újraolvasás nélkül)
     async update(id, updateData) {
       this.loading = true;
       this.error = null;
       try {
-        const updatedItem = await service.update(id, updateData);
-        // const response = await service.getAll();
+        await service.update(id, updateData);
         const response = await service.getAllSortSearch(
           this.sortColumn,
           this.sortDirection,
           this.searchStore.searchWord,
         );
         this.items = response.data;
-        // toast.messages.push(`Sikeresen módosítva`);
-        // toast.show("Success");
         return true;
       } catch (err) {
         this.error = err;
         throw err;
-        return false;
       } finally {
         this.loading = false;
       }
     },
 
-    // 4. DELETE - Törlés
     async delete(id) {
       this.loading = true;
       this.error = null;
       try {
         await service.delete(id);
-        //const response = await service.getAll();
         const response = await service.getAllSortSearch(
           this.sortColumn,
           this.sortDirection,
           this.searchStore.searchWord,
         );
         this.items = response.data;
-        // toast.messages.push(`Sikeresen törölve`);
-        // toast.show("Success");
         return true;
       } catch (err) {
         this.error = err;
         throw err;
-        return false;
       } finally {
         this.loading = false;
       }
