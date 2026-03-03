@@ -23,6 +23,7 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+
          $faker = \Faker\Factory::create('hu_HU');
         return [
             'name' => $faker->firstNameMale() . ' ' . $faker->lastName(),

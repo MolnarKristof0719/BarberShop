@@ -18,11 +18,13 @@ class BarberSeeder extends Seeder
         foreach ($barberUsers as $user) {
             Barber::create([
                 'userId' => $user->id,
-                'profilePicture' => 'https://xsgames.co/randomusers/assets/avatars/male/' . $user->id .'.jpg',
-                'introduction' => fake()->paragraph(3),
-                'isActive' => $user->email === 'barber@example.com'
-                    ? true
-                    : fake()->boolean(95),
+                'profilePicture' => $user->email === 'arabpacek@example.com'
+                    ? 'https://entertainment.time.com/wp-content/uploads/sites/3/2012/04/the-dictator.jpg?w=600'
+                    : 'https://xsgames.co/randomusers/assets/avatars/male/' . $user->id . '.jpg',
+                'introduction' => $user->email === 'arabpacek@example.com'
+                    ? 'أنا حلاق محترف متخصص في التدرجات الدقيقة وتشذيب اللحية بأعلى جودة.'
+                    : fake()->paragraph(3),
+                'isActive' => fake()->boolean(95),
             ]);
         }
     }

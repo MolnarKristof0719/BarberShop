@@ -14,6 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+         $arabFaker = \Faker\Factory::create('ar_SA');
         //
         User::factory()->create([
             'name' => 'Admin',
@@ -37,6 +38,14 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123'),
             'phoneNumber' => fake()->phoneNumber(),
             'role' => 3
+        ]);
+
+        User::factory()->create([
+            'name' => $arabFaker->name(),
+            'email' => 'arabpacek@example.com',
+            'password' => Hash::make('123'),
+            'phoneNumber' => fake()->phoneNumber(),
+            'role' => 2
         ]);
 
         User::factory()->create([
