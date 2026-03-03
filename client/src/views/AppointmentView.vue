@@ -174,10 +174,10 @@ export default {
     },
     stepItems() {
       return [
-        { id: 1, label: "Szolgaltatas" },
+        { id: 1, label: "Szolgáltatás" },
         { id: 2, label: "Barber" },
-        { id: 3, label: "Idopont" },
-        { id: 4, label: "Ellenorzes" },
+        { id: 3, label: "Időpont" },
+        { id: 4, label: "Ellenőrzés" },
       ];
     },
     calendarCells() {
