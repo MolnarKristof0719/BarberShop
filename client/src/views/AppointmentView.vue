@@ -81,11 +81,7 @@
           <button class="btn-close" type="button" @click="closeReferenceModal"></button>
         </div>
         <p class="mb-0 mt-3 text-muted">
-<<<<<<< HEAD
-          A referenciaképek tabla meg nincs bekötve, de a modal keszen all a kesobbi listázasra.
-=======
-          A referenciaképek tábla meg nincs bekötve, de a modal készen áll a későbbi listázásra.
->>>>>>> eb2ce0a55c36975ee2b1b2edf50f81eb1cab5289
+          A referenciaképek tábla még nincs bekötve, de a modal készen áll a későbbi listázásra.
         </p>
       </div>
     </div>

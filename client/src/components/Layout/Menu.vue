@@ -27,9 +27,9 @@
               <RouterLink class="nav-link menu-link" to="/about">Rólunk</RouterLink>
             </li>
             
-            <li class="nav-item" v-if="hasMenuAccess('/service')">
+            <!-- <li class="nav-item" v-if="hasMenuAccess('/service')">
               <RouterLink class="nav-link menu-link" to="/service">Szolgáltatások</RouterLink>
-            </li>
+            </li> -->
             <!-- <li class="nav-item" v-if="hasMenuAccess('/barber')">
               <RouterLink class="nav-link menu-link" to="/barber">Barberek</RouterLink>
             </li> -->
