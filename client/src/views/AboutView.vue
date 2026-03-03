@@ -25,7 +25,7 @@
             <h2 class="focus-name mb-2">{{ activeBarber.user?.name || `Barber #${activeBarber.id}` }}</h2>
             <p class="focus-role mb-4">Barber</p>
             <p class="focus-intro mb-0">
-              {{ activeBarber.introduction || "Nincs bemutatkozas ehhez a barberhez." }}
+              {{ activeBarber.introduction || "Nincs bemutatkozás ehhez a barberhez." }}
             </p>
           </div>
         </article>
@@ -36,10 +36,10 @@
       </div>
 
       <div class="empty-state" v-else-if="!loading">
-        Jelenleg nincs megjelenitheto barber.
+        Jelenleg nincs megjeleníthető barber.
       </div>
       <div class="loading-state" v-else>
-        <i class="bi bi-hourglass-split me-2"></i> Betoltes...
+        <i class="bi bi-hourglass-split me-2"></i> Betöltés...
       </div>
 
       <div class="dot-nav mt-4" v-if="displayItems.length > 1">
