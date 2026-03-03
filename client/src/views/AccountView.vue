@@ -6,7 +6,7 @@
         type="button"
         @click="onAvatarClick"
         :disabled="!isBarber || barberLoading || !barberRecordId"
-        :title="isBarber ? 'Profilkep csere' : 'Csak barbernek modosithato'"
+        :title="isBarber ? 'Profilkép csere' : 'Csak barbernek módosítható'"
       >
         <img v-if="avatarImageSrc" :src="avatarImageSrc" alt="Profilkep" class="avatar-image" />
         <i v-else class="bi bi-person"></i>
@@ -21,12 +21,12 @@
       />
 
       <h1 class="mb-1">{{ item?.name || "-" }}</h1>
-      <p class="text-muted mb-4">Bejelentkezett felhasznalo adatai</p>
+      <p class="text-muted mb-4">Bejelentkezett felhasználó adatai</p>
 
       <div class="row gy-3">
         <div class="col-12">
           <div class="info-box">
-            <small class="label">Nev</small>
+            <small class="label">Név</small>
             <p class="value mb-0">{{ item?.name || "-" }}</p>
           </div>
         </div>
@@ -44,17 +44,17 @@
         </div>
         <div class="col-12">
           <div class="info-box">
-            <small class="label">Szerepkor</small>
+            <small class="label">Szerepkör</small>
             <p class="value mb-0">{{ roleLabel }}</p>
           </div>
         </div>
 
         <div class="col-12">
           <div class="info-box">
-            <small class="label">Fiok adatok modositasa</small>
+            <small class="label">Fiók adatok módosítása</small>
             <form class="row g-2 mt-1" @submit.prevent="saveProfile">
               <div class="col-12">
-                <label class="form-label mb-1" for="accountName">Nev</label>
+                <label class="form-label mb-1" for="accountName">Név</label>
                 <input
                   id="accountName"
                   v-model="editForm.name"
@@ -84,7 +84,7 @@
               </div>
 
               <div class="col-12">
-                <label class="form-label mb-1" for="accountPhone">Telefon (opcionalis)</label>
+                <label class="form-label mb-1" for="accountPhone">Telefon (opcionális)</label>
                 <input
                   id="accountPhone"
                   v-model="editForm.phoneNumber"
@@ -100,7 +100,7 @@
 
               <div class="col-12 mt-3">
                 <button class="btn btn-dark" type="submit" :disabled="savingProfile || loading">
-                  {{ savingProfile ? "Mentes..." : "Mentes" }}
+                  {{ savingProfile ? "Mentés..." : "Mentés" }}
                 </button>
               </div>
             </form>
@@ -109,12 +109,12 @@
 
         <div class="col-12" v-if="isBarber">
           <div class="info-box">
-            <small class="label">Profilkep csere</small>
+            <small class="label">Profilkép csere</small>
             <p class="mb-0 mt-2 helper-text">
-              Kattints az avatarra es valassz egy kepet. A rendszer a regi kepet automatikusan torli.
+              Kattints az avatárra és valássz egy képet. A rendszer a régi képet automatikusan törli.
             </p>
             <p class="mb-0 mt-2 selected-file" v-if="selectedFileName">
-              Kivalasztott: {{ selectedFileName }}
+              Kiválasztott: {{ selectedFileName }}
             </p>
           </div>
         </div>
