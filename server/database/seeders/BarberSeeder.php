@@ -25,7 +25,7 @@ class BarberSeeder extends Seeder
                     default => 'https://xsgames.co/randomusers/assets/avatars/male/' . $user->id . '.jpg',
                 },
                 'introduction' => $user->email === 'arabpacek@example.com'
-                    ? 'سنرسل الطرد.'
+                    ? 'أرسلت الطرد.'
                     : fake()->paragraph(3),
                 'isActive' => fake()->boolean(95),
             ]);
