@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
 class UpdateUserSelfRequest extends FormRequest
 {
@@ -36,13 +35,7 @@ class UpdateUserSelfRequest extends FormRequest
                 'email',
                 'max:191',
                 'required_without_all:name,phoneNumber',
-                Rule::unique('users')
-                    ->where(
-                        fn($query) => $query
-                            ->where('email', $this->email)
-                            ->where('phoneNumber', $this->phoneNumber)
-                    )
-                    ->ignore($this->user()->id),
+                Rule::unique('users', 'email')->ignore($this->user()->id),
             ],
             'phoneNumber' => [
                 'sometimes',
