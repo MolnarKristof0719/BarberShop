@@ -30,9 +30,9 @@
             <li class="nav-item" v-if="hasMenuAccess('/service')">
               <RouterLink class="nav-link menu-link" to="/service">Szolgáltatások</RouterLink>
             </li>
-            <li class="nav-item" v-if="hasMenuAccess('/barber')">
+            <!-- <li class="nav-item" v-if="hasMenuAccess('/barber')">
               <RouterLink class="nav-link menu-link" to="/barber">Barberek</RouterLink>
-            </li>
+            </li> -->
           </ul>
 
           <div class="menu-meta d-flex flex-column flex-lg-row align-items-lg-center ms-lg-4 gap-2 gap-lg-3">

@@ -20,6 +20,8 @@ Route::post('users', [UserController::class, 'store']); // regisztráció
 
 Route::get('/services', [ServiceController::class, 'index']); // public
 Route::get('/servicessortsearch/{column}/{direction}/{search?}', [ServiceController::class, 'indexSortSearch']);
+Route::get('/barbers', [BarberController::class, 'index']);
+Route::get('/barbers/{id}', [BarberController::class, 'show']);
 
 // Ha nálatok a barberek listája PUBLIC legyen, hagyd így:
 // Route::get('/barbers', [BarberController::class, 'index']);
@@ -67,9 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->middleware('ability:*');
 
     // --- BARBERS (ability:barbers:get) ---
-    Route::get('/barbers', [BarberController::class, 'index'])->middleware('ability:barbers:get');
     Route::get('/barberssortsearch/{column}/{direction}/{search?}', [BarberController::class, 'indexSortSearch'])->middleware('ability:barbers:get');
-    Route::get('/barbers/{id}', [BarberController::class, 'show'])->middleware('ability:barbers:get');
     Route::get('barberbyid/{barberId}/{column}/{direction}/{search?}', [BarberController::class, 'indexBarbersById']);
 
     // Admin barber CRUD (ha van ilyen controller funkció)

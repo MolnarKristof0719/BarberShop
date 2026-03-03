@@ -81,7 +81,7 @@
           <button class="btn-close" type="button" @click="closeReferenceModal"></button>
         </div>
         <p class="mb-0 mt-3 text-muted">
-          A referenciakepek tabla meg nincs bekotve, de a modal keszen all a kesobbi listazasra.
+          A referenciaképek tabla meg nincs bekötve, de a modal keszen all a kesobbi listázasra.
         </p>
       </div>
     </div>
@@ -352,7 +352,7 @@ export default {
       } catch (error) {
         this.submitError =
           error?.response?.data?.message ||
-          "A foglalas nem sikerult. Ellenorizd az adatokat es probald ujra.";
+          "A foglalás nem sikerült. Ellenőrizd az adatokat és próbáld újra.";
       } finally {
         this.submitLoading = false;
       }
