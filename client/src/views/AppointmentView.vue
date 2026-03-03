@@ -3,10 +3,10 @@
     <div class="hero d-flex flex-wrap align-items-center justify-content-between gap-3">
       <div>
         <p class="hero-kicker mb-1">Barber Shop</p>
-        <h1 class="hero-title mb-1">Idopontfoglalas</h1>
-        <p class="hero-subtitle mb-0">Valassz szolgaltatast, barbert, napot es idopontot.</p>
+        <h1 class="hero-title mb-1">Időpontfoglalás</h1>
+        <p class="hero-subtitle mb-0">Válassz szolgáltatást, barbert, napot es időpontot.</p>
       </div>
-      <div class="step-pill">Lepes: {{ currentStep }}/4</div>
+      <div class="step-pill">Lépés: {{ currentStep }}/4</div>
     </div>
 
     <StepperComponent
@@ -81,7 +81,11 @@
           <button class="btn-close" type="button" @click="closeReferenceModal"></button>
         </div>
         <p class="mb-0 mt-3 text-muted">
+<<<<<<< HEAD
           A referenciaképek tabla meg nincs bekötve, de a modal keszen all a kesobbi listázasra.
+=======
+          A referenciaképek tábla meg nincs bekötve, de a modal készen áll a későbbi listázásra.
+>>>>>>> eb2ce0a55c36975ee2b1b2edf50f81eb1cab5289
         </p>
       </div>
     </div>
