@@ -63,10 +63,10 @@ export default {
   },
   data() {
     return {
-      pageTitle: "Admin - Szolgaltatasok (tablazat)",
+      pageTitle: "Admin - Szolgáltatások (táblázat)",
       tableColumns: [
         { key: "id", label: "ID", debug: 2 },
-        { key: "service", label: "Szolgaltatas", debug: 2 },
+        { key: "service", label: "Szolgáltatás", debug: 2 },
       ],
       useCollectionStore: useServiceStore,
       isOpenConfirmModal: false,
@@ -107,13 +107,13 @@ export default {
     },
     updateHandler(id) {
       this.state = "u";
-      this.title = "Szolgaltatas modositasa";
+      this.title = "Szolgáltatás módosítása";
       this.getById(id);
       this.$refs.form.show();
     },
     createHandler() {
       this.state = "c";
-      this.title = "Uj szolgaltatas";
+      this.title = "Új szolgáltatás";
       this.clearItem();
       this.$refs.form.show();
     },

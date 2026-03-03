@@ -63,13 +63,13 @@ export default {
   },
   data() {
     return {
-      pageTitle: "Admin - Barberek (tablazat)",
+      pageTitle: "Admin - Barberek (táblázat)",
       tableColumns: [
         { key: "id", label: "ID", debug: 2 },
         { key: "userId", label: "User ID", debug: 2 },
-        { key: "userName", label: "Nev", debug: 2 },
+        { key: "userName", label: "Név", debug: 2 },
         { key: "userEmail", label: "Email", debug: 2 },
-        { key: "isActiveLabel", label: "Statusz", debug: 2 },
+        { key: "isActiveLabel", label: "Státusz", debug: 2 },
       ],
       useCollectionStore: useBarberStore,
       isOpenConfirmModal: false,
@@ -94,7 +94,7 @@ export default {
         userId: item.userId,
         userName: item.user?.name || "",
         userEmail: item.user?.email || "",
-        isActiveLabel: item.isActive ? "Aktiv" : "Inaktiv",
+        isActiveLabel: item.isActive ? "Aktív" : "Inaktív",
       }));
     },
   },
@@ -119,13 +119,13 @@ export default {
     },
     async updateHandler(id) {
       this.state = "u";
-      this.title = "Barber modositasa";
+      this.title = "Barber módosítása";
       await this.getById(id);
       this.$refs.form.show();
     },
     createHandler() {
       this.state = "c";
-      this.title = "Uj barber";
+      this.title = "Új barber";
       this.clearItem();
       this.$refs.form.show();
     },
