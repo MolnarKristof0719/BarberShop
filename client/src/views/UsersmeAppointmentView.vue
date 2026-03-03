@@ -52,12 +52,18 @@ export default {
   },
   methods: {
     ...mapActions(useUsersmeAppointmentStore, ["getAll", "cancel"]),
+    async refreshAppointments() {
+      await this.getAll();
+    },
     async cancelAppointment(id) {
       await this.cancel(id);
     },
   },
   async mounted() {
-    await this.getAll();
+    await this.refreshAppointments();
+  },
+  async activated() {
+    await this.refreshAppointments();
   },
 };
 </script>

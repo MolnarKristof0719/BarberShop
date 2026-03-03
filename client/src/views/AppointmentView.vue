@@ -99,6 +99,7 @@ import StepperComponent from "@/components/Appointment/StepperComponent.vue";
 import { useAppointmentStore } from "@/stores/appointmentStore";
 import { useBarberStore } from "@/stores/barberStore";
 import { useServiceStore } from "@/stores/serviceStore";
+import { useUsersmeAppointmentStore } from "@/stores/usersmeappointmentStore";
 
 export default {
   name: "AppointmentView",
@@ -129,6 +130,7 @@ export default {
       serviceStore: useServiceStore(),
       barberStore: useBarberStore(),
       appointmentStore: useAppointmentStore(),
+      usersmeAppointmentStore: useUsersmeAppointmentStore(),
     };
   },
   computed: {
@@ -410,6 +412,7 @@ export default {
           services: this.selectedServiceIds,
         });
 
+        await this.usersmeAppointmentStore.getAll();
         await this.$router.push({ name: "home" });
       } catch (error) {
         this.submitError =
