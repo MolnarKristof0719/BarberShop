@@ -1,19 +1,24 @@
 import { defineStore } from "pinia";
 // import { useToastStore } from "@/stores/toastStore";
 import { useSearchStore } from "./searchStore";
-import service from "@/api/schoolclassService";
+import service from "@/api/appointmentService";
 
 // const toast = useToastStore();
 
 //változtatás
 class Item {
-  constructor(id = 0, osztalyNev = "") {
+  constructor(id = 0, barberId = "", userId = "", appointmentDate = "", appointmentTime = "", status = "", cancelledBy = "", ) {
     this.id = id;
-    this.osztalyNev = osztalyNev;
+    this.barberId = barberId;
+    this.userId = userId;
+    this.appointmentDate = appointmentDate;
+    this.appointmentTime = appointmentTime;
+    this.status = status;
+    this.cancelledBy = cancelledBy;
   }
 }
 
-export const useSchoolclassStore = defineStore("schoolclass", {
+export const useAppointmentStore = defineStore("appointment", {
   state: () => ({
     item: new Item(),
     items: [new Item()],

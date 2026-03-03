@@ -1,14 +1,11 @@
 import apiClient from './axiosClient'; 
-const route = '/schoolclasses';
+const route = '/appointments';
 
 export default {
-  async getAllAbc() {
-    const route = `/schoolclassesabc`
-    return await apiClient.get(route);
-  },
+  
 
    async getAllSortSearch(column='id', direction='asc', search='') {
-    const route = `/schoolclassessortsearch/${column}/${direction}/${search}`
+    const route = `/appointmentssortsearch/${column}/${direction}/${search}`
     return await apiClient.get(route);
   },
 
