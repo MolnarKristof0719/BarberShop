@@ -22,11 +22,12 @@
         :key="barber.id"
         class="barber-card"
         :class="{
+          inactive: !barber.isActive,
           selected:
             selectedBarberId === barber.id &&
             selectedBarberMode === 'specific',
         }"
-        @click="$emit('select-barber', barber.id)"
+        @click="onBarberClick(barber)"
       >
         <div class="barber-main">
           <div class="avatar">
@@ -39,7 +40,10 @@
           </div>
           <div>
             <p class="barber-name mb-1">{{ barberName(barber) }}</p>
-            <p class="barber-intro mb-0">{{ barber.introduction || "Barber" }}</p>
+            <p class="barber-intro mb-0">
+              {{ barber.introduction || "Barber" }}
+              <span v-if="!barber.isActive" class="inactive-label"> (jelenleg nem aktiv)</span>
+            </p>
           </div>
         </div>
         <button
@@ -81,6 +85,12 @@ export default {
     "next",
   ],
   methods: {
+    onBarberClick(barber) {
+      if (!barber?.isActive) {
+        return;
+      }
+      this.$emit("select-barber", barber.id);
+    },
     barberName(barber) {
       return barber?.user?.name || `Barber #${barber?.id || ""}`;
     },
@@ -98,3 +108,17 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.barber-card.inactive {
+  background: #f2f4f6;
+  color: #8a949e;
+  border-color: #dce2e8;
+  cursor: not-allowed;
+}
+
+.inactive-label {
+  font-style: italic;
+  color: #8a949e;
+}
+</style>

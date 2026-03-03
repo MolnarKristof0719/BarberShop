@@ -414,7 +414,7 @@ class UserController extends Controller
 
         $rows = Appointment::query()
             ->where('userId', $user->id)
-            ->with(['services', 'barber'])
+            ->with(['services', 'barber.user'])
             ->orderByDesc('appointmentDate')
             ->orderByDesc('appointmentTime')
             ->get();
@@ -432,7 +432,7 @@ class UserController extends Controller
         $row = Appointment::query()
             ->where('id', $id)
             ->where('userId', $user->id)
-            ->with(['services', 'barber'])
+            ->with(['services', 'barber.user'])
             ->first();
 
         if (!$row) {
@@ -480,7 +480,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Cancelled',
-            'data' => $appointment->fresh()->load(['services', 'barber'])
+            'data' => $appointment->fresh()->load(['services', 'barber.user'])
         ], 200, options: JSON_UNESCAPED_UNICODE);
     }
 }

@@ -11,7 +11,16 @@
         :key="service.id"
         type="button"
         class="select-card"
-        :class="{ selected: selectedServiceIds.includes(service.id) }"
+        :class="{
+          selected: selectedServiceIds.includes(service.id),
+          'disabled-service':
+            disabledServiceIds.includes(service.id) &&
+            !selectedServiceIds.includes(service.id),
+        }"
+        :disabled="
+          disabledServiceIds.includes(service.id) &&
+          !selectedServiceIds.includes(service.id)
+        "
         @click="$emit('toggle-service', service.id)"
       >
         <span>{{ service.service }}</span>
@@ -45,6 +54,7 @@ export default {
   props: {
     services: { type: Array, required: true },
     selectedServiceIds: { type: Array, required: true },
+    disabledServiceIds: { type: Array, default: () => [] },
   },
   emits: ["toggle-service", "next"],
 };

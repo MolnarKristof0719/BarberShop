@@ -74,7 +74,7 @@ export default {
     ...mapState(useBarberStore, ["items", "loading"]),
     displayItems() {
       if (!Array.isArray(this.items)) return [];
-      return this.items.filter((item) => item && item.id && item.isActive !== false);
+      return this.items.filter((item) => item && item.id);
     },
     activeBarber() {
       if (!this.displayItems.length) return null;

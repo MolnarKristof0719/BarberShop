@@ -21,6 +21,7 @@
         v-if="currentStep === 1"
         :services="services"
         :selected-service-ids="selectedServiceIds"
+        :disabled-service-ids="disabledServiceIds"
         @toggle-service="toggleService"
         @next="goToStep(2)"
       />
@@ -139,7 +140,7 @@ export default {
     },
     activeBarbers() {
       return this.barbers
-        .filter((barber) => barber && barber.id && barber.isActive)
+        .filter((barber) => barber && barber.id)
         .sort((a, b) => this.barberName(a).localeCompare(this.barberName(b)));
     },
     selectedBarber() {
@@ -152,12 +153,46 @@ export default {
       if (this.selectedBarberMode === "earliest") {
         return true;
       }
-      return !!this.selectedBarberId;
+      return !!this.selectedBarberId && !!this.selectedBarber?.isActive;
     },
     selectedServiceNames() {
       return this.services
         .filter((service) => this.selectedServiceIds.includes(service.id))
         .map((service) => service.service);
+    },
+    serviceTypeById() {
+      return this.services.reduce((acc, service) => {
+        acc[service.id] = this.getServiceType(service.service);
+        return acc;
+      }, {});
+    },
+    disabledServiceIds() {
+      const selectedSet = new Set(this.selectedServiceIds);
+      const selectedTypes = new Set(
+        this.selectedServiceIds
+          .map((id) => this.serviceTypeById[id])
+          .filter(Boolean),
+      );
+
+      const conflictByType = {
+        one_length: ["fade", "hair_beard_combo"],
+        fade: ["one_length", "hair_beard_combo"],
+        beard_trim: ["hair_beard_combo"],
+        hair_beard_combo: ["one_length", "fade", "beard_trim"],
+      };
+
+      return this.services
+        .filter((service) => !selectedSet.has(service.id))
+        .filter((service) => {
+          const type = this.serviceTypeById[service.id];
+          if (!type) {
+            return false;
+          }
+          return [...selectedTypes].some((selectedType) =>
+            (conflictByType[selectedType] || []).includes(type),
+          );
+        })
+        .map((service) => service.id);
     },
     monthDate() {
       const [year, month] = this.monthCursor.split("-").map(Number);
@@ -219,11 +254,38 @@ export default {
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     },
+    normalizeText(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    },
+    getServiceType(name) {
+      const normalized = this.normalizeText(name);
+      const isHaircut = normalized.includes("hajvag");
+      const isFade = normalized.includes("atmenetes") && isHaircut;
+      const isOneLength = normalized.includes("egyhosszu") && isHaircut;
+      const isCombo = isHaircut && normalized.includes("szakall");
+      const isBeardTrim =
+        normalized.includes("szakall") && normalized.includes("igazit");
+
+      if (isCombo) return "hair_beard_combo";
+      if (isFade) return "fade";
+      if (isOneLength) return "one_length";
+      if (isBeardTrim) return "beard_trim";
+      return null;
+    },
     barberName(barber) {
       return barber?.user?.name || `Barber #${barber?.id || ""}`;
     },
     toggleService(id) {
       this.submitError = "";
+      if (
+        this.disabledServiceIds.includes(id) &&
+        !this.selectedServiceIds.includes(id)
+      ) {
+        return;
+      }
       if (this.selectedServiceIds.includes(id)) {
         this.selectedServiceIds = this.selectedServiceIds.filter((item) => item !== id);
       } else {
@@ -507,6 +569,13 @@ export default {
 :deep(.barber-card.selected) {
   border-color: #111111;
   background: #f7f8fa;
+}
+
+:deep(.select-card.disabled-service) {
+  background: #f1f3f5;
+  color: #9aa3ad;
+  border-color: #e2e7ec;
+  cursor: not-allowed;
 }
 
 :deep(.barber-main) {

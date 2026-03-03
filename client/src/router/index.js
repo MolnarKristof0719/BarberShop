@@ -19,7 +19,6 @@ const router = createRouter({
       component: HomeView,
       meta: {
         title: () => "Fooldal",
-        breadcrumb: "Fooldal",
       },
     },
     {
@@ -28,7 +27,6 @@ const router = createRouter({
       component: () => import("@/views/AboutView.vue"),
       meta: {
         title: () => "Rolunk",
-        breadcrumb: "Rolunk",
       },
     },
     {
@@ -38,7 +36,6 @@ const router = createRouter({
       beforeEnter: [checkIfNotLogged],
       meta: {
         title: () => "Service",
-        breadcrumb: "Service",
         roles: [1, 2, 3],
       },
     },
@@ -48,7 +45,6 @@ const router = createRouter({
       component: () => import("@/views/BarberView.vue"),
       meta: {
         title: () => "Barber",
-        breadcrumb: "Barber",
       },
     },
     {
@@ -58,8 +54,17 @@ const router = createRouter({
       beforeEnter: [checkIfNotLogged],
       meta: {
         title: () => "Időpont",
-        breadcrumb: "Időpont",
         roles: [1, 2, 3],
+      },
+    },
+    {
+      path: "/usersmeappointment",
+      name: "usersmeappointment",
+      component: () => import("@/views/UsersmeAppointmentView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: () => "Foglalásaim",
+        roles: [3],
       },
     },
     
@@ -72,7 +77,6 @@ const router = createRouter({
       beforeEnter: [checkIfNotLogged],
       meta: {
         title: () => "Admin",
-        breadcrumb: "Admin",
         roles: [1],
       },
       children: [
@@ -82,7 +86,6 @@ const router = createRouter({
           component: () => import("@/views/UsersView.vue"),
           meta: {
             title: () => "Users",
-            breadcrumb: "Users",
             roles: [1],
           },
         },
@@ -92,7 +95,6 @@ const router = createRouter({
           component: () => import("@/views/AdminBarbersView.vue"),
           meta: {
             title: () => "Admin Barberek",
-            breadcrumb: "Admin Barberek",
             roles: [1],
           },
         },
@@ -102,7 +104,6 @@ const router = createRouter({
           component: () => import("@/views/AdminServicesView.vue"),
           meta: {
             title: () => "Admin Services",
-            breadcrumb: "Admin Services",
             roles: [1],
           },
         },

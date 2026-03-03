@@ -6,15 +6,9 @@
           <span class="logo-box"><img src="/logo.png" alt="logó" class="logo-img" /></span>
         </RouterLink>
 
-        <button
-          class="navbar-toggler menu-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+        <button class="navbar-toggler menu-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+          aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -26,11 +20,11 @@
             <li class="nav-item">
               <RouterLink class="nav-link menu-link" to="/about">Rólunk</RouterLink>
             </li>
-            
+
             <li class="nav-item">
               <RouterLink class="book-btn" to="/appointment">Book Now</RouterLink>
             </li>
-            
+
             <!-- <li class="nav-item" v-if="hasMenuAccess('/service')">
               <RouterLink class="nav-link menu-link" to="/service">Szolgáltatások</RouterLink>
             </li> -->
@@ -44,14 +38,8 @@
             </div>
 
             <form class="d-flex menu-search" role="search" v-if="showAdminSearch">
-              <input
-                id="search"
-                class="form-control"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-                v-model="searchWordInput"
-              />
+              <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search"
+                v-model="searchWordInput" />
               <label for="search" class="form-label m-0">
                 <i @click="onClickSearchButton" class="bi bi-search fs-5 my-pointer"></i>
               </label>
@@ -70,6 +58,11 @@
                   <li>
                     <RouterLink class="dropdown-item" to="/account">Fiók</RouterLink>
                   </li>
+                  <template v-if="hasMenuAccess('/usersmeappointment')">
+                    <li>
+                      <RouterLink class="dropdown-item" to="/usersmeappointment">Foglalásaim</RouterLink>
+                    </li>
+                  </template>
                   <template v-if="hasMenuAccess('/admin')">
                     <li>
                       <hr class="dropdown-divider" />
@@ -164,7 +157,7 @@ export default {
 </script>
 
 <style scoped>
-.book-btn{
+.book-btn {
   display: inline-block;
   background: #111111;
   color: #ffffff;

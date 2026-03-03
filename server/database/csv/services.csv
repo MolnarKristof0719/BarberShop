@@ -1,7 +1,11 @@
 id;service
-1;Egyhossz hajvágás
+1;Egyhosszú hajvágás
 2;Átmenetes hajvágás
-4;Hajmosás
-5;Szakáll igazítás
-6;Borotválás
-7;Hajvágás és szakáll igazítás
+3;Hajvágás és szakálligazítás
+4;Szakálligazítás
+5;Kontúrigazítás
+6;Borotválás (hot towel)
+7;Hajmosás
+8;Fejmasszázs
+9;Gyerek hajvágás
+10;Ősz haj fedés
