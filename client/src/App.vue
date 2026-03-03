@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      footerContent: "Ez egy masik lablec szoveg",
+      footerContent: "",
     };
   },
 };
