@@ -27,6 +27,10 @@
               <RouterLink class="nav-link menu-link" to="/about">Rólunk</RouterLink>
             </li>
             
+            <li class="nav-item">
+              <RouterLink class="book-btn" to="/appointment">Book Now</RouterLink>
+            </li>
+            
             <!-- <li class="nav-item" v-if="hasMenuAccess('/service')">
               <RouterLink class="nav-link menu-link" to="/service">Szolgáltatások</RouterLink>
             </li> -->
@@ -160,6 +164,17 @@ export default {
 </script>
 
 <style scoped>
+.book-btn{
+  display: inline-block;
+  background: #111111;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid #111111;
+  border-radius: 0;
+  padding: 10px 24px;
+  font-size: 0.95rem;
+}
+
 .menu-wrap {
   border-radius: 12px;
   overflow: visible;
