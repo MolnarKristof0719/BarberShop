@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Sportolás</h1>
+    <h1>Időpontfoglalás</h1>
   </div>
 </template>
 

@@ -46,24 +46,23 @@ const router = createRouter({
       path: "/barber",
       name: "barber",
       component: () => import("@/views/BarberView.vue"),
-      beforeEnter: [checkIfNotLogged],
       meta: {
         title: () => "Barber",
         breadcrumb: "Barber",
-        roles: [1, 2, 3],
       },
     },
     {
-      path: "/plaingsport",
-      name: "plaingsport",
-      component: () => import("@/views/PlayngSportView.vue"),
+      path: "/appointment",
+      name: "appointment",
+      component: () => import("@/views/AppointmentView.vue"),
       beforeEnter: [checkIfNotLogged],
       meta: {
-        title: () => "Sportolas",
-        breadcrumb: "Sportolas",
-        roles: [1, 2],
+        title: () => "Időpont",
+        breadcrumb: "Időpont",
+        roles: [1, 2, 3],
       },
     },
+    
 
     {
       path: "/admin",

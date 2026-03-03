@@ -3,7 +3,7 @@
     <section class="hero-banner" :style="heroStyle">
       <div class="hero-overlay">
         <h1 class="hero-title-main">BLACK TIMBER BARBERSHOP</h1>
-        <RouterLink class="hero-book-btn" to="/service">Book Now</RouterLink>
+        <RouterLink class="hero-book-btn" to="/appointment">Book Now</RouterLink>
       </div>
     </section>
   </section>
