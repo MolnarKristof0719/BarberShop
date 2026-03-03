@@ -3,10 +3,10 @@
     <div class="hero d-flex flex-wrap align-items-center justify-content-between gap-3">
       <div>
         <p class="hero-kicker mb-1">Barber Shop</p>
-        <h1 class="hero-title mb-1">Idopontfoglalas</h1>
-        <p class="hero-subtitle mb-0">Valassz szolgaltatast, barbert, napot es idopontot.</p>
+        <h1 class="hero-title mb-1">Időpontfoglalás</h1>
+        <p class="hero-subtitle mb-0">Válassz szolgáltatást, barbert, napot es időpontot.</p>
       </div>
-      <div class="step-pill">Lepes: {{ currentStep }}/4</div>
+      <div class="step-pill">Lépés: {{ currentStep }}/4</div>
     </div>
 
     <StepperComponent
@@ -81,7 +81,7 @@
           <button class="btn-close" type="button" @click="closeReferenceModal"></button>
         </div>
         <p class="mb-0 mt-3 text-muted">
-          A referenciakepek tabla meg nincs bekotve, de a modal keszen all a kesobbi listazasra.
+          A referenciaképek tábla meg nincs bekötve, de a modal készen áll a későbbi listázásra.
         </p>
       </div>
     </div>
@@ -174,10 +174,10 @@ export default {
     },
     stepItems() {
       return [
-        { id: 1, label: "Szolgaltatas" },
+        { id: 1, label: "Szolgáltatás" },
         { id: 2, label: "Barber" },
-        { id: 3, label: "Idopont" },
-        { id: 4, label: "Ellenorzes" },
+        { id: 3, label: "Időpont" },
+        { id: 4, label: "Ellenőrzés" },
       ];
     },
     calendarCells() {
@@ -352,7 +352,7 @@ export default {
       } catch (error) {
         this.submitError =
           error?.response?.data?.message ||
-          "A foglalas nem sikerult. Ellenorizd az adatokat es probald ujra.";
+          "A foglalás nem sikerült. Ellenőrizd az adatokat és próbáld újra.";
       } finally {
         this.submitLoading = false;
       }
