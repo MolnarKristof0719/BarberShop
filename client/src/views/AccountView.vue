@@ -40,6 +40,23 @@
           </div>
         </div>
 
+        <div class="col-12" v-if="isBarber">
+          <div class="info-box">
+            <small class="label">Szabadnap kérelmezése</small>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <button
+                class="btn btn-dark btn-sm"
+                type="button"
+                @click="openDayoffRequest"
+                :disabled="barberLoading || dayoffUploading || !barberRecordId"
+              >
+                {{ dayoffUploading ? "Kérelem Küldése..." : "Új szabadnap kérelmezése" }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+
         <div class="col-12">
           <div class="info-box">
             <small class="label">Fiók adatok módosítása</small>
@@ -146,6 +163,58 @@
         </div>
       </div>
     </div>
+
+    <div v-if="showDayoffModal" class="dayoff-modal-backdrop" @click="closeDayoffRequest">
+      <div class="dayoff-modal" @click.stop>
+        <div class="d-flex align-items-center justify-content-between gap-2">
+          <h3 class="mb-0">Szabadnap kérelmezése</h3>
+          <button class="btn-close" type="button" @click="closeDayoffRequest"></button>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label mb-1" for="dayoffDate">Válassz egy napot</label>
+          <input
+            id="dayoffDate"
+            v-model="dayoffDate"
+            type="date"
+            class="form-control"
+            :min="todayDateString()"
+          />
+          <p v-if="dayoffError" class="text-danger mt-2 mb-0">{{ dayoffError }}</p>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+          <button
+            class="btn btn-dark btn-sm"
+            type="button"
+            @click="submitDayoffRequest"
+            :disabled="dayoffUploading || !dayoffDate"
+          >
+            {{ dayoffUploading ? "Küldés..." : "Szabadnap rögzítése" }}
+          </button>
+          
+        </div>
+
+        <div class="mt-3">
+          <small class="label">Már rögzített szabadnapjaid</small>
+          <p v-if="dayoffLoading" class="mb-0 mt-2 helper-text">Betöltés...</p>
+          <p v-else-if="!dayoffItems.length" class="mb-0 mt-2 helper-text">Még nincs rögzített szabadnap.</p>
+          <div v-else class="dayoff-list mt-2">
+            <div v-for="dayoff in dayoffItems" :key="dayoff.id" class="dayoff-item">
+              <span>{{ formatHungarianDate(dayoff.offDay) }}</span>
+              <button
+                class="btn btn-outline-danger btn-sm"
+                type="button"
+                @click="deleteDayoff(dayoff.id)"
+                :disabled="dayoffDeletingId === dayoff.id || dayoffUploading"
+              >
+                {{ dayoffDeletingId === dayoff.id ? "Törlés..." : "Törlés" }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -154,6 +223,7 @@ import { mapActions, mapState } from "pinia";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import { useToastStore } from "@/stores/toastStore";
 import barberService from "@/api/barberService";
+import barberOffDayService from "@/api/barberOffDayService";
 import referencePictureService from "@/api/referencePictureService";
 import { resolveMediaUrl } from "@/utils/media";
 
@@ -169,6 +239,13 @@ export default {
       referenceLoading: false,
       referenceUploading: false,
       referenceDeletingId: null,
+      showDayoffModal: false,
+      dayoffDate: "",
+      dayoffItems: [],
+      dayoffLoading: false,
+      dayoffUploading: false,
+      dayoffDeletingId: null,
+      dayoffError: "",
       savingProfile: false,
       profileErrors: {},
       editForm: {
@@ -270,6 +347,98 @@ export default {
       this.referenceLoading = false;
       this.referenceUploading = false;
       this.referenceDeletingId = null;
+      this.showDayoffModal = false;
+      this.dayoffDate = "";
+      this.dayoffItems = [];
+      this.dayoffLoading = false;
+      this.dayoffUploading = false;
+      this.dayoffDeletingId = null;
+      this.dayoffError = "";
+    },
+    normalizeOffDay(value) {
+      const raw = String(value || "");
+      return raw.includes("T") ? raw.slice(0, 10) : raw;
+    },
+    formatHungarianDate(value) {
+      const day = this.normalizeOffDay(value);
+      if (!day) return "-";
+      const [year, month, date] = day.split("-").map(Number);
+      if (!year || !month || !date) return day;
+      return new Date(year, month - 1, date).toLocaleDateString("hu-HU", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+    todayDateString() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    },
+    async loadDayoffItems() {
+      this.dayoffLoading = true;
+      try {
+        const response = await barberOffDayService.getAll();
+        const rows = Array.isArray(response?.data) ? response.data : [];
+        this.dayoffItems = rows
+          .map((row) => ({
+            ...row,
+            offDay: this.normalizeOffDay(row.offDay),
+          }))
+          .sort((a, b) => String(a.offDay).localeCompare(String(b.offDay)));
+      } catch {
+        this.dayoffItems = [];
+      } finally {
+        this.dayoffLoading = false;
+      }
+    },
+    async openDayoffRequest() {
+      if (!this.isBarber || this.barberLoading || !this.barberRecordId) return;
+      this.showDayoffModal = true;
+      this.dayoffError = "";
+      this.dayoffDate = this.todayDateString();
+      await this.loadDayoffItems();
+    },
+    closeDayoffRequest() {
+      this.showDayoffModal = false;
+      this.dayoffError = "";
+    },
+    async submitDayoffRequest() {
+      if (!this.dayoffDate) return;
+
+      this.dayoffUploading = true;
+      this.dayoffError = "";
+      try {
+        await barberOffDayService.create({ offDay: this.dayoffDate });
+        await this.loadDayoffItems();
+
+        const toastStore = useToastStore();
+        toastStore.messages.push("Szabadnap sikeresen rogzitve.");
+        toastStore.show("Success");
+      } catch (error) {
+        this.dayoffError =
+          error?.response?.data?.message || "A szabadnap rögzítése nem sikerült.";
+      } finally {
+        this.dayoffUploading = false;
+      }
+    },
+    async deleteDayoff(id) {
+      if (!id) return;
+
+      this.dayoffDeletingId = id;
+      try {
+        await barberOffDayService.delete(id);
+        this.dayoffItems = this.dayoffItems.filter((row) => row.id !== id);
+
+        const toastStore = useToastStore();
+        toastStore.messages.push("Szabadnap torolve.");
+        toastStore.show("Success");
+      } catch {
+      } finally {
+        this.dayoffDeletingId = null;
+      }
     },
     async loadReferencePictures() {
       if (!this.barberRecordId) {
@@ -489,6 +658,43 @@ export default {
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 8px;
+}
+
+.dayoff-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.dayoff-modal {
+  width: min(520px, 100%);
+  max-height: min(86vh, 760px);
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #d8dee5;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.dayoff-list {
+  display: grid;
+  gap: 8px;
+}
+
+.dayoff-item {
+  border: 1px solid #e1e6eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 @media (max-width: 576px) {

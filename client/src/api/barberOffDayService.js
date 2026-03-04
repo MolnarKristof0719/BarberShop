@@ -1,0 +1,17 @@
+import apiClient from "./axiosClient";
+
+const route = "/barber_off_days";
+
+export default {
+  async getAll() {
+    return await apiClient.get(route);
+  },
+
+  async create(data) {
+    return await apiClient.post(route, data);
+  },
+
+  async delete(id) {
+    return await apiClient.delete(`${route}/${id}`);
+  },
+};
