@@ -78,12 +78,32 @@
     <div v-if="showReferenceModal" class="ref-modal-backdrop" @click="closeReferenceModal">
       <div class="ref-modal" @click.stop>
         <div class="d-flex align-items-center justify-content-between gap-2">
-          <h3 class="mb-0">{{ referenceModalBarberName }} referenciakepek</h3>
+          <h3 class="mb-0">{{ referenceModalBarberName }} referenciaképek</h3>
           <button class="btn-close" type="button" @click="closeReferenceModal"></button>
         </div>
-        <p class="mb-0 mt-3 text-muted">
-          A referenciaképek tábla még nincs bekötve, de a modal készen áll a későbbi listázásra.
-        </p>
+        <div class="ref-modal-body mt-3">
+          <p v-if="referenceModalLoading" class="mb-0 text-muted">
+            Referenciaképek betöltése...
+          </p>
+          <p v-else-if="referenceModalError" class="mb-0 text-danger">
+            {{ referenceModalError }}
+          </p>
+          <p v-else-if="!referenceModalPictures.length" class="mb-0 text-muted">
+            Ehhez a barberhez meg nincs feltöltött referenciakép.
+          </p>
+          <div v-else class="ref-grid">
+            <a
+              v-for="picture in referenceModalPictures"
+              :key="picture.id"
+              :href="resolveImage(picture.picture)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="ref-item"
+            >
+              <img :src="resolveImage(picture.picture)" alt="Barber referencia kep" />
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -91,6 +111,7 @@
 
 <script>
 import appointmentService from "@/api/appointmentService";
+import barberService from "@/api/barberService";
 import BarbersComponent from "@/components/Appointment/BarbersComponent.vue";
 import DateTimeComponent from "@/components/Appointment/DateTimeComponent.vue";
 import ReviewComponent from "@/components/Appointment/ReviewComponent.vue";
@@ -100,6 +121,7 @@ import { useAppointmentStore } from "@/stores/appointmentStore";
 import { useBarberStore } from "@/stores/barberStore";
 import { useServiceStore } from "@/stores/serviceStore";
 import { useUsersmeAppointmentStore } from "@/stores/usersmeappointmentStore";
+import { resolveMediaUrl } from "@/utils/media";
 
 export default {
   name: "AppointmentView",
@@ -127,6 +149,9 @@ export default {
       submitError: "",
       showReferenceModal: false,
       referenceModalBarberName: "",
+      referenceModalPictures: [],
+      referenceModalLoading: false,
+      referenceModalError: "",
       serviceStore: useServiceStore(),
       barberStore: useBarberStore(),
       appointmentStore: useAppointmentStore(),
@@ -280,6 +305,9 @@ export default {
     barberName(barber) {
       return barber?.user?.name || `Barber #${barber?.id || ""}`;
     },
+    resolveImage(path) {
+      return resolveMediaUrl(path);
+    },
     toggleService(id) {
       this.submitError = "";
       if (
@@ -337,13 +365,35 @@ export default {
         this.goToStep(step);
       }
     },
-    openReferenceModal(barber) {
+    async openReferenceModal(barber) {
       this.referenceModalBarberName = this.barberName(barber);
       this.showReferenceModal = true;
+      document.body.classList.add("modal-open-lock");
+      this.referenceModalLoading = true;
+      this.referenceModalError = "";
+      this.referenceModalPictures = [];
+
+      try {
+        if (!barber?.id) {
+          throw new Error("Missing barber id");
+        }
+        const response = await barberService.getById(barber.id);
+        const pictures =
+          response?.data?.reference_pictures;
+        this.referenceModalPictures = Array.isArray(pictures) ? pictures : [];
+      } catch {
+        this.referenceModalError = "A referenciakepek betoltese nem sikerult.";
+      } finally {
+        this.referenceModalLoading = false;
+      }
     },
     closeReferenceModal() {
       this.showReferenceModal = false;
       this.referenceModalBarberName = "";
+      this.referenceModalPictures = [];
+      this.referenceModalLoading = false;
+      this.referenceModalError = "";
+      document.body.classList.remove("modal-open-lock");
     },
     async changeMonth(delta) {
       const current = new Date(this.monthDate);
@@ -426,10 +476,17 @@ export default {
   async mounted() {
     await Promise.all([this.serviceStore.getAll(), this.barberStore.getAll()]);
   },
+  beforeUnmount() {
+    document.body.classList.remove("modal-open-lock");
+  },
 };
 </script>
 
 <style scoped>
+:global(body.modal-open-lock) {
+  overflow: hidden;
+}
+
 .appointment-page {
   min-height: 100%;
   padding: 10px;
@@ -705,10 +762,40 @@ export default {
 
 .ref-modal {
   width: min(560px, 100%);
+  max-height: min(84vh, 760px);
   border-radius: 14px;
   background: #fff;
   border: 1px solid #d8dee5;
   padding: 16px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.ref-modal-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
+
+.ref-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ref-item {
+  display: block;
+  border: 1px solid #dce3ea;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.ref-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
 }
 
 @media (max-width: 767px) {
@@ -722,6 +809,10 @@ export default {
 
   :deep(.actions .btn) {
     flex: 1;
+  }
+
+  .ref-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

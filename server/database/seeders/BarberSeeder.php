@@ -13,7 +13,6 @@ class BarberSeeder extends Seeder
      */
     public function run(): void
     {
-        $scrappyCocoProfilePicture = 'IDE_IRD_A_SAJAT_LINKED';
 
         $barberUsers = User::where('role', 2)->get();
         foreach ($barberUsers as $user) {

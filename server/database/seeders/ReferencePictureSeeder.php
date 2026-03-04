@@ -17,26 +17,32 @@ class ReferencePictureSeeder extends Seeder
         }
 
         $inserted = 0;
+        $now = now();
+        $tags = [
+            'barber,haircut',
+            'barbershop,hair',
+            'barber,fade',
+            'barber,beard',
+            'men,haircut',
+        ];
 
         foreach ($barberIds as $barberId) {
-
-            // barberenként 1–6 referencia kép
-            $count = random_int(1, 6);
+            // Barberenkent 6-12 referencia kep
+            $count = random_int(6, 12);
 
             for ($i = 1; $i <= $count; $i++) {
+                $tagIndex = ($barberId + $i) % count($tags);
+                $tag = $tags[$tagIndex];
+                $lockId = ($barberId * 1000) + $i;
 
-                /**
-                 * Picsum seed:
-                 * - barberId + i → garantáltan más kép
-                 * - ugyanaz a barber nem kap kétszer ugyanazt
-                 */
-                $seed = 'barber_' . $barberId . '_' . $i;
-
-                $picture = "https://picsum.photos/seed/{$seed}/600/600";
+                // Egyedi URL-ek: lock alapjan mindegyik sor kulonbozo lesz.
+                $picture = "https://loremflickr.com/640/480/{$tag}?lock={$lockId}";
 
                 $inserted += DB::table('reference_pictures')->insertOrIgnore([
                     'barberId' => $barberId,
                     'picture' => $picture,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
             }
         }

@@ -2,56 +2,39 @@
   <div class="flow-card active">
     <div class="flow-header">
       <h2>2. Barber valasztas</h2>
-      <small v-if="selectedBarberMode === 'earliest'">Legkorabbi mod</small>
-      <small v-else>{{ selectedBarberName || "Nincs kivalasztva" }}</small>
+      <small v-if="selectedBarberMode === 'earliest'">Legkorábbi mód</small>
+      <small v-else>{{ selectedBarberName || "Nincs kiválasztva" }}</small>
     </div>
 
     <div class="card-list">
-      <button
-        type="button"
-        class="select-card"
-        :class="{ selected: selectedBarberMode === 'earliest' }"
-        @click="$emit('select-earliest-mode')"
-      >
+      <button type="button" class="select-card" :class="{ selected: selectedBarberMode === 'earliest' }"
+        @click="$emit('select-earliest-mode')">
         <span>Legkorabbi idopontok osszes barbernel</span>
         <i class="bi bi-clock-history"></i>
       </button>
 
-      <div
-        v-for="barber in activeBarbers"
-        :key="barber.id"
-        class="barber-card"
-        :class="{
-          inactive: !barber.isActive,
-          selected:
-            selectedBarberId === barber.id &&
-            selectedBarberMode === 'specific',
-        }"
-        @click="onBarberClick(barber)"
-      >
+      <div v-for="barber in activeBarbers" :key="barber.id" class="barber-card" :class="{
+        inactive: !barber.isActive,
+        selected:
+          selectedBarberId === barber.id &&
+          selectedBarberMode === 'specific',
+      }" @click="onBarberClick(barber)">
         <div class="barber-main">
           <div class="avatar">
-            <img
-              v-if="barber.profilePicture"
-              :src="resolveImage(barber.profilePicture)"
-              :alt="barberName(barber)"
-            />
+            <img v-if="barber.profilePicture" :src="resolveImage(barber.profilePicture)" :alt="barberName(barber)" />
             <span v-else>{{ initials(barberName(barber)) }}</span>
           </div>
           <div>
             <p class="barber-name mb-1">{{ barberName(barber) }}</p>
             <p class="barber-intro mb-0">
               {{ barber.introduction || "Barber" }}
-              <span v-if="!barber.isActive" class="inactive-label"> (jelenleg nem aktiv)</span>
+              <span v-if="!barber.isActive" class="inactive-label"> (jelenleg nem aktív)</span>
             </p>
           </div>
         </div>
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          @click.stop="$emit('open-reference', barber)"
-        >
+        <button class="btn btn-outline-secondary btn-sm" @click.stop="$emit('open-reference', barber)">
           <i class="bi bi-image"></i>
-          Kepek
+          Képek
         </button>
       </div>
     </div>
@@ -59,8 +42,7 @@
     <div class="actions">
       <button class="btn btn-outline-secondary" @click="$emit('back')">Vissza</button>
       <button class="btn btn-dark" :disabled="!canProceedFromBarber" @click="$emit('next')">
-        Tovabb a naptarhoz
-      </button>
+        Tovább a naptárhoz </button>
     </div>
   </div>
 </template>

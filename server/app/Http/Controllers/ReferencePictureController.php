@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ReferencePicture as CurrentModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ReferencePictureController extends Controller
@@ -33,7 +34,7 @@ class ReferencePictureController extends Controller
 
             $data = $request->validate([
                 'barberId' => ['nullable', 'integer', 'exists:barbers,id'],
-                'picture' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'], // max 2MB
+                'picture' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             ]);
 
             if ($user?->isAdmin()) {
@@ -49,14 +50,12 @@ class ReferencePictureController extends Controller
                 }
             }
 
-            if ($request->hasFile('picture')) {
-                $file = $request->file('picture');
-                $path = $file->store('references', 'public');
-            }
+            $file = $request->file('picture');
+            $storedRelativePath = $file->store('references', 'public');
 
             return CurrentModel::create([
                 'barberId' => $barberId,
-                'picture' => $path,
+                'picture' => '/storage/' . $storedRelativePath,
             ]);
         });
     }
@@ -72,6 +71,15 @@ class ReferencePictureController extends Controller
                 !($user?->isBarber() && $user->barber?->id === $row->barberId)
             ) {
                 throw new HttpException(403, 'Nincs jogosultságod a referenciakép törléséhez.');
+            }
+
+            $path = $row->picture;
+            if (is_string($path) && $path !== '') {
+                $pathOnly = parse_url($path, PHP_URL_PATH) ?: $path;
+                if (str_starts_with($pathOnly, '/storage/')) {
+                    $storagePath = ltrim(str_replace('/storage/', '', $pathOnly), '/');
+                    Storage::disk('public')->delete($storagePath);
+                }
             }
 
             $row->delete();

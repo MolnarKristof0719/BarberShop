@@ -1,24 +1,15 @@
 ﻿<template>
   <section class="account-page">
     <div class="account-card">
-      <button
-        class="avatar-large avatar-button"
-        type="button"
-        @click="onAvatarClick"
+      <button class="avatar-large avatar-button" type="button" @click="onAvatarClick"
         :disabled="!isBarber || barberLoading || !barberRecordId"
-        :title="isBarber ? 'Profilkép csere' : 'Csak barbernek módosítható'"
-      >
+        :title="isBarber ? 'Profilkép csere' : 'Csak barbernek módosítható'">
         <img v-if="avatarImageSrc" :src="avatarImageSrc" alt="Profilkep" class="avatar-image" />
         <i v-else class="bi bi-person"></i>
       </button>
 
-      <input
-        ref="profileFileInput"
-        type="file"
-        class="d-none"
-        accept="image/png,image/jpeg,image/jpg,image/webp"
-        @change="onProfilePictureSelected"
-      />
+      <input ref="profileFileInput" type="file" class="d-none" accept="image/png,image/jpeg,image/jpg,image/webp"
+        @change="onProfilePictureSelected" />
 
       <h1 class="mb-1">{{ item?.name || "-" }}</h1>
       <p class="text-muted mb-4">Bejelentkezett felhasználó adatai</p>
@@ -55,14 +46,8 @@
             <form class="row g-2 mt-1" @submit.prevent="saveProfile">
               <div class="col-12">
                 <label class="form-label mb-1" for="accountName">Név</label>
-                <input
-                  id="accountName"
-                  v-model="editForm.name"
-                  type="text"
-                  class="form-control"
-                  :class="{ 'is-invalid': profileErrors.name }"
-                  @input="clearProfileError('name')"
-                />
+                <input id="accountName" v-model="editForm.name" type="text" class="form-control"
+                  :class="{ 'is-invalid': profileErrors.name }" @input="clearProfileError('name')" />
                 <div class="invalid-feedback" v-if="profileErrors.name">
                   {{ profileErrors.name[0] }}
                 </div>
@@ -70,14 +55,8 @@
 
               <div class="col-12">
                 <label class="form-label mb-1" for="accountEmail">Email</label>
-                <input
-                  id="accountEmail"
-                  v-model="editForm.email"
-                  type="email"
-                  class="form-control"
-                  :class="{ 'is-invalid': profileErrors.email }"
-                  @input="clearProfileError('email')"
-                />
+                <input id="accountEmail" v-model="editForm.email" type="email" class="form-control"
+                  :class="{ 'is-invalid': profileErrors.email }" @input="clearProfileError('email')" />
                 <div class="invalid-feedback" v-if="profileErrors.email">
                   {{ profileErrors.email[0] }}
                 </div>
@@ -85,14 +64,8 @@
 
               <div class="col-12">
                 <label class="form-label mb-1" for="accountPhone">Telefon (opcionális)</label>
-                <input
-                  id="accountPhone"
-                  v-model="editForm.phoneNumber"
-                  type="text"
-                  class="form-control"
-                  :class="{ 'is-invalid': profileErrors.phoneNumber }"
-                  @input="clearProfileError('phoneNumber')"
-                />
+                <input id="accountPhone" v-model="editForm.phoneNumber" type="text" class="form-control"
+                  :class="{ 'is-invalid': profileErrors.phoneNumber }" @input="clearProfileError('phoneNumber')" />
                 <div class="invalid-feedback" v-if="profileErrors.phoneNumber">
                   {{ profileErrors.phoneNumber[0] }}
                 </div>
@@ -118,6 +91,59 @@
             </p>
           </div>
         </div>
+
+        <div class="col-12" v-if="isBarber">
+          <div class="info-box">
+            <small class="label">Referenciaképek kezelése</small>
+
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <button
+                class="btn btn-dark btn-sm"
+                type="button"
+                @click="openReferenceUpload"
+                :disabled="barberLoading || referenceUploading || !barberRecordId"
+              >
+                {{ referenceUploading ? "Feltöltés..." : "Új referencia kép feltöltése" }}
+              </button>
+            </div>
+
+            <input
+              ref="referenceFileInput"
+              type="file"
+              class="d-none"
+              accept="image/png,image/jpeg,image/jpg,image/webp"
+              @change="onReferencePictureSelected"
+            />
+
+            <p v-if="referenceLoading" class="mb-0 mt-3 helper-text">
+              Referenciaképek betöltése...
+            </p>
+            <p v-else-if="!referencePictures.length" class="mb-0 mt-3 helper-text">
+              Még nincs feltöltött referencia képed.
+            </p>
+            <div v-else class="reference-grid mt-3">
+              <div
+                v-for="picture in referencePictures"
+                :key="picture.id"
+                class="reference-card"
+              >
+                <img
+                  class="reference-image"
+                  :src="resolveImage(picture.picture)"
+                  alt="Referencia kep"
+                />
+                <button
+                  class="btn btn-outline-danger btn-sm w-100"
+                  type="button"
+                  @click="deleteReferencePicture(picture.id)"
+                  :disabled="referenceDeletingId === picture.id || referenceUploading"
+                >
+                  {{ referenceDeletingId === picture.id ? "Törlés..." : "Törlés" }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -128,6 +154,7 @@ import { mapActions, mapState } from "pinia";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import { useToastStore } from "@/stores/toastStore";
 import barberService from "@/api/barberService";
+import referencePictureService from "@/api/referencePictureService";
 import { resolveMediaUrl } from "@/utils/media";
 
 export default {
@@ -138,6 +165,10 @@ export default {
       barberProfilePicture: "",
       barberLoading: false,
       selectedFileName: "",
+      referencePictures: [],
+      referenceLoading: false,
+      referenceUploading: false,
+      referenceDeletingId: null,
       savingProfile: false,
       profileErrors: {},
       editForm: {
@@ -182,6 +213,9 @@ export default {
   },
   methods: {
     ...mapActions(useUserLoginLogoutStore, ["updateMe"]),
+    resolveImage(path) {
+      return resolveMediaUrl(path);
+    },
     syncEditForm() {
       this.editForm.name = this.item?.name || "";
       this.editForm.email = this.item?.email || "";
@@ -232,6 +266,26 @@ export default {
       this.barberRecordId = null;
       this.barberProfilePicture = "";
       this.selectedFileName = "";
+      this.referencePictures = [];
+      this.referenceLoading = false;
+      this.referenceUploading = false;
+      this.referenceDeletingId = null;
+    },
+    async loadReferencePictures() {
+      if (!this.barberRecordId) {
+        this.referencePictures = [];
+        return;
+      }
+
+      this.referenceLoading = true;
+      try {
+        const response = await referencePictureService.getAll(this.barberRecordId);
+        this.referencePictures = Array.isArray(response?.data) ? response.data : [];
+      } catch {
+        this.referencePictures = [];
+      } finally {
+        this.referenceLoading = false;
+      }
     },
     async loadBarberProfile() {
       if (!this.isBarber || !this.item?.id) {
@@ -252,6 +306,7 @@ export default {
 
         this.barberRecordId = currentBarber.id;
         this.barberProfilePicture = currentBarber.profilePicture || "";
+        await this.loadReferencePictures();
       } catch (error) {
         this.resetBarberState();
       } finally {
@@ -282,6 +337,46 @@ export default {
         if (this.$refs.profileFileInput) {
           this.$refs.profileFileInput.value = "";
         }
+      }
+    },
+    openReferenceUpload() {
+      if (!this.isBarber || this.barberLoading || !this.barberRecordId) return;
+      this.$refs.referenceFileInput?.click();
+    },
+    async onReferencePictureSelected(event) {
+      const file = event?.target?.files?.[0];
+      if (!file || !this.barberRecordId) return;
+
+      this.referenceUploading = true;
+      try {
+        await referencePictureService.create(file);
+        await this.loadReferencePictures();
+
+        const toastStore = useToastStore();
+        toastStore.messages.push("Referenciakep sikeresen feltoltve.");
+        toastStore.show("Success");
+      } catch (error) {
+      } finally {
+        this.referenceUploading = false;
+        if (this.$refs.referenceFileInput) {
+          this.$refs.referenceFileInput.value = "";
+        }
+      }
+    },
+    async deleteReferencePicture(id) {
+      if (!id) return;
+
+      this.referenceDeletingId = id;
+      try {
+        await referencePictureService.delete(id);
+        this.referencePictures = this.referencePictures.filter((picture) => picture.id !== id);
+
+        const toastStore = useToastStore();
+        toastStore.messages.push("Referenciakep torolve.");
+        toastStore.show("Success");
+      } catch (error) {
+      } finally {
+        this.referenceDeletingId = null;
       }
     },
   },
@@ -371,5 +466,34 @@ export default {
 
 .form-label {
   color: #343a40;
+}
+
+.reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.reference-card {
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.reference-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+@media (max-width: 576px) {
+  .reference-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
