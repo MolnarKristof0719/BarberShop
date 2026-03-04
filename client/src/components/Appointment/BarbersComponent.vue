@@ -1,7 +1,7 @@
 <template>
   <div class="flow-card active">
     <div class="flow-header">
-      <h2>2. Barber valasztas</h2>
+      <h2>2. Barber választás</h2>
       <small v-if="selectedBarberMode === 'earliest'">Legkorábbi mód</small>
       <small v-else>{{ selectedBarberName || "Nincs kiválasztva" }}</small>
     </div>
@@ -9,7 +9,7 @@
     <div class="card-list">
       <button type="button" class="select-card" :class="{ selected: selectedBarberMode === 'earliest' }"
         @click="$emit('select-earliest-mode')">
-        <span>Legkorabbi idopontok osszes barbernel</span>
+        <span>Legkorábbi időpontok az összes barbernél</span>
         <i class="bi bi-clock-history"></i>
       </button>
 

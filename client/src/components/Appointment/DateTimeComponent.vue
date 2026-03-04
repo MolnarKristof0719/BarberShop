@@ -1,14 +1,14 @@
 <template>
   <div class="flow-card active">
     <div class="flow-header">
-      <h2>3. Datum es idosav</h2>
+      <h2>3. Dátum és idősáv</h2>
       <small v-if="selectedDate && selectedTime">{{ selectedDate }} {{ selectedTime }}</small>
-      <small v-else>Valassz idopontot</small>
+      <small v-else>Válassz időpontot</small>
     </div>
 
     <div v-if="selectedBarberMode === 'earliest'">
       <button class="btn btn-dark mb-3" :disabled="earliestLoading" @click="$emit('load-earliest-options')">
-        {{ earliestLoading ? "Kereses..." : "Legkorabbi idopontok betoltese" }}
+        {{ earliestLoading ? "Keresés..." : "Legkorábbi időpontok betöltése" }}
       </button>
 
       <div v-if="earliestOptions.length" class="card-list">
@@ -31,14 +31,14 @@
           <i class="bi bi-check2"></i>
         </button>
       </div>
-      <p v-else class="empty-state">Nyomd meg a gombot a legkorabbi opciokhoz.</p>
+      <p v-else class="empty-state">Nyomd meg a gombot a legkorábbi opciókhoz.</p>
     </div>
 
     <div v-else>
       <div class="calendar-tools">
-        <button class="btn btn-outline-secondary btn-sm" @click="$emit('change-month', -1)">Elso honap</button>
+        <button class="btn btn-outline-secondary btn-sm" @click="$emit('change-month', -1)">Elöző hónap</button>
         <strong>{{ monthLabel }}</strong>
-        <button class="btn btn-outline-secondary btn-sm" @click="$emit('change-month', 1)">Kovetkezo honap</button>
+        <button class="btn btn-outline-secondary btn-sm" @click="$emit('change-month', 1)">Következő hónap</button>
       </div>
 
       <div class="calendar-grid mt-3">
@@ -78,7 +78,7 @@
     <div class="actions">
       <button class="btn btn-outline-secondary" @click="$emit('back')">Vissza</button>
       <button class="btn btn-dark" :disabled="!canProceedToReview" @click="$emit('next')">
-        Tovabb az ellenorzeshez
+        Tovább az ellenőrzéshez
       </button>
     </div>
   </div>

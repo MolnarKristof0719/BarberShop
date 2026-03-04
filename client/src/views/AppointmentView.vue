@@ -89,7 +89,7 @@
             {{ referenceModalError }}
           </p>
           <p v-else-if="!referenceModalPictures.length" class="mb-0 text-muted">
-            Ehhez a barberhez meg nincs feltöltött referenciakép.
+            Ehhez a barberhez még nincs feltöltött referenciakép.
           </p>
           <div v-else class="ref-grid">
             <a
