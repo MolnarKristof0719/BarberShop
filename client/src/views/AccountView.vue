@@ -84,7 +84,7 @@
           <div class="info-box">
             <small class="label">Profilkép csere</small>
             <p class="mb-0 mt-2 helper-text">
-              Kattints az avatárra és valássz egy képet. A rendszer a régi képet automatikusan törli.
+              Kattints az avatárra és válassz egy képet. A rendszer a régi képet automatikusan törli.
             </p>
             <p class="mb-0 mt-2 selected-file" v-if="selectedFileName">
               Kiválasztott: {{ selectedFileName }}
