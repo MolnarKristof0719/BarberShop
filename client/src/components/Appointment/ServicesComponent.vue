@@ -1,8 +1,8 @@
 <template>
   <div class="flow-card active">
     <div class="flow-header">
-      <h2>1. Szolgaltatasok</h2>
-      <small>{{ selectedServiceIds.length }} kivalasztva</small>
+      <h2>1. Szolgáltatások</h2>
+      <small>{{ selectedServiceIds.length }} kiválasztva</small>
     </div>
 
     <div v-if="services.length" class="card-list">
@@ -34,7 +34,7 @@
         ></i>
       </button>
     </div>
-    <p v-else class="empty-state">Nincs elerheto szolgaltatas.</p>
+    <p v-else class="empty-state">Nincs elérhető szolgáltatás.</p>
 
     <div class="actions">
       <button
@@ -42,7 +42,7 @@
         :disabled="!selectedServiceIds.length"
         @click="$emit('next')"
       >
-        Tovabb a barberekhez
+        Tovább a barberekhez
       </button>
     </div>
   </div>

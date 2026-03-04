@@ -1,21 +1,21 @@
 <template>
   <div class="flow-card active">
     <div class="flow-header">
-      <h2>4. Foglalas veglegesites</h2>
-      <small>Ellenorizd az adatokat</small>
+      <h2>4. Foglalás véglegesítés</h2>
+      <small>Ellenőrizd az adatokat</small>
     </div>
 
     <ul class="summary-list">
-      <li><strong>Szolgaltatasok:</strong> {{ selectedServiceNames.join(", ") }}</li>
+      <li><strong>Szolgáltatások:</strong> {{ selectedServiceNames.join(", ") }}</li>
       <li><strong>Barber:</strong> {{ selectedBarberName }}</li>
-      <li><strong>Datum:</strong> {{ selectedDate }}</li>
-      <li><strong>Idopont:</strong> {{ selectedTime }}</li>
+      <li><strong>Dátum:</strong> {{ selectedDate }}</li>
+      <li><strong>Időpont:</strong> {{ selectedTime }}</li>
     </ul>
 
     <div class="actions">
       <button class="btn btn-outline-secondary" @click="$emit('back')">Vissza</button>
       <button class="btn btn-success" :disabled="submitLoading" @click="$emit('submit')">
-        {{ submitLoading ? "Kuldese..." : "Foglalas kuldese" }}
+        {{ submitLoading ? "Küldése..." : "Foglalás küldése" }}
       </button>
     </div>
 
