@@ -20,7 +20,7 @@
       </div>
 
       <div class="mb-3 row">
-        <label for="profilePicture" class="col-form-label col-3">Profilkep URL</label>
+        <label for="profilePicture" class="col-form-label col-3">Profilkép URL</label>
         <div class="col-9">
           <input
             id="profilePicture"

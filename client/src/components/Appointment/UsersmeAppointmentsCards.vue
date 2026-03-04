@@ -12,7 +12,7 @@
       <div class="booking-content">
         <div class="details-grid">
           <div class="detail-item">
-            <div class="detail-label">Idopont</div>
+            <div class="detail-label">Időpont</div>
             <div class="detail-value">
               {{ formatDate(appointment.appointmentDate) }}
               <span class="accent">|</span>
@@ -26,7 +26,7 @@
           </div>
 
           <div class="detail-item">
-            <div class="detail-label">Allapot</div>
+            <div class="detail-label">Állapot</div>
             <div class="detail-value">
               <span class="status-chip" :class="statusClass(appointment.status)">
                 {{ statusLabel(appointment.status) }}
@@ -35,7 +35,7 @@
           </div>
 
           <div class="detail-item mb-0">
-            <div class="detail-label">Szolgaltatasok</div>
+            <div class="detail-label">Szolgáltatások</div>
             <div>
               <span
                 v-for="service in appointment.services || []"
@@ -45,7 +45,7 @@
                 {{ service.service }}
               </span>
               <span v-if="!(appointment.services || []).length" class="service-tag">
-                Nincs szolgaltatas
+                Nincs szolgáltatás
               </span>
             </div>
           </div>
@@ -58,7 +58,7 @@
             :disabled="appointment.status === 'cancelled' || loading"
             @click="$emit('cancel', appointment.id)"
           >
-            Lemondas
+            Lemondás
           </button>
         </div>
       </div>
