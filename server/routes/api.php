@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('users/{id}', [UserController::class, 'show'])->middleware('ability:*');
     Route::patch('users/{id}', [UserController::class, 'update'])->middleware('ability:*');
     Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('ability:*');
+    Route::get('/userssortsearch/{column}/{direction}/{search?}', [UserController::class, 'indexSortSearch'])->middleware('ability:*');
 
     // --- SERVICES ADMIN CRUD (ha kell adminnak) ---
     Route::post('/services', [ServiceController::class, 'store'])->middleware('ability:*');
