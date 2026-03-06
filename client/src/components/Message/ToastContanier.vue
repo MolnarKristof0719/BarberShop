@@ -1,9 +1,9 @@
 <template>
   <div
-    class="alert alert-primary alert-dismissible fade show custom-center-alert"
+    class="alert alert-dismissible fade show custom-center-alert"
     :class="{
-      'alert-danger': type == 'Error',
-      'alert-success': type == 'Success',
+      'my-alert-danger': type == 'Error',
+      'my-alert-success': type == 'Success',
     }"
     role="alert"
     v-if="messages.length"
@@ -14,7 +14,12 @@
         {{ message }}
       </p>
     </div>
-    <button type="button" class="btn-close" @click="close()" aria-label="Close"></button>
+    <button
+      type="button"
+      class="btn-close"
+      @click="close()"
+      aria-label="Close"
+    ></button>
   </div>
 </template>
 
@@ -38,9 +43,29 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1080; /* Hogy biztosan minden felett legyen */
-  min-width: 300px; /* Opcionális: ne legyen túl összenyomva */
-  /* Egyedi, lágyabb árnyék */
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3), 0 5px 10px rgba(0, 0, 0, 0.05);
+  z-index: 1080;
+  min-width: 300px;
+  box-shadow:
+    0 15px 25px rgba(0, 0, 0, 0.3),
+    0 5px 10px rgba(0, 0, 0, 0.05);
+}
+
+.my-alert-success {
+  background-color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+}
+
+.my-alert-danger {
+  background-color: #ffe1e1 !important;
+  border: 1px solid #f5a5a5 !important;
+  color: #7a1010 !important;
+}
+
+.my-alert-success h5,
+.my-alert-danger h5,
+.my-alert-success p,
+.my-alert-danger p {
+  color: inherit !important;
 }
 </style>
