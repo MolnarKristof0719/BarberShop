@@ -21,6 +21,25 @@ class UserController extends Controller
 {
     use AuthorizesRequests;
 
+    public function indexSortSearch($column, $direction, $search = null)
+    {
+        return $this->apiResponse(function () use ($column, $direction, $search) {
+            $query = User::query();
+
+            if (!empty($search) && $search !== 'all') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            }
+
+            $allowedColumns = ['id', 'name'];
+            $sortColumn = in_array($column, $allowedColumns) ? $column : 'id';
+            $sortDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+            return $query->orderBy($sortColumn, $sortDirection)->get();
+        });
+    }
+
     public function login(LoginUserRequest $request)
     {
         //EltĂˇroljuk az adatokat vĂˇltozĂłkba
