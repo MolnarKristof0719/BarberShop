@@ -9,7 +9,7 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
     item: JSON.parse(localStorage.getItem("user_data")) || null,
     loading: false,
     error: null,
-    rolNames: ["Admin", "Tanár", "Diák"],
+    rolNames: ["Admin", "Barber", "Costumer"],
   }),
   //valamilyen formában visszaadja
   getters: {
