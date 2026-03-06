@@ -415,7 +415,7 @@ export default {
         await this.loadDayoffItems();
 
         const toastStore = useToastStore();
-        toastStore.messages.push("Szabadnap sikeresen rogzitve.");
+        toastStore.messages.push("Szabadnap sikeresen rögzítve.");
         toastStore.show("Success");
       } catch (error) {
         this.dayoffError =
@@ -433,7 +433,7 @@ export default {
         this.dayoffItems = this.dayoffItems.filter((row) => row.id !== id);
 
         const toastStore = useToastStore();
-        toastStore.messages.push("Szabadnap torolve.");
+        toastStore.messages.push("Szabadnap törölve.");
         toastStore.show("Success");
       } catch {
       } finally {
@@ -498,7 +498,7 @@ export default {
         this.barberProfilePicture = response?.data?.profilePicture || this.barberProfilePicture;
 
         const toastStore = useToastStore();
-        toastStore.messages.push("Profilkep sikeresen frissitve.");
+        toastStore.messages.push("Profilkép sikeresen frissítve.");
         toastStore.show("Success");
       } catch (error) {
       } finally {
@@ -522,7 +522,7 @@ export default {
         await this.loadReferencePictures();
 
         const toastStore = useToastStore();
-        toastStore.messages.push("Referenciakep sikeresen feltoltve.");
+        toastStore.messages.push("Referenciakép sikeresen feltöltve.");
         toastStore.show("Success");
       } catch (error) {
       } finally {
@@ -541,7 +541,7 @@ export default {
         this.referencePictures = this.referencePictures.filter((picture) => picture.id !== id);
 
         const toastStore = useToastStore();
-        toastStore.messages.push("Referenciakep torolve.");
+        toastStore.messages.push("Referenciakép törölve.");
         toastStore.show("Success");
       } catch (error) {
       } finally {

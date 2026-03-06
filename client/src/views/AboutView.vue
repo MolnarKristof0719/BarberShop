@@ -4,7 +4,7 @@
       <p class="section-title mb-5">MEET THE BARBERS</p>
 
       <div class="carousel-shell" v-if="activeBarber">
-        <button class="nav-arrow nav-left" type="button" @click="prevBarber" aria-label="Elozo barber">
+        <button class="nav-arrow nav-left" type="button" @click="prevBarber" aria-label="Előző barber">
           <i class="bi bi-chevron-left"></i>
         </button>
 
@@ -13,7 +13,7 @@
             <img
               v-if="activeBarber.profilePicture"
               :src="profileImage(activeBarber.profilePicture)"
-              :alt="activeBarber.user?.name || 'Barber kep'"
+              :alt="activeBarber.user?.name || 'Barber kép'"
               class="focus-image"
             />
             <div v-else class="focus-image fallback d-flex align-items-center justify-content-center">
@@ -30,7 +30,7 @@
           </div>
         </article>
 
-        <button class="nav-arrow nav-right" type="button" @click="nextBarber" aria-label="Kovetkezo barber">
+        <button class="nav-arrow nav-right" type="button" @click="nextBarber" aria-label="Következő barber">
           <i class="bi bi-chevron-right"></i>
         </button>
       </div>
