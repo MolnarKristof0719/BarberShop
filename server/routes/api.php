@@ -19,6 +19,7 @@ Route::post('users/login', [UserController::class, 'login']);
 Route::post('users', [UserController::class, 'store']); // regisztráció
 
 Route::get('/services', [ServiceController::class, 'index']); // public
+Route::get('/services/{id}', [ServiceController::class, 'show']);
 Route::get('/servicessortsearch/{column}/{direction}/{search?}', [ServiceController::class, 'indexSortSearch']);
 Route::get('/barbers', [BarberController::class, 'index']);
 Route::get('/barbers/{id}', [BarberController::class, 'show']);
@@ -65,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- SERVICES ADMIN CRUD (ha kell adminnak) ---
     Route::post('/services', [ServiceController::class, 'store'])->middleware('ability:*');
+    Route::patch('/services/{id}', [ServiceController::class, 'update'])->middleware('ability:*');
     Route::put('/services/{id}', [ServiceController::class, 'update'])->middleware('ability:*');
     Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->middleware('ability:*');
 

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreServiceRequest;
+use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service as CurrentModel;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ServiceController extends Controller
 {
@@ -39,14 +39,12 @@ class ServiceController extends Controller
     //endregion
 
     //region store
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
         return $this->apiResponse(function () use ($request) {
             $this->authorizeAdmin();
 
-            $data = $request->validate([
-                'service' => ['required', 'string', 'max:255'],
-            ]);
+            $data = $request->validated();
 
             return CurrentModel::create($data);
         });
@@ -67,7 +65,7 @@ class ServiceController extends Controller
     //endregion
 
     //region update
-    public function update(Request $request, int $id)
+    public function update(UpdateServiceRequest $request, int $id)
     {
         return $this->apiResponse(function () use ($request, $id) {
             $this->authorizeAdmin();
@@ -75,9 +73,7 @@ class ServiceController extends Controller
             $row = CurrentModel::query()->find($id);
             abort_if(!$row, 404, 'Service not found');
 
-            $data = $request->validate([
-                'service' => ['required', 'string', 'max:255'],
-            ]);
+            $data = $request->validated();
 
             $row->update($data);
 
