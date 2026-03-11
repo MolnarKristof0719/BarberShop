@@ -6,6 +6,22 @@
         <RouterLink class="hero-book-btn" to="/appointment">Book Now</RouterLink>
       </div>
     </section>
+    <section class="services-offered">
+      <div class="services-inner">
+        <p class="services-eyebrow">BARBER SHOP</p>
+        <h2 class="services-title">Szolgaltatasok</h2>
+        <ul class="services-list">
+          <li>Ferfi hajvagas</li>
+          <li>Gyerek hajvagas</li>
+          <li>Szakall igazitasa</li>
+          <li>Teljes fejborotvalas</li>
+          <li>Meleg torolkozos kontur</li>
+          <li>Meleg torolkozos arcborotvalas</li>
+          <li>Gyantazas</li>
+        </ul>
+        <RouterLink class="services-btn" to="/services">Tovabbi informacio</RouterLink>
+      </div>
+    </section>
   </section>
 </template>
 
@@ -83,6 +99,71 @@ export default {
 }
 
 .hero-book-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.services-offered {
+  margin: 24px 0 0;
+  padding: clamp(48px, 6vw, 80px) 16px;
+  background:
+    linear-gradient(0deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04)),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.25) 0px,
+      rgba(255, 255, 255, 0.25) 6px,
+      rgba(255, 255, 255, 0) 6px,
+      rgba(255, 255, 255, 0) 14px
+    ),
+    #e3e0da;
+}
+
+.services-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.services-eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: #7a736b;
+}
+
+.services-title {
+  margin: 0 0 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+  letter-spacing: 0.08em;
+  color: #111111;
+}
+
+.services-list {
+  margin: 0 auto 20px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  color: #1f1f1f;
+  font-size: 0.98rem;
+}
+
+.services-list li {
+  padding: 4px 0;
+}
+
+.services-btn {
+  display: inline-block;
+  background: #111111;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid #111111;
+  padding: 10px 24px;
+  font-size: 0.95rem;
+}
+
+.services-btn:hover {
   background: #000000;
   color: #ffffff;
 }
