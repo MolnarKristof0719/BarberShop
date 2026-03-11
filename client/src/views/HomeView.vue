@@ -11,13 +11,9 @@
         <p class="services-eyebrow">BARBER SHOP</p>
         <h2 class="services-title">Szolgaltatasok</h2>
         <ul class="services-list">
-          <li>Ferfi hajvagas</li>
-          <li>Gyerek hajvagas</li>
-          <li>Szakall igazitasa</li>
-          <li>Teljes fejborotvalas</li>
-          <li>Meleg torolkozos kontur</li>
-          <li>Meleg torolkozos arcborotvalas</li>
-          <li>Gyantazas</li>
+          <li v-for="service in services" :key="service">
+            {{ service }}
+          </li>
         </ul>
         <RouterLink class="services-btn" to="/services">Tovabbi informacio</RouterLink>
       </div>
@@ -26,8 +22,10 @@
 </template>
 
 <script>
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import { useSearchStore } from "@/stores/searchStore";
+import { useServiceStore } from "@/stores/serviceStore";
+
 
 export default {
   name: "HomeView",
@@ -37,17 +35,25 @@ export default {
     };
   },
   computed: {
+    ...mapState(useServiceStore, ["items"]),
     heroStyle() {
       return {
         backgroundImage: `url('${this.heroImageUrl}')`,
       };
     },
+    services() {
+      return (this.items || [])
+        .map((service) => service.service)
+        .filter(Boolean);
+    },
   },
   methods: {
     ...mapActions(useSearchStore, ["resetSearchWord"]),
+    ...mapActions(useServiceStore, { fetchServices: "getAll" }),
   },
   mounted() {
     this.resetSearchWord();
+    this.fetchServices();
   },
 };
 </script>
