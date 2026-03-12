@@ -36,7 +36,7 @@
 
     <div v-else>
       <div class="calendar-tools">
-        <button class="btn btn-outline-secondary btn-sm" @click="$emit('change-month', -1)">Elöző hónap</button>
+        <button class="btn btn-outline-secondary btn-sm" @click="$emit('change-month', -1)">Előző hónap</button>
         <strong>{{ monthLabel }}</strong>
         <button class="btn btn-outline-secondary btn-sm" @click="$emit('change-month', 1)">Következő hónap</button>
       </div>

@@ -2,20 +2,20 @@
   <section class="home-page">
     <section class="hero-banner" :style="heroStyle">
       <div class="hero-overlay">
-        <h1 class="hero-title-main">BLACK TIMBER BARBERSHOP</h1>
+        <h1 class="hero-title-main">BLACK TIMBER BARBER SHOP</h1>
         <RouterLink class="hero-book-btn" to="/appointment">Book Now</RouterLink>
       </div>
     </section>
     <section class="services-offered">
       <div class="services-inner">
-        <p class="services-eyebrow">BARBER SHOP</p>
-        <h2 class="services-title">Szolgaltatasok</h2>
+        <p class="services-eyebrow">BLACK TIMBER BARBER SHOP</p>
+        <h2 class="services-title">Szolgáltatások</h2>
         <ul class="services-list">
           <li v-for="service in services" :key="service">
             {{ service }}
           </li>
         </ul>
-        <RouterLink class="services-btn" to="/services">Tovabbi informacio</RouterLink>
+        <RouterLink class="services-btn" to="/services">További információ</RouterLink>
       </div>
     </section>
   </section>
