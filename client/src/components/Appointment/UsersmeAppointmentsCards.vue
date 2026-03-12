@@ -1,10 +1,6 @@
 <template>
   <section class="appointments-list">
-    <article
-      v-for="appointment in appointments"
-      :key="appointment.id"
-      class="booking-card"
-    >
+    <article v-for="appointment in appointments" :key="appointment.id" class="booking-card">
       <header class="booking-header">
         <h2 class="booking-title mb-0">BARBER <span class="accent">SHOP</span></h2>
       </header>
@@ -37,11 +33,7 @@
           <div class="detail-item mb-0">
             <div class="detail-label">Szolgáltatások</div>
             <div>
-              <span
-                v-for="service in appointment.services || []"
-                :key="service.id"
-                class="service-tag"
-              >
+              <span v-for="service in appointment.services || []" :key="service.id" class="service-tag">
                 {{ service.service }}
               </span>
               <span v-if="!(appointment.services || []).length" class="service-tag">
@@ -50,16 +42,21 @@
             </div>
           </div>
         </div>
-
         <div class="actions">
-          <button
-            class="btn btn-outline-danger btn-sm"
-            type="button"
-            :disabled="appointment.status === 'cancelled' || loading"
-            @click="$emit('cancel', appointment.id)"
-          >
-            Lemondás
-          </button>
+          <div class="review">
+            <button class="btn btn-outline-dark btn-sm" type="button"
+              v-if="appointment.status === 'completed'"
+              @click="$emit('review', appointment.id)">
+              Vélemény
+            </button>
+          </div>
+          <div class="delete">
+            <button class="btn btn-outline-danger btn-sm" type="button"
+              :disabled="appointment.status === 'cancelled' || loading || appointment.status === 'completed'"
+              @click="$emit('cancel', appointment.id)">
+              Lemondás
+            </button>
+          </div>
         </div>
       </div>
     </article>
@@ -73,7 +70,7 @@ export default {
     appointments: { type: Array, required: true },
     loading: { type: Boolean, default: false },
   },
-  emits: ["cancel"],
+  emits: ["cancel", "review"],
   methods: {
     formatDate(value) {
       if (!value) return "-";
@@ -93,8 +90,8 @@ export default {
     },
     statusLabel(status) {
       const map = {
-        pending: "Fuggoben",
-        completed: "Teljesitve",
+        booked: "Függőben",
+        completed: "Teljesítve",
         cancelled: "Lemondva",
       };
       return map[status] || status || "-";
@@ -204,9 +201,20 @@ export default {
   color: #8f1d2d;
 }
 
-.actions {
+.delete {
   margin-top: 10px;
   display: flex;
   justify-content: flex-end;
+}
+
+.review {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

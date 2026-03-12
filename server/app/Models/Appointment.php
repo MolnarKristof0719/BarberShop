@@ -59,4 +59,14 @@ class Appointment extends Model
     {
         return $this->hasOne(Review::class, 'appointmentId');
     }
+
+    public static function markElapsedAsCompleted(int $graceMinutes = 30): int
+    {
+        $cutoff = now()->subMinutes($graceMinutes)->toDateTimeString();
+
+        return static::query()
+            ->where('status', 'booked')
+            ->whereRaw('TIMESTAMP(appointmentDate, appointmentTime) <= ?', [$cutoff])
+            ->update(['status' => 'completed']);
+    }
 }

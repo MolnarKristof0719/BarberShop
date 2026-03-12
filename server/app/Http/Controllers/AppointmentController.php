@@ -20,6 +20,7 @@ class AppointmentController extends Controller
     public function indexSortSearch($column, $direction, $search = null)
     {
         return $this->apiResponse(function () use ($column, $direction, $search) {
+            CurrentModel::markElapsedAsCompleted();
             $query = CurrentModel::query();
 
             if (!empty($search) && $search !== 'all') {
@@ -39,6 +40,7 @@ class AppointmentController extends Controller
     public function index()
     {
         return $this->apiResponse(function () {
+            CurrentModel::markElapsedAsCompleted();
             $user = auth()->user();
 
             if ($user?->isBarber()) {
@@ -308,6 +310,7 @@ class AppointmentController extends Controller
     public function show(int $id)
     {
         return $this->apiResponse(function () use ($id) {
+            CurrentModel::markElapsedAsCompleted();
             $appointment = CurrentModel::query()
                 ->with(['services', 'barber', 'user'])
                 ->find($id);

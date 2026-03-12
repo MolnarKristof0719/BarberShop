@@ -431,6 +431,8 @@ class UserController extends Controller
     {
         $user = $request->user();
 
+        Appointment::markElapsedAsCompleted();
+
         $rows = Appointment::query()
             ->where('userId', $user->id)
             ->with(['services', 'barber.user'])
@@ -447,6 +449,8 @@ class UserController extends Controller
     public function myAppointmentShow(Request $request, int $id)
     {
         $user = $request->user();
+
+        Appointment::markElapsedAsCompleted();
 
         $row = Appointment::query()
             ->where('id', $id)
