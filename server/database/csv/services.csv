@@ -1,11 +1,11 @@
-id;service
-1;Egyhosszú hajvágás
-2;Átmenetes hajvágás
-3;Hajvágás és szakálligazítás
-4;Szakálligazítás
-5;Kontúrigazítás
-6;Borotválás (hot towel)
-7;Hajmosás
-8;Fejmasszázs
-9;Gyerek hajvágás
-10;Ősz haj fedés
+id;service;price
+1;Egyhosszú hajvágás;3000
+2;Átmenetes hajvágás;4500
+3;Hajvágás és szakálligazítás;6000
+4;Szakálligazítás;2000
+5;Kontúrigazítás;2000
+6;Borotválás;2000
+7;Hajmosás;500
+8;Fejmasszázs;1500
+9;Gyerek hajvágás;2500
+10;Ősz haj fedés;3000

@@ -58,6 +58,14 @@ const router = createRouter({
       },
     },
     {
+      path: "/services",
+      name: "services",
+      component: () => import("@/views/ServiceView.vue"),
+      meta: {
+        title: () => "Szolgáltatások",
+      },
+    },
+    {
       path: "/usersmeappointment",
       name: "usersmeappointment",
       component: () => import("@/views/UsersmeAppointmentView.vue"),

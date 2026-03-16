@@ -1,13 +1,9 @@
 <template>
   <div class="row g-4">
-    <div v-for="item in items" :key="item.id" class="col-12 col-md-6 col-xl-4">
+    <div v-for="item in items" :key="item.id" class="col-12 col-md-6">
       <article class="service-card h-100">
-        <div class="service-icon">
-          <i class="bi" :class="iconById(item.id)"></i>
-        </div>
-
         <h5 class="service-title mb-2">{{ item.service }}</h5>
-        <p class="service-desc mb-4">{{ descriptionByName(item.service) }}</p>
+        <p class="price mb-4">{{item.price}} Ft</p>
 
       
       </article>
@@ -21,23 +17,7 @@ export default {
   props: {
     items: { type: Array, required: true },
   },
-  methods: {
-    iconById(id) {
-      const icons = ["bi-scissors", "bi-stars", "bi-droplet", "bi-magic"];
-      return icons[id % icons.length];
-    },
-    priceById(id) {
-      const prices = [3500, 5000, 5000, 3000, 4500, 4000];
-      return prices[id % prices.length];
-    },
-    durationById(id) {
-      const durations = [20, 30, 40, 50, 60];
-      return durations[id % durations.length];
-    },
-    descriptionByName(name) {
-      return `${name} szolgálatás professzionális kivitelezéssel.`;
-    },
-  },
+    
 };
 </script>
 
@@ -45,7 +25,7 @@ export default {
 .service-card {
   border: 1px solid #e5d7d9;
   border-radius: 14px;
-  background: #ffffff;
+  background: #f8f8f8;
   padding: 22px;
   box-shadow: 0 8px 20px rgba(17, 17, 17, 0.05);
   transition:
@@ -58,23 +38,12 @@ export default {
   box-shadow: 0 12px 24px rgba(17, 17, 17, 0.09);
 }
 
-.service-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #8f2438;
-  color: #d3ad47;
-  border: 3px solid #b16e3e;
-  font-size: 24px;
-  margin-bottom: 16px;
-}
+
 
 .service-title {
   color: #111111;
   font-weight: 700;
+  font-size: 25px;
 }
 
 .service-desc {
@@ -84,7 +53,7 @@ export default {
 
 .price {
   color: #8f2438;
-  font-size: 32px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1;
 }
