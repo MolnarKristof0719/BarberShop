@@ -4,7 +4,7 @@
       <div>
         <p class="hero-kicker mb-1">Barber Shop</p>
         <h1 class="hero-title mb-1">Szolgáltatások</h1>
-        <p class="hero-subtitle mb-0">Válaszd ki a neked megfelelő szolgáltatást.</p>
+        
       </div>
 
       <div class="d-flex align-items-center gap-2">
