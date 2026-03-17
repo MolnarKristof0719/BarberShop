@@ -96,8 +96,8 @@ export default {
     ratingText() {
       const avg = this.activeRating.avg || 0;
       const count = this.activeRating.count || 0;
-      if (!count) return "MĂ©g nincs Ă©rtĂ©kelĂ©s";
-      return `${avg.toFixed(1)} / 5 (${count} vĂ©lemĂ©ny)`;
+      if (!count) return "Még nincs értékelés";
+      return `${avg.toFixed(1)} / 5 (${count} vélemény)`;
     },
   },
   methods: {

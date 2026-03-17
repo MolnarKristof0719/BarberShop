@@ -4,6 +4,9 @@
       <p class="hero-kicker mb-1">Barber Shop</p>
       <h1 class="hero-title mb-1">Barber információ</h1>
       <p class="hero-subtitle mb-0">Ismerd meg a barber munkáit és véleményeket.</p>
+      <RouterLink to="/barber" class="btn btn-outline-dark mt-3 barbersbutton">
+        Vissza a barber listához
+      </RouterLink>
     </div>
 
     <div v-if="loading" class="state-box mt-3">Betöltés...</div>
@@ -159,6 +162,10 @@ export default {
 </script>
 
 <style scoped>
+.barbersbutton{
+  border-radius: 50px;
+  font-size: 12px;
+}
 .barber-detail-page {
   min-height: 100%;
   padding: 10px;
