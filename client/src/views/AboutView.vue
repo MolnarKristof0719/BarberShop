@@ -183,6 +183,7 @@ export default {
   gap: 16px;
   max-width: 400px;
   margin: 0 auto;
+  min-height: 800px;
 }
 
 .barber-focus-card {
