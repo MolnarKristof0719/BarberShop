@@ -28,9 +28,9 @@ class ReviewSeeder extends Seeder
         foreach ($appointments as $appointment) {
 
             // opcionális: nem mindenki ír review-t (ha mindet akarod, töröld ezt az if-et)
-            if (random_int(1, 100) > 70) {
-                continue;
-            }
+            // if (random_int(1, 100) > 70) {
+            //     continue;
+            // }
 
             $rating = random_int(1, 5);
             $comment = $faker->sentence(12);

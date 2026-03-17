@@ -51,10 +51,10 @@
           :class="{ active: index === activeIndex }" type="button" @click="activeIndex = index"
           :aria-label="`Barber ${index + 1}`"></button>
       </div>
+      <RouterLink to="/barber" class="btn btn-outline-dark all-barbers">
+        Összes barber megtekintése
+      </RouterLink>
     </section>
-    <RouterLink to="/barber" class="btn btn-outline-dark all-barbers">
-      Összes barber megtekintése
-    </RouterLink>
   </section>
 </template>
 
