@@ -2,11 +2,11 @@
   <section class="barber-detail-page">
     <div class="hero">
       <p class="hero-kicker mb-1">Barber Shop</p>
-      <h1 class="hero-title mb-1">Barber informacio</h1>
-      <p class="hero-subtitle mb-0">Ismerd meg a barber munkait es velemenyeket.</p>
+      <h1 class="hero-title mb-1">Barber információ</h1>
+      <p class="hero-subtitle mb-0">Ismerd meg a barber munkáit és véleményeket.</p>
     </div>
 
-    <div v-if="loading" class="state-box mt-3">Betoltes...</div>
+    <div v-if="loading" class="state-box mt-3">Betöltés...</div>
     <div v-else-if="errorMsg" class="state-box mt-3 error-box">{{ errorMsg }}</div>
 
     <div v-else-if="barber" class="detail-shell mt-3">
@@ -39,19 +39,19 @@
             </p>
           </div>
           <p class="profile-intro mb-0">
-            {{ barber.introduction || "Nincs bemutatkozas ehhez a barberhez." }}
+            {{ barber.introduction || "Nincs bemutatkozás ehhez a barberhez." }}
           </p>
         </div>
       </section>
 
       <section class="reviews-section">
-        <h3 class="section-title">Ertekelesek es velemenyek</h3>
-        <div v-if="!reviews.length" class="empty-card">MĂ©g nincs vĂ©lemĂ©ny.</div>
+        <h3 class="section-title">Értékelések és vélemények</h3>
+        <div v-if="!reviews.length" class="empty-card">Még nincs vélemény.</div>
         <div v-else class="reviews-grid">
           <article v-for="review in reviews" :key="review.id" class="review-card">
             <div class="review-header">
               <p class="reviewer-name mb-0">
-                {{ review.user?.name || "Vendeg" }}
+                {{ review.user?.name || "Vendég" }}
               </p>
               <div class="rating-stars small">
                 <i
@@ -63,20 +63,20 @@
               </div>
             </div>
             <p class="review-text mb-0">
-              {{ review.comment || "Nincs szoveges velemeny." }}
+              {{ review.comment || "Nincs szöveges vélemény." }}
             </p>
           </article>
         </div>
       </section>
 
       <section class="references-section">
-        <h3 class="section-title">Referenciakepek</h3>
+        <h3 class="section-title">Referenciaképek</h3>
         <div v-if="!referencePictures.length" class="empty-card">
-          Ehhez a barberhez nincs referenciakep.
+          Ehhez a barberhez nincs referenciakép.
         </div>
         <div v-else class="references-grid">
           <div v-for="picture in referencePictures" :key="picture.id" class="reference-tile">
-            <img :src="profileImage(picture.picture)" alt="Barber referencia kep" />
+            <img :src="profileImage(picture.picture)" alt="Barber referenciakép" />
           </div>
         </div>
       </section>
@@ -120,8 +120,8 @@ export default {
       return Math.round(this.averageRating || 0);
     },
     ratingText() {
-      if (!this.reviews.length) return "MĂ©g nincs Ă©rtĂ©kelĂ©s";
-      return `${this.averageRating.toFixed(1)} / 5 (${this.reviews.length} vĂ©lemĂ©ny)`;
+      if (!this.reviews.length) return "Még nincs értékelés";
+      return `${this.averageRating.toFixed(1)} / 5 (${this.reviews.length} vélemény)`;
     },
   },
   methods: {
@@ -130,7 +130,7 @@ export default {
     },
     async loadBarber() {
       if (!this.barberId) {
-        this.errorMsg = "Hianyzik a barber azonositoja.";
+        this.errorMsg = "Hiányzik a barber azonosítója.";
         return;
       }
       this.loading = true;
@@ -139,7 +139,7 @@ export default {
         const response = await barberService.getById(this.barberId);
         this.barber = response?.data || null;
       } catch (err) {
-        this.errorMsg = "Nem sikerult betolteni a barber adatait.";
+        this.errorMsg = "Nem sikerült betölteni a barber adatait.";
       } finally {
         this.loading = false;
       }
