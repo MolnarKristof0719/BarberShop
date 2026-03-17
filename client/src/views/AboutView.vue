@@ -10,12 +10,8 @@
 
         <article class="barber-focus-card">
           <div class="focus-image-wrap">
-            <img
-              v-if="activeBarber.profilePicture"
-              :src="profileImage(activeBarber.profilePicture)"
-              :alt="activeBarber.user?.name || 'Barber kép'"
-              class="focus-image"
-            />
+            <img v-if="activeBarber.profilePicture" :src="profileImage(activeBarber.profilePicture)"
+              :alt="activeBarber.user?.name || 'Barber kép'" class="focus-image" />
             <div v-else class="focus-image fallback d-flex align-items-center justify-content-center">
               <i class="bi bi-person-circle fs-1"></i>
             </div>
@@ -26,12 +22,7 @@
             <p class="focus-role mb-4">Barber</p>
             <div class="focus-rating" v-if="activeBarber">
               <div class="rating-stars">
-                <i
-                  v-for="n in 5"
-                  :key="n"
-                  class="bi"
-                  :class="n <= roundedRating ? 'bi-star-fill' : 'bi-star'"
-                ></i>
+                <i v-for="n in 5" :key="n" class="bi" :class="n <= roundedRating ? 'bi-star-fill' : 'bi-star'"></i>
               </div>
               <p class="rating-text mb-0">
                 {{ ratingText }}
@@ -56,17 +47,14 @@
       </div>
 
       <div class="dot-nav mt-4" v-if="displayItems.length > 1">
-        <button
-          v-for="(item, index) in displayItems"
-          :key="item.id"
-          class="dot-btn"
-          :class="{ active: index === activeIndex }"
-          type="button"
-          @click="activeIndex = index"
-          :aria-label="`Barber ${index + 1}`"
-        ></button>
+        <button v-for="(item, index) in displayItems" :key="item.id" class="dot-btn"
+          :class="{ active: index === activeIndex }" type="button" @click="activeIndex = index"
+          :aria-label="`Barber ${index + 1}`"></button>
       </div>
     </section>
+    <RouterLink to="/barber" class="btn btn-outline-dark all-barbers">
+      Összes barber megtekintése
+    </RouterLink>
   </section>
 </template>
 
@@ -160,6 +148,15 @@ export default {
 </script>
 
 <style scoped>
+.all-barbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 30px auto 0;
+  padding: 10px;
+  border-radius: 30px;
+}
+
 .about-page {
   min-height: 100%;
 }
