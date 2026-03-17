@@ -155,6 +155,7 @@ export default {
   margin: 30px auto 0;
   padding: 10px;
   border-radius: 30px;
+  max-width: 300px;
 }
 
 .about-page {
