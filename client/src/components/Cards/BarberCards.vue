@@ -38,7 +38,7 @@
             {{ item.introduction || "Nincs bemutatkozás." }}
           </p>
           <RouterLink
-            class="btn btn-dark btn-sm mt-3 align-self-start"
+            class="btn btn-dark btn-sm mt-2 align-self-start"
             :to="{ name: 'barberDetail', params: { id: item.id } }"
           >
             Megtekintem
@@ -71,6 +71,8 @@ export default {
 
 <style scoped>
 .barber-card {
+  display: flex;
+  flex-direction: column;
   border: 1px solid #e9ecef;
   border-radius: 16px;
   overflow: hidden;
@@ -126,6 +128,9 @@ export default {
 
 .card-body-custom {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .name {
