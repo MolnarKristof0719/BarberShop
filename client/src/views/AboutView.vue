@@ -24,6 +24,19 @@
           <div class="focus-content">
             <h2 class="focus-name mb-2">{{ activeBarber.user?.name || `Barber #${activeBarber.id}` }}</h2>
             <p class="focus-role mb-4">Barber</p>
+            <div class="focus-rating" v-if="activeBarber">
+              <div class="rating-stars">
+                <i
+                  v-for="n in 5"
+                  :key="n"
+                  class="bi"
+                  :class="n <= roundedRating ? 'bi-star-fill' : 'bi-star'"
+                ></i>
+              </div>
+              <p class="rating-text mb-0">
+                {{ ratingText }}
+              </p>
+            </div>
             <p class="focus-intro mb-0">
               {{ activeBarber.introduction || "Nincs bemutatkozás ehhez a barberhez." }}
             </p>
@@ -60,6 +73,8 @@
 <script>
 import { mapActions, mapState } from "pinia";
 import { useBarberStore } from "@/stores/barberStore";
+import { useReviewStore } from "@/stores/reviewStore";
+import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import { resolveMediaUrl } from "@/utils/media";
 
 export default {
@@ -67,7 +82,9 @@ export default {
   data() {
     return {
       activeIndex: 0,
-      
+      reviewStats: {},
+      reviewStore: useReviewStore(),
+      userStore: useUserLoginLogoutStore(),
     };
   },
   computed: {
@@ -81,9 +98,49 @@ export default {
       const safeIndex = Math.min(this.activeIndex, this.displayItems.length - 1);
       return this.displayItems[safeIndex];
     },
+    activeRating() {
+      if (!this.activeBarber?.id) return { avg: 0, count: 0 };
+      return this.reviewStats[this.activeBarber.id] || { avg: 0, count: 0 };
+    },
+    roundedRating() {
+      return Math.round(this.activeRating.avg || 0);
+    },
+    ratingText() {
+      const avg = this.activeRating.avg || 0;
+      const count = this.activeRating.count || 0;
+      if (!count) return "MĂ©g nincs Ă©rtĂ©kelĂ©s";
+      return `${avg.toFixed(1)} / 5 (${count} vĂ©lemĂ©ny)`;
+    },
   },
   methods: {
     ...mapActions(useBarberStore, ["getAll"]),
+    buildReviewStats(reviews) {
+      const stats = {};
+      (reviews || []).forEach((review) => {
+        const barberId = Number(review?.barberId);
+        const rating = Number(review?.rating || 0);
+        if (!barberId || !rating) return;
+        if (!stats[barberId]) {
+          stats[barberId] = { sum: 0, count: 0, avg: 0 };
+        }
+        stats[barberId].sum += rating;
+        stats[barberId].count += 1;
+        stats[barberId].avg = stats[barberId].sum / stats[barberId].count;
+      });
+      return stats;
+    },
+    async loadReviews() {
+      if (!this.userStore.isLoggedIn) {
+        this.reviewStats = {};
+        return;
+      }
+      try {
+        const reviews = await this.reviewStore.getAll();
+        this.reviewStats = this.buildReviewStats(reviews);
+      } catch {
+        this.reviewStats = {};
+      }
+    },
     nextBarber() {
       if (!this.displayItems.length) return;
       this.activeIndex = (this.activeIndex + 1) % this.displayItems.length;
@@ -97,7 +154,7 @@ export default {
     },
   },
   async mounted() {
-    await this.getAll();
+    await Promise.all([this.getAll(), this.loadReviews()]);
   },
 };
 </script>
@@ -123,10 +180,10 @@ export default {
 
 .carousel-shell {
   display: grid;
-  grid-template-columns: 48px minmax(260px, 640px) 48px;
+  grid-template-columns: 24px minmax(130px, 320px) 24px;
   align-items: center;
   gap: 16px;
-  max-width: 760px;
+  max-width: 400px;
   margin: 0 auto;
 }
 
@@ -167,6 +224,25 @@ export default {
 .focus-role {
   color: #5f5f5f;
   font-style: italic;
+}
+
+.focus-rating {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  margin-bottom: 16px;
+}
+
+.rating-stars {
+  color: #c5a059;
+  font-size: 1.05rem;
+  display: flex;
+  gap: 6px;
+}
+
+.rating-text {
+  color: #4f4f4f;
+  font-weight: 600;
 }
 
 .focus-intro {

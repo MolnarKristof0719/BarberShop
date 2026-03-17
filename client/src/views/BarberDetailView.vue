@@ -1,0 +1,346 @@
+<template>
+  <section class="barber-detail-page">
+    <div class="hero">
+      <p class="hero-kicker mb-1">Barber Shop</p>
+      <h1 class="hero-title mb-1">Barber informacio</h1>
+      <p class="hero-subtitle mb-0">Ismerd meg a barber munkait es velemenyeket.</p>
+    </div>
+
+    <div v-if="loading" class="state-box mt-3">Betoltes...</div>
+    <div v-else-if="errorMsg" class="state-box mt-3 error-box">{{ errorMsg }}</div>
+
+    <div v-else-if="barber" class="detail-shell mt-3">
+      <section class="profile-card">
+        <div class="profile-image-wrap">
+          <img
+            v-if="barber.profilePicture"
+            :src="profileImage(barber.profilePicture)"
+            :alt="barberName"
+            class="profile-image"
+          />
+          <div v-else class="profile-image fallback d-flex align-items-center justify-content-center">
+            <i class="bi bi-person-circle fs-1"></i>
+          </div>
+        </div>
+        <div class="profile-content">
+          <h2 class="profile-name mb-2">{{ barberName }}</h2>
+          <p class="profile-role mb-3">Barber</p>
+          <div class="rating-summary">
+            <div class="rating-stars">
+              <i
+                v-for="n in 5"
+                :key="n"
+                class="bi"
+                :class="n <= roundedRating ? 'bi-star-fill' : 'bi-star'"
+              ></i>
+            </div>
+            <p class="rating-text mb-0">
+              {{ ratingText }}
+            </p>
+          </div>
+          <p class="profile-intro mb-0">
+            {{ barber.introduction || "Nincs bemutatkozas ehhez a barberhez." }}
+          </p>
+        </div>
+      </section>
+
+      <section class="reviews-section">
+        <h3 class="section-title">Ertekelesek es velemenyek</h3>
+        <div v-if="!reviews.length" class="empty-card">MĂ©g nincs vĂ©lemĂ©ny.</div>
+        <div v-else class="reviews-grid">
+          <article v-for="review in reviews" :key="review.id" class="review-card">
+            <div class="review-header">
+              <p class="reviewer-name mb-0">
+                {{ review.user?.name || "Vendeg" }}
+              </p>
+              <div class="rating-stars small">
+                <i
+                  v-for="n in 5"
+                  :key="`${review.id}-${n}`"
+                  class="bi"
+                  :class="n <= review.rating ? 'bi-star-fill' : 'bi-star'"
+                ></i>
+              </div>
+            </div>
+            <p class="review-text mb-0">
+              {{ review.comment || "Nincs szoveges velemeny." }}
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="references-section">
+        <h3 class="section-title">Referenciakepek</h3>
+        <div v-if="!referencePictures.length" class="empty-card">
+          Ehhez a barberhez nincs referenciakep.
+        </div>
+        <div v-else class="references-grid">
+          <div v-for="picture in referencePictures" :key="picture.id" class="reference-tile">
+            <img :src="profileImage(picture.picture)" alt="Barber referencia kep" />
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</template>
+
+<script>
+import barberService from "@/api/barberService";
+import { resolveMediaUrl } from "@/utils/media";
+
+export default {
+  name: "BarberDetailView",
+  data() {
+    return {
+      barber: null,
+      loading: false,
+      errorMsg: "",
+    };
+  },
+  computed: {
+    barberId() {
+      const parsed = Number(this.$route?.params?.id);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    },
+    barberName() {
+      return this.barber?.user?.name || this.barber?.name || (this.barber?.id ? `Barber #${this.barber.id}` : "");
+    },
+    reviews() {
+      return Array.isArray(this.barber?.reviews) ? this.barber.reviews : [];
+    },
+    referencePictures() {
+      return Array.isArray(this.barber?.referencePictures) ? this.barber.referencePictures : [];
+    },
+    averageRating() {
+      if (!this.reviews.length) return 0;
+      const sum = this.reviews.reduce((acc, review) => acc + Number(review.rating || 0), 0);
+      return sum / this.reviews.length;
+    },
+    roundedRating() {
+      return Math.round(this.averageRating || 0);
+    },
+    ratingText() {
+      if (!this.reviews.length) return "MĂ©g nincs Ă©rtĂ©kelĂ©s";
+      return `${this.averageRating.toFixed(1)} / 5 (${this.reviews.length} vĂ©lemĂ©ny)`;
+    },
+  },
+  methods: {
+    profileImage(path) {
+      return resolveMediaUrl(path);
+    },
+    async loadBarber() {
+      if (!this.barberId) {
+        this.errorMsg = "Hianyzik a barber azonositoja.";
+        return;
+      }
+      this.loading = true;
+      this.errorMsg = "";
+      try {
+        const response = await barberService.getById(this.barberId);
+        this.barber = response?.data || null;
+      } catch (err) {
+        this.errorMsg = "Nem sikerult betolteni a barber adatait.";
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+  async mounted() {
+    await this.loadBarber();
+  },
+  watch: {
+    "$route.params.id": {
+      async handler() {
+        await this.loadBarber();
+      },
+    },
+  },
+};
+</script>
+
+<style scoped>
+.barber-detail-page {
+  min-height: 100%;
+  padding: 10px;
+}
+
+.hero {
+  border: 1px solid #e4e8ec;
+  border-radius: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+}
+
+.hero-kicker {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c5a059;
+  font-weight: 700;
+}
+
+.hero-title {
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  color: #101820;
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  color: #5f6b76;
+}
+
+.state-box {
+  border: 1px solid #e4e8ec;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 14px;
+  color: #5f6b76;
+}
+
+.error-box {
+  border-color: #f2c7c7;
+  background: #fff5f5;
+  color: #9b1c1c;
+}
+
+.detail-shell {
+  display: grid;
+  gap: 20px;
+}
+
+.profile-card {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(180px, 260px) 1fr;
+  border: 1px solid #e4e8ec;
+  border-radius: 16px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.profile-image-wrap {
+  background: #111111;
+  min-height: 220px;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-content {
+  padding: 20px;
+}
+
+.profile-name {
+  font-weight: 700;
+  color: #111111;
+}
+
+.profile-role {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.rating-stars {
+  color: #c5a059;
+  display: flex;
+  gap: 6px;
+}
+
+.rating-stars.small {
+  font-size: 0.9rem;
+}
+
+.rating-text {
+  color: #4f4f4f;
+  font-weight: 600;
+}
+
+.profile-intro {
+  color: #222;
+  line-height: 1.6;
+}
+
+.section-title {
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 12px;
+}
+
+.reviews-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.review-card {
+  border: 1px solid #e4e8ec;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 14px;
+  box-shadow: 0 6px 16px rgba(17, 17, 17, 0.05);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.reviewer-name {
+  font-weight: 700;
+  color: #111111;
+}
+
+.review-text {
+  color: #4f4f4f;
+  line-height: 1.5;
+}
+
+.references-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.reference-tile {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.reference-tile img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.empty-card {
+  border: 1px dashed #d5dce3;
+  border-radius: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  color: #6c757d;
+}
+
+@media (max-width: 991.98px) {
+  .profile-card {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-image-wrap {
+    height: 240px;
+  }
+}
+</style>

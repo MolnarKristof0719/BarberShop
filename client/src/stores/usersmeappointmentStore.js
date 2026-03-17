@@ -24,6 +24,20 @@ export const useUsersmeAppointmentStore = defineStore("usersmeAppointment", {
       }
     },
 
+    async getById(id) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await service.getById(id);
+        return response?.data || null;
+      } catch (err) {
+        this.error = err;
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async cancel(id) {
       this.loading = true;
       this.error = null;

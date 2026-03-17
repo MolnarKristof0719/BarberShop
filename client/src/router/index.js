@@ -18,7 +18,7 @@ const router = createRouter({
       name: "home",
       component: HomeView,
       meta: {
-        title: () => "Fooldal",
+        title: () => "Főoldal",
       },
     },
     {
@@ -26,7 +26,7 @@ const router = createRouter({
       name: "about",
       component: () => import("@/views/AboutView.vue"),
       meta: {
-        title: () => "Rolunk",
+        title: () => "Rólunk",
       },
     },
     {
@@ -43,6 +43,14 @@ const router = createRouter({
       path: "/barber",
       name: "barber",
       component: () => import("@/views/BarberView.vue"),
+      meta: {
+        title: () => "Barber",
+      },
+    },
+    {
+      path: "/barber/:id",
+      name: "barberDetail",
+      component: () => import("@/views/BarberDetailView.vue"),
       meta: {
         title: () => "Barber",
       },
@@ -75,6 +83,17 @@ const router = createRouter({
         roles: [3],
       },
     },
+    {
+      path: "/review",
+      name: "review",
+      component: () => import("@/views/ReviewView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: () => "Vélemény",
+        roles: [3],
+      },
+    },
+
     
 
     {
@@ -163,7 +182,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  document.title = "Iskola - " + to.meta.title(to);
+  document.title = "BarberShop - " + to.meta.title(to);
 
   const requiredRoles = to.meta.roles;
   const userStore = useUserLoginLogoutStore();

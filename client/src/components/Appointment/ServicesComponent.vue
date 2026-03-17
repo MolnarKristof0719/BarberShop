@@ -24,6 +24,7 @@
         @click="$emit('toggle-service', service.id)"
       >
         <span>{{ service.service }}</span>
+        
         <i
           class="bi"
           :class="

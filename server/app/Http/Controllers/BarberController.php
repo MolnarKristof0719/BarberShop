@@ -89,7 +89,7 @@ class BarberController extends Controller
     {
         return $this->apiResponse(function () use ($id) {
             return CurrentModel::query()
-                ->with(['referencePictures', 'reviews', 'user'])
+                ->with(['referencePictures', 'reviews.user', 'user'])
                 ->findOrFail($id);
         });
     }

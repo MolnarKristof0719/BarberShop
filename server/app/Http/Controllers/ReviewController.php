@@ -49,12 +49,14 @@ class ReviewController extends Controller
                 'comment' => ['nullable', 'string'],
             ]);
 
+            $comment = $data['comment'] ?? '';
+
             return CurrentModel::create([
                 'appointmentId' => $appointmentId,
                 'barberId' => $appointment->barberId,
                 'userId' => $user->id,
                 'rating' => $data['rating'],
-                'comment' => $data['comment'] ?? null,
+                'comment' => $comment,
             ]);
         });
     }

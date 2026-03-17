@@ -16,6 +16,7 @@
         :appointments="activeItems"
         :loading="loading"
         @cancel="cancelAppointment"
+        @review="openReview"
       />
 
       <div v-if="cancelledItems.length" class="cancelled-block">
@@ -25,6 +26,7 @@
           :appointments="cancelledItems"
           :loading="loading"
           @cancel="cancelAppointment"
+          @review="openReview"
         />
       </div>
     </template>
@@ -57,6 +59,9 @@ export default {
     },
     async cancelAppointment(id) {
       await this.cancel(id);
+    },
+    openReview(id) {
+      this.$router.push({ name: "review", query: { appointmentId: id } });
     },
   },
   async mounted() {

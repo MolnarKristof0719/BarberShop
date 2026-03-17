@@ -23,7 +23,7 @@
             class="status-chip"
             :class="item.isActive ? 'status-active' : 'status-inactive'"
           >
-            {{ item.isActive ? "Aktív" : "Inaktív" }}
+            {{ item.isActive ? "Aktí­v" : "Inaktí­v" }}
           </span>
         </div>
 
@@ -37,6 +37,12 @@
           <p class="intro mb-0 flex-grow-1">
             {{ item.introduction || "Nincs bemutatkozás." }}
           </p>
+          <RouterLink
+            class="btn btn-dark btn-sm mt-3 align-self-start"
+            :to="{ name: 'barberDetail', params: { id: item.id } }"
+          >
+            Megtekintem
+          </RouterLink>
         </div>
       </article>
     </div>
@@ -45,9 +51,13 @@
 
 <script>
 import { resolveMediaUrl } from "@/utils/media";
+import { RouterLink } from "vue-router";
 
 export default {
   name: "BarberCards",
+  components: {
+    RouterLink,
+  },
   props: {
     items: { type: Array, required: true },
   },
