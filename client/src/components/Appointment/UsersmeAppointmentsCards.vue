@@ -46,8 +46,9 @@
           <div class="review">
             <button class="btn btn-outline-dark btn-sm" type="button"
               v-if="appointment.status === 'completed'"
+              :disabled="isReviewed(appointment.id)"
               @click="$emit('review', appointment.id)">
-              Vélemény
+              {{ isReviewed(appointment.id) ? "Velemeny irva" : "Velemeny" }}
             </button>
           </div>
           <div class="delete">
@@ -69,6 +70,7 @@ export default {
   props: {
     appointments: { type: Array, required: true },
     loading: { type: Boolean, default: false },
+    reviewedIds: { type: Object, default: () => new Set() },
   },
   emits: ["cancel", "review"],
   methods: {
@@ -100,6 +102,9 @@ export default {
       if (status === "completed") return "done";
       if (status === "cancelled") return "cancelled";
       return "pending";
+    },
+    isReviewed(appointmentId) {
+      return this.reviewedIds instanceof Set && this.reviewedIds.has(appointmentId);
     },
   },
 };

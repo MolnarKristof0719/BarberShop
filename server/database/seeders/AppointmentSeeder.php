@@ -20,25 +20,25 @@ class AppointmentSeeder extends Seeder
         $slots = $slotService->generateHalfHourSlots('09:00', '18:00');
 
         $barberIds = Barber::query()->pluck('id')->all();
-        $userIds   = User::query()->pluck('id')->all();
+        $userIds   = User::query()->where('role', 3)->pluck('id')->all();
 
         if (empty($barberIds) || empty($userIds)) {
             return;
         }
 
-        // csak a következő 2 hónapig generálunk dátumokat
-        $maxDate = Carbon::today()->addMonthsNoOverflow(2);
-        $maxDaysAhead = Carbon::today()->diffInDays($maxDate);
+        $pastDays = 60;
+        $futureDays = 60;
+        $maxDaysAhead = $pastDays + $futureDays;
 
         // customer lemondás esélye (%)
-        $cancelChancePast = 10;   // múltban 10% cancelled (customer)
+        $cancelChancePast = 5;   // múltban 10% cancelled (customer)
         $cancelChanceFuture = 5;  // jövőben 5% cancelled (customer)
 
         // offDay-re mennyi eséllyel csináljunk rekordot? (%)
         // (ha 0, akkor offDay-re sosem generál)
         $offDayGenerateChance = 30;
 
-        $target = 200;
+        $target = 300;
         $created = 0;
         $attempts = 0;
         $maxAttempts = $target * 150;
@@ -50,6 +50,7 @@ class AppointmentSeeder extends Seeder
             $userId   = $userIds[array_rand($userIds)];
 
             $date = Carbon::today()
+                ->subDays($pastDays)
                 ->addDays(random_int(0, $maxDaysAhead))
                 ->toDateString();
 

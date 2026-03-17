@@ -75,11 +75,11 @@
       <section class="references-section">
         <h3 class="section-title">Referenciaképek</h3>
         <div v-if="!referencePictures.length" class="empty-card">
-          Ehhez a barberhez nincs referenciakép.
+          Ehhez a barberhez még nincs feltöltött referenciakép.
         </div>
         <div v-else class="references-grid">
           <div v-for="picture in referencePictures" :key="picture.id" class="reference-tile">
-            <img :src="profileImage(picture.picture)" alt="Barber referenciakép" />
+            <img :src="profileImage(picture.picture)" alt="Referencia kep" />
           </div>
         </div>
       </section>
@@ -112,7 +112,13 @@ export default {
       return Array.isArray(this.barber?.reviews) ? this.barber.reviews : [];
     },
     referencePictures() {
-      return Array.isArray(this.barber?.referencePictures) ? this.barber.referencePictures : [];
+      if (Array.isArray(this.barber?.referencePictures)) {
+        return this.barber.referencePictures;
+      }
+      if (Array.isArray(this.barber?.reference_pictures)) {
+        return this.barber.reference_pictures;
+      }
+      return [];
     },
     averageRating() {
       if (!this.reviews.length) return 0;

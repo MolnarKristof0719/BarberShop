@@ -15,6 +15,7 @@
         class="mt-3"
         :appointments="activeItems"
         :loading="loading"
+        :reviewed-ids="reviewedAppointmentIds"
         @cancel="cancelAppointment"
         @review="openReview"
       />
@@ -25,6 +26,7 @@
         <UsersmeAppointmentsCards
           :appointments="cancelledItems"
           :loading="loading"
+          :reviewed-ids="reviewedAppointmentIds"
           @cancel="cancelAppointment"
           @review="openReview"
         />
@@ -37,11 +39,20 @@
 import { mapActions, mapState } from "pinia";
 import UsersmeAppointmentsCards from "@/components/Appointment/UsersmeAppointmentsCards.vue";
 import { useUsersmeAppointmentStore } from "@/stores/usersmeappointmentStore";
+import { useReviewStore } from "@/stores/reviewStore";
+import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 
 export default {
   name: "UsersmeAppointmentView",
   components: {
     UsersmeAppointmentsCards,
+  },
+  data() {
+    return {
+      reviewStore: useReviewStore(),
+      userStore: useUserLoginLogoutStore(),
+      reviewedAppointmentIds: new Set(),
+    };
   },
   computed: {
     ...mapState(useUsersmeAppointmentStore, ["items", "loading"]),
@@ -60,15 +71,32 @@ export default {
     async cancelAppointment(id) {
       await this.cancel(id);
     },
+    async loadReviews() {
+      if (!this.userStore.isLoggedIn) {
+        this.reviewedAppointmentIds = new Set();
+        return;
+      }
+      try {
+        const reviews = await this.reviewStore.getAll();
+        const mine = (reviews || []).filter(
+          (review) => Number(review?.userId) === Number(this.userStore.item?.id),
+        );
+        this.reviewedAppointmentIds = new Set(mine.map((review) => review.appointmentId));
+      } catch {
+        this.reviewedAppointmentIds = new Set();
+      }
+    },
     openReview(id) {
       this.$router.push({ name: "review", query: { appointmentId: id } });
     },
   },
   async mounted() {
     await this.refreshAppointments();
+    await this.loadReviews();
   },
   async activated() {
     await this.refreshAppointments();
+    await this.loadReviews();
   },
 };
 </script>

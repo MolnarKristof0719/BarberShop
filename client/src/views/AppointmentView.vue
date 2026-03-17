@@ -378,8 +378,7 @@ export default {
           throw new Error("Missing barber id");
         }
         const response = await barberService.getById(barber.id);
-        const pictures =
-          response?.data?.reference_pictures;
+        const pictures = response?.data?.reference_pictures;
         this.referenceModalPictures = Array.isArray(pictures) ? pictures : [];
       } catch {
         this.referenceModalError = "A referenciakepek betoltese nem sikerult.";
