@@ -14,6 +14,9 @@
         .detail-item { margin-bottom: 15px; }
         .detail-label { font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
         .detail-value { font-size: 16px; font-weight: 500; color: #111; }
+        .detail-value-price {
+            font-size: 16px; font-weight: 500; color: #8f2438;
+        }
         .service-tag { 
             display: inline-block; 
             background: #111; 
@@ -63,6 +66,11 @@
                     </div>
                 </div>
             </div>
+
+            <div class="detail-item">
+                    <div class="detail-label">Ár:</div>
+                    <div class="detail-value-price">{{ $appointment->totalPrice }} Ft</div>
+                </div>
 
             <p style="font-size: 14px; line-height: 1.5; color: #666;">
                 Kérjük, érkezz 5 perccel korábban. Ha közbejönne valami, kérlek jelezd nekünk időben!
