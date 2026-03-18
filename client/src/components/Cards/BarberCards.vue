@@ -5,7 +5,14 @@
       :key="item.id"
       class="col-12 col-sm-6 col-lg-4 col-xl-3"
     >
-      <article class="barber-card h-100">
+      <article
+        class="barber-card h-100"
+        role="button"
+        tabindex="0"
+        @click="goToBarber(item.id)"
+        @keydown.enter="goToBarber(item.id)"
+        @keydown.space.prevent="goToBarber(item.id)"
+      >
         <div class="media-wrap">
           <img
             v-if="item.profilePicture"
@@ -37,12 +44,6 @@
           <p class="intro mb-0 flex-grow-1">
             {{ item.introduction || "Nincs bemutatkozás." }}
           </p>
-          <RouterLink
-            class="btn btn-dark btn-sm mt-2 align-self-start"
-            :to="{ name: 'barberDetail', params: { id: item.id } }"
-          >
-            Megtekintem
-          </RouterLink>
         </div>
       </article>
     </div>
@@ -65,6 +66,10 @@ export default {
     profileImage(path) {
       return resolveMediaUrl(path);
     },
+    goToBarber(id) {
+      if (!id) return;
+      this.$router.push({ name: "barberDetail", params: { id } });
+    },
   },
 };
 </script>
@@ -79,6 +84,7 @@ export default {
   background: #ffffff;
   box-shadow: 0 8px 24px rgba(17, 17, 17, 0.06);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
 .barber-card:hover {
