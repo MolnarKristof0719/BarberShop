@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('appointmentId')->constrained('appointments')->onDelete('cascade');
             $table->foreignId('serviceId')->constrained('services')->onDelete('cascade');
+            $table->unsignedInteger('totalPrice')->default(0);
             $table->unique(['appointmentId', 'serviceId']);
 
         });

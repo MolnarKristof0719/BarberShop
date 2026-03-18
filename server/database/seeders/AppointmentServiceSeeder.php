@@ -28,10 +28,15 @@ class AppointmentServiceSeeder extends Seeder
                 ->shuffle()
                 ->take($serviceCount);
 
+            $totalPrice = Service::query()
+                ->whereIn('id', $selectedServiceIds->all())
+                ->sum('price');
+
             foreach ($selectedServiceIds as $serviceId) {
                 DB::table('appointment_services')->insertOrIgnore([
                     'appointmentId' => $appointmentId,
                     'serviceId' => $serviceId,
+                    'totalPrice' => (int) $totalPrice,
                 ]);
             }
         }

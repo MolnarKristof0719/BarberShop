@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\BookingCreatedMail;
 use App\Models\Appointment as CurrentModel;
 use App\Models\Barber;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -128,7 +129,16 @@ class AppointmentController extends Controller
                         'cancelledBy' => 'none',
                     ]);
 
-                    $appointment->services()->sync($data['services']);
+                    $totalPrice = Service::query()
+                        ->whereIn('id', $data['services'])
+                        ->sum('price');
+
+                    $syncPayload = [];
+                    foreach ($data['services'] as $serviceId) {
+                        $syncPayload[$serviceId] = ['totalPrice' => (int) $totalPrice];
+                    }
+
+                    $appointment->services()->sync($syncPayload);
                     $appointment->load(['services', 'barber.user', 'user']);
 
                     Mail::to($appointment->user->email)->send(new BookingCreatedMail($appointment));
