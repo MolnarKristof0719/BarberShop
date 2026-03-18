@@ -5,7 +5,7 @@
       <small>{{ selectedServiceIds.length }} kiválasztva</small>
     </div>
 
-    <div v-if="services.length" class="card-list col-12 col-md-6" >
+    <div v-if="services.length" class="card-list col-12 " >
       <button
         v-for="service in services"
         :key="service.id"
