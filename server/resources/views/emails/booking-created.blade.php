@@ -14,14 +14,17 @@
         .detail-item { margin-bottom: 15px; }
         .detail-label { font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
         .detail-value { font-size: 16px; font-weight: 500; color: #111; }
-        .service-tag {
-            display: inline-block;
-            background: #111;
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            margin: 4px 4px 0 0;
+        .detail-value-price {
+            font-size: 16px; font-weight: 500; color: #8f2438;
+        }
+        .service-tag { 
+            display: inline-block; 
+            background: #111; 
+            color: #fff; 
+            padding: 4px 12px; 
+            border-radius: 15px; 
+            font-size: 12px; 
+            margin: 4px 4px 0 0; 
         }
         .footer { text-align: center; padding: 20px; color: #999; font-size: 13px; }
         .accent { color: #c5a059; } /* Egy kis barber-arany szín */
@@ -63,6 +66,11 @@
                     </div>
                 </div>
             </div>
+
+            <div class="detail-item">
+                    <div class="detail-label">Ár:</div>
+                    <div class="detail-value-price">{{ $appointment->totalPrice }} Ft</div>
+                </div>
 
             <p style="font-size: 14px; line-height: 1.5; color: #666;">
                 Kérlek, érkezz 5 perccel korábban. Ha közbejönne valami, kérlek jelezd nekünk időben!
