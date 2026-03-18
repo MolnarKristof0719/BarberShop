@@ -10,6 +10,7 @@
       <li><strong>Barber:</strong> {{ selectedBarberName }}</li>
       <li><strong>Dátum:</strong> {{ selectedDate }}</li>
       <li><strong>Időpont:</strong> {{ selectedTime }}</li>
+      <li><strong>Fizetendő összeg:</strong> {{ totalPriceText }} Ft</li>
     </ul>
 
     <div class="actions">
@@ -31,6 +32,7 @@ export default {
     selectedBarberName: { type: String, default: "" },
     selectedDate: { type: String, default: "" },
     selectedTime: { type: String, default: "" },
+    totalPriceText: { type: String, default: "0" },
     submitLoading: { type: Boolean, required: true },
     submitError: { type: String, default: "" },
   },

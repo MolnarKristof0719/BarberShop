@@ -23,7 +23,10 @@
         "
         @click="$emit('toggle-service', service.id)"
       >
-        <span>{{ service.service }}</span>
+        <span class="service-info">
+          <span class="service-name">{{ service.service }}</span>
+          <span class="service-price">{{ service.price }} Ft</span>
+        </span>
         
         <i
           class="bi"

@@ -68,6 +68,7 @@
         :selected-barber-name="selectedBarberName"
         :selected-date="selectedDate"
         :selected-time="selectedTime"
+        :total-price-text="selectedServiceTotalText"
         :submit-loading="submitLoading"
         :submit-error="submitError"
         @back="goToStep(3)"
@@ -186,6 +187,20 @@ export default {
       return this.services
         .filter((service) => this.selectedServiceIds.includes(service.id))
         .map((service) => service.service);
+    },
+    selectedServiceTotal() {
+      return this.services
+        .filter((service) => this.selectedServiceIds.includes(service.id))
+        .reduce((sum, service) => {
+          const raw = service?.price ?? "";
+          const numeric = Number(String(raw).replace(/[^\d]/g, ""));
+          return sum + (Number.isFinite(numeric) ? numeric : 0);
+        }, 0);
+    },
+    selectedServiceTotalText() {
+      return Number.isFinite(this.selectedServiceTotal)
+        ? this.selectedServiceTotal.toLocaleString("hu-HU")
+        : "0";
     },
     serviceTypeById() {
       return this.services.reduce((acc, service) => {
@@ -683,6 +698,22 @@ export default {
 
 :deep(.barber-intro) {
   color: #6b737c;
+  font-size: 0.9rem;
+}
+
+:deep(.service-info) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:deep(.service-name) {
+  font-weight: 600;
+}
+
+:deep(.service-price) {
+  color: #8f2438;
+  font-weight: 700;
   font-size: 0.9rem;
 }
 
