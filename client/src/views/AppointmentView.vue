@@ -473,15 +473,21 @@ export default {
     },
   },
   async mounted() {
+    document.body.classList.add("appointment-wide");
     await Promise.all([this.serviceStore.getAll(), this.barberStore.getAll()]);
   },
   beforeUnmount() {
+    document.body.classList.remove("appointment-wide");
     document.body.classList.remove("modal-open-lock");
   },
 };
 </script>
 
 <style scoped>
+:global(body.appointment-wide .my-container) {
+  max-width: 1800px;
+}
+
 :global(body.modal-open-lock) {
   overflow: hidden;
 }
@@ -576,7 +582,16 @@ export default {
 
 .flow {
   display: grid;
+  grid-template-columns: 1fr minmax(0, 2fr) minmax(0, 2fr) 1fr;
   gap: 16px;
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.flow > * {
+  grid-column: 2 / 4;
+  width: 100%;
 }
 
 :deep(.flow-card) {
