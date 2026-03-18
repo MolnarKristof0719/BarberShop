@@ -120,25 +120,21 @@ class AppointmentController extends Controller
 
             try {
                 return DB::transaction(function () use ($data) {
+                    $totalPrice = Service::query()
+                        ->whereIn('id', $data['services'])
+                        ->sum('price');
+
                     $appointment = CurrentModel::create([
                         'barberId' => $data['barberId'],
                         'userId' => auth()->id(),
                         'appointmentDate' => $data['appointmentDate'],
                         'appointmentTime' => $data['appointmentTime'],
+                        'totalPrice' => (int) $totalPrice,
                         'status' => 'booked',
                         'cancelledBy' => 'none',
                     ]);
 
-                    $totalPrice = Service::query()
-                        ->whereIn('id', $data['services'])
-                        ->sum('price');
-
-                    $syncPayload = [];
-                    foreach ($data['services'] as $serviceId) {
-                        $syncPayload[$serviceId] = ['totalPrice' => (int) $totalPrice];
-                    }
-
-                    $appointment->services()->sync($syncPayload);
+                    $appointment->services()->sync($data['services']);
                     $appointment->load(['services', 'barber.user', 'user']);
 
                     Mail::to($appointment->user->email)->send(new BookingCreatedMail($appointment));

@@ -20,6 +20,7 @@ return new class extends Migration {
 
             $table->date('appointmentDate');
             $table->time('appointmentTime');
+            $table->unsignedInteger('totalPrice')->default(0);
 
             // egy barbernek egy idősáv = 1 foglalás
             $table->unique(['barberId', 'appointmentDate', 'appointmentTime'], 'uniq_barber_slot');

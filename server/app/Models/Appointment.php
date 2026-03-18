@@ -16,6 +16,7 @@ class Appointment extends Model
         'userId',
         'appointmentDate',
         'appointmentTime',
+        'totalPrice',
         'status',
         'cancelledBy',
     ];
@@ -47,7 +48,7 @@ class Appointment extends Model
             'appointment_services',
             'appointmentId',
             'serviceId'
-        )->withPivot('totalPrice');
+        );
     }
 
     public function appointmentServices()
