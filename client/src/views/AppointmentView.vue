@@ -396,7 +396,7 @@ export default {
         const pictures = response?.data?.reference_pictures;
         this.referenceModalPictures = Array.isArray(pictures) ? pictures : [];
       } catch {
-        this.referenceModalError = "A referenciakepek betoltese nem sikerult.";
+        this.referenceModalError = "A referenciaképek betöltése nem sikerült.";
       } finally {
         this.referenceModalLoading = false;
       }
