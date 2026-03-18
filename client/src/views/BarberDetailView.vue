@@ -3,14 +3,18 @@
     <div class="hero">
       <p class="hero-kicker mb-1">Barber Shop</p>
       <h1 class="hero-title mb-1">Barber információ</h1>
-      <p class="hero-subtitle mb-0">Ismerd meg a barber munkáit és véleményeket.</p>
+      <p class="hero-subtitle mb-0">
+        Ismerd meg a barber munkáit és véleményeket.
+      </p>
       <RouterLink to="/barber" class="btn btn-outline-dark mt-3 barbersbutton">
         Vissza a barber listához
       </RouterLink>
     </div>
 
     <div v-if="loading" class="state-box mt-3">Betöltés...</div>
-    <div v-else-if="errorMsg" class="state-box mt-3 error-box">{{ errorMsg }}</div>
+    <div v-else-if="errorMsg" class="state-box mt-3 error-box">
+      {{ errorMsg }}
+    </div>
 
     <div v-else-if="barber" class="detail-shell mt-3">
       <section class="profile-card">
@@ -21,7 +25,10 @@
             :alt="barberName"
             class="profile-image"
           />
-          <div v-else class="profile-image fallback d-flex align-items-center justify-content-center">
+          <div
+            v-else
+            class="profile-image fallback d-flex align-items-center justify-content-center"
+          >
             <i class="bi bi-person-circle fs-1"></i>
           </div>
         </div>
@@ -51,7 +58,11 @@
         <h3 class="section-title">Értékelések és vélemények</h3>
         <div v-if="!reviews.length" class="empty-card">Még nincs vélemény.</div>
         <div v-else class="reviews-grid">
-          <article v-for="review in reviews" :key="review.id" class="review-card">
+          <article
+            v-for="review in reviews"
+            :key="review.id"
+            class="review-card"
+          >
             <div class="review-header">
               <p class="reviewer-name mb-0">
                 {{ review.user?.name || "Vendég" }}
@@ -78,11 +89,56 @@
           Ehhez a barberhez még nincs feltöltött referenciakép.
         </div>
         <div v-else class="references-grid">
-          <div v-for="picture in referencePictures" :key="picture.id" class="reference-tile">
+          <button
+            v-for="(picture, index) in referencePictures"
+            :key="picture.id"
+            type="button"
+            class="reference-tile"
+            @click="openLightbox(index)"
+          >
             <img :src="profileImage(picture.picture)" alt="Referencia kep" />
-          </div>
+          </button>
         </div>
       </section>
+    </div>
+
+    <div
+      v-if="lightboxOpen"
+      class="lightbox-backdrop"
+      @click.self="closeLightbox"
+    >
+      <button
+        type="button"
+        class="lightbox-close"
+        @click="closeLightbox"
+        aria-label="Bezárás"
+      >
+        ×
+      </button>
+      <button
+        type="button"
+        class="lightbox-nav prev"
+        @click="prevImage"
+        aria-label="Előző kép"
+      >
+        ‹
+      </button>
+      <img
+        :src="currentLightboxSrc"
+        class="lightbox-image"
+        alt="Referencia kép nagyban"
+      />
+      <button
+        type="button"
+        class="lightbox-nav next"
+        @click="nextImage"
+        aria-label="Következő kép"
+      >
+        ›
+      </button>
+      <div class="lightbox-counter">
+        {{ lightboxIndex + 1 }} / {{ referencePictures.length }}
+      </div>
     </div>
   </section>
 </template>
@@ -98,6 +154,8 @@ export default {
       barber: null,
       loading: false,
       errorMsg: "",
+      lightboxOpen: false,
+      lightboxIndex: 0,
     };
   },
   computed: {
@@ -106,7 +164,11 @@ export default {
       return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
     },
     barberName() {
-      return this.barber?.user?.name || this.barber?.name || (this.barber?.id ? `Barber #${this.barber.id}` : "");
+      return (
+        this.barber?.user?.name ||
+        this.barber?.name ||
+        (this.barber?.id ? `Barber #${this.barber.id}` : "")
+      );
     },
     reviews() {
       return Array.isArray(this.barber?.reviews) ? this.barber.reviews : [];
@@ -122,7 +184,10 @@ export default {
     },
     averageRating() {
       if (!this.reviews.length) return 0;
-      const sum = this.reviews.reduce((acc, review) => acc + Number(review.rating || 0), 0);
+      const sum = this.reviews.reduce(
+        (acc, review) => acc + Number(review.rating || 0),
+        0,
+      );
       return sum / this.reviews.length;
     },
     roundedRating() {
@@ -132,10 +197,42 @@ export default {
       if (!this.reviews.length) return "Még nincs értékelés";
       return `${this.averageRating.toFixed(1)} / 5 (${this.reviews.length} vélemény)`;
     },
+    currentLightboxSrc() {
+      if (!this.referencePictures.length) return "";
+      const picture = this.referencePictures[this.lightboxIndex];
+      return picture ? this.profileImage(picture.picture) : "";
+    },
   },
   methods: {
     profileImage(path) {
       return resolveMediaUrl(path);
+    },
+    openLightbox(index) {
+      if (!this.referencePictures.length) return;
+      this.lightboxIndex = index;
+      this.lightboxOpen = true;
+      document.body.style.overflow = "hidden";
+    },
+    closeLightbox() {
+      this.lightboxOpen = false;
+      document.body.style.overflow = "";
+    },
+    nextImage() {
+      if (!this.referencePictures.length) return;
+      this.lightboxIndex =
+        (this.lightboxIndex + 1) % this.referencePictures.length;
+    },
+    prevImage() {
+      if (!this.referencePictures.length) return;
+      this.lightboxIndex =
+        (this.lightboxIndex - 1 + this.referencePictures.length) %
+        this.referencePictures.length;
+    },
+    onKeydown(event) {
+      if (!this.lightboxOpen) return;
+      if (event.key === "Escape") this.closeLightbox();
+      if (event.key === "ArrowRight") this.nextImage();
+      if (event.key === "ArrowLeft") this.prevImage();
     },
     async loadBarber() {
       if (!this.barberId) {
@@ -156,6 +253,11 @@ export default {
   },
   async mounted() {
     await this.loadBarber();
+    window.addEventListener("keydown", this.onKeydown);
+  },
+  beforeUnmount() {
+    window.removeEventListener("keydown", this.onKeydown);
+    document.body.style.overflow = "";
   },
   watch: {
     "$route.params.id": {
@@ -168,7 +270,7 @@ export default {
 </script>
 
 <style scoped>
-.barbersbutton{
+.barbersbutton {
   border-radius: 50px;
   font-size: 12px;
 }
@@ -327,6 +429,10 @@ export default {
 }
 
 .reference-tile {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #e9ecef;
@@ -345,6 +451,64 @@ export default {
   padding: 16px;
   background: #f8fafc;
   color: #6c757d;
+}
+
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
+}
+
+.lightbox-image {
+  max-width: min(92vw, 1200px);
+  max-height: 82vh;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #111111;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: transparent;
+  border: 0;
+  color: #ffffff;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.lightbox-nav.prev {
+  left: 16px;
+}
+
+.lightbox-nav.next {
+  right: 16px;
+}
+
+.lightbox-counter {
+  position: absolute;
+  bottom: 16px;
+  color: #e6e6e6;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
 }
 
 @media (max-width: 991.98px) {
