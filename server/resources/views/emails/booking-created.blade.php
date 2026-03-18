@@ -65,12 +65,14 @@
                         @endforelse
                     </div>
                 </div>
-            </div>
 
-            <div class="detail-item">
+                <div class="detail-item">
                     <div class="detail-label">Ár:</div>
                     <div class="detail-value-price">{{ $appointment->totalPrice }} Ft</div>
                 </div>
+            </div>
+
+            
 
             <p style="font-size: 14px; line-height: 1.5; color: #666;">
                 Kérlek, érkezz 5 perccel korábban. Ha közbejönne valami, kérlek jelezd nekünk időben!
