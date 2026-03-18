@@ -48,7 +48,7 @@
               v-if="appointment.status === 'completed'"
               :disabled="isReviewed(appointment.id)"
               @click="$emit('review', appointment.id)">
-              {{ isReviewed(appointment.id) ? "Velemeny irva" : "Velemeny" }}
+              {{ isReviewed(appointment.id) ? "Vélemény írva" : "Vélemény" }}
             </button>
           </div>
           <div class="delete">
@@ -118,6 +118,8 @@ export default {
 }
 
 .booking-card {
+  display: flex;
+  flex-direction: column;
   background: #ffffff;
   border: 1px solid #e1e5ea;
   border-radius: 12px;
@@ -143,6 +145,9 @@ export default {
 
 .booking-content {
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .details-grid {
@@ -150,6 +155,7 @@ export default {
   border: 1px solid #e9ecef;
   border-radius: 8px;
   padding: 10px;
+  flex: 1;
 }
 
 .detail-item {
@@ -219,7 +225,10 @@ export default {
 }
 
 .actions {
+  margin-top: auto;
+  padding-top: 10px;
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
 }
 </style>
