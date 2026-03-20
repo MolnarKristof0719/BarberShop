@@ -29,6 +29,10 @@ export default {
     return await apiClient.patch(`${route}/${id}`, data);
   },
 
+  async updatePassword(id, data) {
+    return await apiClient.patch(`${route}/${id}/password`, data);
+  },
+
   // DELETE: Törlés
   async delete(id) {
     return await apiClient.delete(`${route}/${id}`);

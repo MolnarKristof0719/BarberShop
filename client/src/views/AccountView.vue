@@ -94,6 +94,11 @@
                 </button>
               </div>
             </form>
+            <div class="mt-3">
+              <button class="btn btn-outline-dark btn-sm" type="button" @click="openPasswordChange">
+                Jelszó módosítása
+              </button>
+            </div>
           </div>
         </div>
 
@@ -164,6 +169,12 @@
       </div>
     </div>
 
+    <PasswordChangeForm
+      ref="passwordForm"
+      :title="passwordTitle"
+      @yesEventForm="yesEventPasswordHandler"
+    />
+
     <div v-if="showDayoffModal" class="dayoff-modal-backdrop" @click="closeDayoffRequest">
       <div class="dayoff-modal" @click.stop>
         <div class="d-flex align-items-center justify-content-between gap-2">
@@ -226,9 +237,13 @@ import barberService from "@/api/barberService";
 import barberOffDayService from "@/api/barberOffDayService";
 import referencePictureService from "@/api/referencePictureService";
 import { resolveMediaUrl } from "@/utils/media";
+import PasswordChangeForm from "@/components/Forms/PasswordChangeForm.vue";
 
 export default {
   name: "AccountView",
+  components: {
+    PasswordChangeForm,
+  },
   data() {
     return {
       barberRecordId: null,
@@ -253,6 +268,7 @@ export default {
         email: "",
         phoneNumber: "",
       },
+      passwordTitle: "Jelszó módosítása",
     };
   },
   watch: {
@@ -289,7 +305,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useUserLoginLogoutStore, ["updateMe"]),
+    ...mapActions(useUserLoginLogoutStore, ["updateMe", "updatePasswordMe"]),
     resolveImage(path) {
       return resolveMediaUrl(path);
     },
@@ -337,6 +353,24 @@ export default {
         }
       } finally {
         this.savingProfile = false;
+      }
+    },
+    openPasswordChange() {
+      this.passwordTitle = "Jelszó módosítása";
+      this.$refs.passwordForm.show();
+    },
+    async yesEventPasswordHandler({ item, done }) {
+      try {
+        await this.updatePasswordMe(item);
+        const toastStore = useToastStore();
+        toastStore.messages.push("Jelszó sikeresen módosítva.");
+        toastStore.show("Success");
+        done(true);
+      } catch (error) {
+        if (error?.response?.status === 422) {
+          this.$refs.passwordForm.setServerErrors(error.response.data.errors);
+        }
+        done(false);
       }
     },
     resetBarberState() {

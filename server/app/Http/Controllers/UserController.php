@@ -408,6 +408,32 @@ class UserController extends Controller
         return response()->json($data, $status, options: JSON_UNESCAPED_UNICODE);
     }
 
+    // Admin jelszó módosítása bármely usernél
+    public function updatePasswordAdmin(UpdateUserPasswordRequest $request, int $id)
+    {
+        $userToUpdate = User::find($id);
+
+        if (!$userToUpdate) {
+            return response()->json([
+                'message' => "Not found id: $id",
+                'data' => null
+            ], 404, options: JSON_UNESCAPED_UNICODE);
+        }
+
+        $this->authorize('updateAdmin', $userToUpdate);
+
+        $userToUpdate->update([
+            'password' => Hash::make($request->newpassword)
+        ]);
+
+        return response()->json([
+            'message' => 'Jelszó sikeresen módosítva.',
+            'data' => [
+                'user' => $userToUpdate
+            ]
+        ], 200, options: JSON_UNESCAPED_UNICODE);
+    }
+
 
 
     //Ă–nmagam megnĂ©zĂ©se

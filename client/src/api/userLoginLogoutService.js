@@ -17,4 +17,7 @@ export default {
   updateMe(data) {
     return apiClient.patch(`/usersme`, data);
   },
+  updatePasswordMe(data) {
+    return apiClient.patch(`/usersmeupdatepassword`, data);
+  },
 };

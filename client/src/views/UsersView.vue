@@ -38,6 +38,11 @@
       :item="item"
       @yesEventForm="yesEventFormHandler"
     />
+    <PasswordChangeForm
+      ref="passwordForm"
+      :title="passwordTitle"
+      @yesEventForm="yesEventPasswordHandler"
+    />
 
     <!-- Confirm modal -->
     <ConfirmModal
@@ -58,6 +63,7 @@ import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
 import FormUser from "@/components/Forms/FormUser.vue";
+import PasswordChangeForm from "@/components/Forms/PasswordChangeForm.vue";
 export default {
   //módosít
   name: "SchooClassView",
@@ -66,6 +72,7 @@ export default {
     ConfirmModal,
     ButtonsCrudCreate,
     FormUser,
+    PasswordChangeForm,
   },
   watch: {
     searchWord() {
@@ -89,6 +96,8 @@ export default {
       toDeleteId: null,
       state: "r", //crud
       title: "",
+      passwordTitle: "Jelszó módosítása",
+      passwordUserId: null,
     };
   },
   computed: {
@@ -104,6 +113,7 @@ export default {
       "getById",
       "create",
       "update",
+      "updatePassword",
       "delete",
       "clearItem",
     ]),
@@ -131,8 +141,9 @@ export default {
       // console.log("Create:");
     },
     passwordChangeHandler(id){
-      console.log("passwordChangeHandler", id);
-      
+      this.passwordUserId = id;
+      this.passwordTitle = "Jelszó módosítása";
+      this.$refs.passwordForm.show();
     },
     sortHandler(column) {
       console.log(column);
@@ -177,6 +188,25 @@ export default {
           done(false);
         }
         //átadom a hibát
+      }
+    },
+
+    async yesEventPasswordHandler({ item, done }) {
+      try {
+        if (!this.passwordUserId) {
+          done(false);
+          return;
+        }
+        await this.updatePassword(this.passwordUserId, item);
+        const toastStore = useToastStore();
+        toastStore.messages.push("Jelszó sikeresen módosítva.");
+        toastStore.show("Success");
+        done(true);
+      } catch (err) {
+        if (err.response && err.response.status === 422) {
+          this.$refs.passwordForm.setServerErrors(err.response.data.errors);
+        }
+        done(false);
       }
     },
 
