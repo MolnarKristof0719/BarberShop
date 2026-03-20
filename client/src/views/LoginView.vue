@@ -21,7 +21,7 @@ export default {
         await this.login(user);
         this.$router.push("/");
       } catch (error) {
-        console.log("Bejelentkezesi hiba!");
+        console.log("Bejelentkézesi hiba!");
       }
     },
   },
