@@ -1,10 +1,10 @@
 <template>
   <section class="review-page">
     <div class="hero">
-      <p class="hero-kicker mb-1">Fiok</p>
-      <h1 class="hero-title mb-1">Velemeny irasa</h1>
+      <p class="hero-kicker mb-1">Fiók</p>
+      <h1 class="hero-title mb-1">Vélemény írása</h1>
       <p class="hero-subtitle mb-0">
-        Oszd meg az elmenyedet az adott barbertol kapott szolgaltatasrol.
+        Oszd meg az élményedet az adott barbertől kapott szolgáltatásról.
       </p>
     </div>
 
@@ -15,7 +15,7 @@
     <div v-else class="review-card mt-3">
       <div class="appointment-meta">
         <div class="meta-item">
-          <span class="meta-label">Idopont</span>
+          <span class="meta-label">Időpont</span>
           <span class="meta-value">{{ appointmentDate }} {{ appointmentTime }}</span>
         </div>
         <div class="meta-item">
@@ -25,7 +25,7 @@
       </div>
 
       <div class="rating-block">
-        <p class="block-title">Hany csillagot adsz?</p>
+        <p class="block-title">Hány csillagot adsz?</p>
         <div class="stars">
           <button
             v-for="n in 5"
@@ -39,7 +39,7 @@
             <i class="bi" :class="n <= rating ? 'bi-star-fill' : 'bi-star'"></i>
           </button>
         </div>
-        <p class="rating-text">{{ rating ? `${rating}/5` : "Valassz csillagot" }}</p>
+        <p class="rating-text">{{ rating ? `${rating}/5` : "Válassz csillagot" }}</p>
       </div>
 
       <div class="comment-block">
@@ -49,7 +49,7 @@
           v-model="comment"
           class="form-control"
           rows="4"
-          placeholder="Ide irhatod a velemenyedet..."
+          placeholder="Ide írhatod a véleményedet..."
         ></textarea>
       </div>
 
@@ -58,7 +58,7 @@
           Vissza
         </button>
         <button class="btn btn-dark" type="button" @click="saveReview" :disabled="!canSubmit">
-          {{ saving ? "Mentes..." : "Velemeny mentese" }}
+          {{ saving ? "Mentés..." : "Vélemény mentése" }}
         </button>
       </div>
     </div>
@@ -121,13 +121,13 @@ export default {
     },
     async loadAppointment() {
       if (!this.appointmentId) {
-        this.errorMsg = "Hianyzik az idopont azonositoja.";
+        this.errorMsg = "Hiányzik az időpont azonosítója.";
         return;
       }
       try {
         this.appointment = await this.getById(this.appointmentId);
       } catch (err) {
-        this.errorMsg = "Nem sikerult betolteni az idopont adatait.";
+        this.errorMsg = "Nem sikerült betölteni az időpont adatait.";
       }
     },
     async saveReview() {
@@ -140,11 +140,11 @@ export default {
           comment: this.comment.trim() ? this.comment.trim() : "",
         };
         await this.create(this.appointmentId, payload);
-        this.toast.messages.push("Koszonjuk a velemenyt!");
+        this.toast.messages.push("Köszönjük a véleményt!");
         this.toast.show("Success");
         this.$router.push({ name: "usersmeappointment" });
       } catch (err) {
-        this.errorMsg = "Nem sikerult elmenteni a velemenyt.";
+        this.errorMsg = "Nem sikerült elmenteni a véleményt.";
       } finally {
         this.saving = false;
       }
