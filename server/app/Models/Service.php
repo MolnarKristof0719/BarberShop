@@ -11,7 +11,7 @@ class Service extends Model
     use HasFactory;
     public $timestamps = false;
 
-    protected $fillable = ['service'];
+    protected $fillable = ['service', 'price'];
 
      public function appointments()
     {

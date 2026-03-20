@@ -1,46 +1,58 @@
 <template>
   <div>
     <Modal ref="modal" :title="title" @yesEvent="yesEventHandler">
-      <!-- vezérlőelemek -->
-      <div class="mb-4 row pt-2">
-        <label for="service" class="col-form-label col-auto pt-1 pe-0"
-          >Szolgáltatás:</label
-        >
-        <div class="col">
+      
+      <div class="mb-3 row">
+        <label for="service" class="col-form-label col-3">Szolgáltatás</label>
+        <div class="col-9">
           <input
-            type="text"
-            class="form-control"
             id="service"
             v-model="formItem.service"
-            @input="clearError('service')"
+            class="form-control"
             required
+            @input="clearError('service')"
           />
-          <div v-if="!serverErrors.service" class="invalid-feedback position-absolute">
-            A sportnév kötelező
-          </div>
-          <div v-if="serverErrors.service"
-            class="invalid-feedback position-absolute d-block"
-          >
+          <div v-if="serverErrors.service" class="invalid-feedback d-block">
             {{ serverErrors.service[0] }}
           </div>
         </div>
       </div>
+
+      <div class="mb-3 row">
+        <label for="price" class="col-form-label col-3">Ár (Ft)</label>
+        <div class="col-9">
+          <input
+            id="price"
+            type="number"
+            min="0"
+            step="1"
+            v-model.number="formItem.price"
+            class="form-control"
+            required
+            @input="clearError('price')"
+          />
+          <div v-if="serverErrors.price" class="invalid-feedback d-block">
+            {{ serverErrors.price[0] }}
+          </div>
+        </div>
+      </div>
+     
     </Modal>
   </div>
 </template>
 
 <script>
 import Modal from "@/components/Modal/Modal.vue";
-// import Modal from "../Modal/Modal.vue";
+
 export default {
-  emits: ["yesEventForm"],
-  name: "FormService",
+  name: "FormAdminService",
   components: {
     Modal,
   },
+  emits: ["yesEventForm"],
   props: {
-    title: { type: String, default: "Új szolgáltatás felvitele" },
-    item: { type: Object },
+    title: { type: String, default: "Szolgáltatás szerkesztése" },
+    item: { type: Object, required: true },
   },
   data() {
     return {
@@ -49,19 +61,14 @@ export default {
     };
   },
   watch: {
-    //Fontos!!! frissülhessen a szülő által küldött item
     item(value) {
       this.formItem = { ...value };
     },
   },
   methods: {
-    //metódus továbbítás
     show() {
       this.serverErrors = {};
       this.$refs.modal.show();
-    },
-    hide() {
-      this.$refs.modal.hide();
     },
     setServerErrors(errors) {
       this.serverErrors = errors;
