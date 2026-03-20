@@ -166,6 +166,20 @@ export const useUserStore = defineStore("user", {
       }
     },
 
+    async updatePassword(id, payload) {
+      this.loading = true;
+      this.error = null;
+      try {
+        await service.updatePassword(id, payload);
+        return true;
+      } catch (err) {
+        this.error = err;
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     // 4. DELETE - Törlés
     async delete(id) {
       this.loading = true;

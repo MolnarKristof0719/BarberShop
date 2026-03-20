@@ -16,16 +16,12 @@ class UpdateUserPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Ellenőrzi, hogy a megadott 'oldpassword' azonos-e a DB-ben lévővel
-            'oldpassword' => ['required', 'current_password'],
             'newpassword' => ['required', 'string', Password::min(3), 'confirmed'],
         ];
     }
     public function messages(): array
     {
         return [
-            'oldpassword.required' => 'A régi jelszó megadása kötelező!',
-            'oldpassword.current_password' => 'A régi jelszó nem megfelelő!',
             'newpassword.required' => 'Az új jelszó megadása kötelező!',
             'newpassword.string' => 'Az új jelszó szöveg kell legyen!',
             'newpassword.min' => 'Az új jelszó hossza min: 3!',

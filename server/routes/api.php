@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('users', [UserController::class, 'index'])->middleware('ability:*');
     Route::get('users/{id}', [UserController::class, 'show'])->middleware('ability:*');
     Route::patch('users/{id}', [UserController::class, 'update'])->middleware('ability:*');
+    Route::patch('users/{id}/password', [UserController::class, 'updatePasswordAdmin'])->middleware('ability:*');
     Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('ability:*');
     Route::get('/userssortsearch/{column}/{direction}/{search?}', [UserController::class, 'indexSortSearch'])->middleware('ability:*');
 

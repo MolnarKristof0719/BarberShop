@@ -128,5 +128,18 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
         this.loading = false;
       }
     },
+    async updatePasswordMe(payload) {
+      try {
+        this.error = null;
+        this.loading = true;
+        await service.updatePasswordMe(payload);
+        return true;
+      } catch (err) {
+        this.error = err;
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });
