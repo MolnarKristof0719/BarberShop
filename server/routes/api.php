@@ -23,6 +23,7 @@ Route::get('/services/{id}', [ServiceController::class, 'show']);
 Route::get('/servicessortsearch/{column}/{direction}/{search?}', [ServiceController::class, 'indexSortSearch']);
 Route::get('/barbers', [BarberController::class, 'index']);
 Route::get('/barbers/{id}', [BarberController::class, 'show']);
+Route::get('/reviews', [ReviewController::class, 'index']);
 
 // Ha nálatok a barberek listája PUBLIC legyen, hagyd így:
 // Route::get('/barbers', [BarberController::class, 'index']);
@@ -109,7 +110,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ha akarsz review-t, add hozzá a customer abilities listához: 'reviews:post'
     Route::post('/appointments/{appointmentId}/review', [ReviewController::class, 'store'])->middleware('ability:reviews:post');
 
-    Route::get('/reviews', [ReviewController::class, 'index'])->middleware('ability:reviews:get');
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->middleware('ability:reviews:delete');
 
     // --- PIVOT DEBUG (admin) ---

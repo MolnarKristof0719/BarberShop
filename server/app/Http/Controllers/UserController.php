@@ -99,8 +99,7 @@ class UserController extends Controller
                     'appointments:delete',
                     'barbers:get',
                     'reviews:delete',
-                    'reviews:get'
-                    
+
                 ];
                 break;
             default:
@@ -117,7 +116,7 @@ class UserController extends Controller
                     'reviews:get',
                     'reviews:delete',
                     'reference_pictures:get'
-                    
+
 
                 ];
                 break;
@@ -345,7 +344,7 @@ class UserController extends Controller
     {
         //KivesszĂĽk a tĂ¶rlendĹ‘ user-t
         $userToDestroy = $request->user();
-        // A Policy-t hasznĂˇljuk: 
+        // A Policy-t hasznĂˇljuk:
         $this->authorize('delete', $userToDestroy);
         // ... tĂ¶rlĂ©s logika
         //A user tokenjeinek tĂ¶rlĂ©se
@@ -368,7 +367,7 @@ class UserController extends Controller
 
         //KivesszĂĽk a mĂłdosĂ­tandĂł user-t
         $userToUpdate = $request->user();
-        // A Policy-t hasznĂˇljuk: 
+        // A Policy-t hasznĂˇljuk:
         $this->authorize('update', $userToUpdate);
 
         $status = 200;
@@ -391,7 +390,7 @@ class UserController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        // FrissĂ­tjĂĽk a jelszĂłt (a Laravel 10+ automatikusan hasheli, 
+        // FrissĂ­tjĂĽk a jelszĂłt (a Laravel 10+ automatikusan hasheli,
         // ha a model-ben a 'password' mezĹ‘ 'hashed' cast-ot kapott)
         $user->update([
             'password' => Hash::make($request->newpassword)
@@ -415,7 +414,7 @@ class UserController extends Controller
     {
         //KivesszĂĽk a megmutatandĂł usert
         $userToGet = $request->user();
-        // A Policy-t hasznĂˇljuk: 
+        // A Policy-t hasznĂˇljuk:
         $this->authorize('view', $userToGet);
         $status = 200;
         $data = [

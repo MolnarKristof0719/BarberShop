@@ -62,7 +62,6 @@
 import { mapActions, mapState } from "pinia";
 import { useBarberStore } from "@/stores/barberStore";
 import { useReviewStore } from "@/stores/reviewStore";
-import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import { resolveMediaUrl } from "@/utils/media";
 
 export default {
@@ -72,7 +71,6 @@ export default {
       activeIndex: 0,
       reviewStats: {},
       reviewStore: useReviewStore(),
-      userStore: useUserLoginLogoutStore(),
     };
   },
   computed: {
@@ -118,10 +116,6 @@ export default {
       return stats;
     },
     async loadReviews() {
-      if (!this.userStore.isLoggedIn) {
-        this.reviewStats = {};
-        return;
-      }
       try {
         const reviews = await this.reviewStore.getAll();
         this.reviewStats = this.buildReviewStats(reviews);
