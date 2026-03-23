@@ -3,40 +3,20 @@
     <Modal ref="modal" :title="title" @yesEvent="yesEventHandler">
       
       <div class="mb-3 row">
-        <label for="service" class="col-form-label col-3">Szolgáltatás</label>
+        <label for="comment" class="col-form-label col-3">Vélemény</label>
         <div class="col-9">
-          <input
-            id="service"
-            v-model="formItem.service"
+          <textarea
+            id="comment"
+            v-model="formItem.comment"
             class="form-control"
             required
-            @input="clearError('service')"
-          />
-          <div v-if="serverErrors.service" class="invalid-feedback d-block">
-            {{ serverErrors.service[0] }}
+            @input="clearError('comment')"
+          ></textarea>
+          <div v-if="serverErrors.comment" class="invalid-feedback d-block">
+            {{ serverErrors.comment[0] }}
           </div>
         </div>
       </div>
-
-      <div class="mb-3 row">
-        <label for="price" class="col-form-label col-3">Ár (Ft)</label>
-        <div class="col-9">
-          <input
-            id="price"
-            type="number"
-            min="0"
-            step="1"
-            v-model.number="formItem.price"
-            class="form-control"
-            required
-            @input="clearError('price')"
-          />
-          <div v-if="serverErrors.price" class="invalid-feedback d-block">
-            {{ serverErrors.price[0] }}
-          </div>
-        </div>
-      </div>
-     
     </Modal>
   </div>
 </template>
@@ -45,13 +25,13 @@
 import Modal from "@/components/Modal/Modal.vue";
 
 export default {
-  name: "FormAdminService",
+  name: "FormAdminReview",
   components: {
     Modal,
   },
   emits: ["yesEventForm"],
   props: {
-    title: { type: String, default: "Szolgáltatás szerkesztése" },
+    title: { type: String, default: "Vélemény szerkesztése" },
     item: { type: Object, required: true },
   },
   data() {
@@ -86,3 +66,4 @@ export default {
 </script>
 
 <style></style>
+

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Review as CurrentModel;
+use App\Http\Requests\UpdateReviewRequest as UpdateCurrentModelRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
@@ -60,6 +62,36 @@ class ReviewController extends Controller
                 ->orderBy('barberId')
                 ->orderBy('id')
                 ->get();
+        });
+    }
+
+    public function show(int $id)
+    {
+        return $this->apiResponse(function () use ($id) {
+            return CurrentModel::query()
+                ->findOrFail($id);
+        });
+    }
+
+    public function update(UpdateCurrentModelRequest $request, int $id)
+    {
+        return $this->apiResponse(function () use ($request, $id) {
+            $review = CurrentModel::findOrFail($id);
+
+            $user = auth()->user();
+            abort_unless(
+                $user?->isAdmin(),
+                403
+            );
+
+            $data = $request->validated();
+
+            // Update only validated fields
+            $review->fill($data);
+
+            $review->save();
+
+            return $review->fresh();
         });
     }
 
