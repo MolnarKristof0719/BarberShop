@@ -20,23 +20,6 @@
       </div>
 
       <div class="mb-3 row">
-        <label for="profilePicture" class="col-form-label col-3">Profilkép URL</label>
-        <div class="col-9">
-          <input
-            id="profilePicture"
-            v-model="formItem.profilePicture"
-            type="text"
-            class="form-control"
-            required
-            @input="clearError('profilePicture')"
-          />
-          <div v-if="serverErrors.profilePicture" class="invalid-feedback d-block">
-            {{ serverErrors.profilePicture[0] }}
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-3 row">
         <label for="introduction" class="col-form-label col-3">Bemutatkozás</label>
         <div class="col-9">
           <textarea

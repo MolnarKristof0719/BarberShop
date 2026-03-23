@@ -24,7 +24,7 @@
     />
     <div v-else style="width: 120px" class="m-auto">Nincs találat</div>
 
-    <FormService
+    <FormAdminService
       ref="form"
       :title="title"
       :item="item"
@@ -46,7 +46,7 @@ import { useSearchStore } from "@/stores/searchStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
 import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
-import FormService from "@/components/Forms/FormService.vue";
+import FormAdminService from "@/components/Forms/FormAdminService.vue";
 
 export default {
   name: "AdminServicesView",
@@ -54,7 +54,7 @@ export default {
     GenericTable,
     ConfirmModal,
     ButtonsCrudCreate,
-    FormService,
+    FormAdminService,
   },
   watch: {
     searchWord() {
@@ -67,6 +67,7 @@ export default {
       tableColumns: [
         { key: "id", label: "ID", debug: 2 },
         { key: "service", label: "Szolgáltatás", debug: 2 },
+        { key: "price", label: "Ár (Ft)", debug: 2 },
       ],
       useCollectionStore: useServiceStore,
       isOpenConfirmModal: false,

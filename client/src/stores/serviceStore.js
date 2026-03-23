@@ -7,9 +7,10 @@ import service from "@/api/serviceService";
 
 //változtatás
 class Item {
-  constructor(id = 0, service = "") {
+  constructor(id = 0, service = "", price = 0) {
     this.id = id;
     this.service = service;
+    this.price = price;
   }
 }
 

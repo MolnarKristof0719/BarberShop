@@ -30,6 +30,12 @@ class UpdateServiceRequest extends FormRequest
                 'max:50',
                 Rule::unique('services', 'service')->ignore($this->route('id')),
             ],
+            'price' => [
+                'sometimes',
+                'required',
+                'integer',
+                'min:0',
+            ],
         ];
     }
     public function messages(): array
@@ -39,6 +45,9 @@ class UpdateServiceRequest extends FormRequest
             'service.string' => 'A szolgáltatás szöveg kell legyen!',
             'service.max' => 'A szolgáltatás hossza max: 50!',
             'service.unique' => 'A szolgáltatás már létezik!',
+            'price.required' => 'Az ár megadása kötelező!',
+            'price.integer' => 'Az ár csak egész szám lehet!',
+            'price.min' => 'Az ár nem lehet negatív!',
         ];
     }
 }
