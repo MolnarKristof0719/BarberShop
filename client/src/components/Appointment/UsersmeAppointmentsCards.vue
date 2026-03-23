@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="appointments-list">
     <article v-for="appointment in appointments" :key="appointment.id" class="booking-card">
       <header class="booking-header">
@@ -17,8 +17,8 @@
           </div>
 
           <div class="detail-item">
-            <div class="detail-label">Barber</div>
-            <div class="detail-value">{{ barberName(appointment) }}</div>
+            <div class="detail-label">{{ personLabel }}</div>
+            <div class="detail-value">{{ personName(appointment) }}</div>
           </div>
 
           <div class="detail-item">
@@ -45,7 +45,7 @@
         <div class="actions">
           <div class="review">
             <button class="btn btn-outline-dark btn-sm" type="button"
-              v-if="appointment.status === 'completed'"
+              v-if="showReview && appointment.status === 'completed'"
               :disabled="isReviewed(appointment.id)"
               @click="$emit('review', appointment.id)">
               {{ isReviewed(appointment.id) ? "Vélemény írva" : "Vélemény" }}
@@ -71,8 +71,15 @@ export default {
     appointments: { type: Array, required: true },
     loading: { type: Boolean, default: false },
     reviewedIds: { type: Object, default: () => new Set() },
+    context: { type: String, default: "customer" },
+    showReview: { type: Boolean, default: true },
   },
   emits: ["cancel", "review"],
+  computed: {
+    personLabel() {
+      return this.context === "barber" ? "Vendég" : "Barber";
+    },
+  },
   methods: {
     formatDate(value) {
       if (!value) return "-";
@@ -89,6 +96,17 @@ export default {
         appointment?.barber?.name ||
         `Barber #${appointment?.barberId || ""}`
       );
+    },
+    customerName(appointment) {
+      return (
+        appointment?.user?.name ||
+        (appointment?.userId ? `Vendég #${appointment.userId}` : "-")
+      );
+    },
+    personName(appointment) {
+      return this.context === "barber"
+        ? this.customerName(appointment)
+        : this.barberName(appointment);
     },
     statusLabel(status) {
       const map = {

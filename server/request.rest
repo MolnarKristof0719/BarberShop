@@ -13,7 +13,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "barber@example.com",
+    "email": "arabpacek@example.com",
     "password": "123"
 }
 
@@ -227,7 +227,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### my appointment by id (self)
-GET {{host}}/api/usersme/appointments/102
+GET {{host}}/api/usersme/appointments
 Accept: application/json
 Authorization: Bearer {{token}}
 

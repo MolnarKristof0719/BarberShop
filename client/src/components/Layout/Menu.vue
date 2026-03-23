@@ -63,6 +63,11 @@
                       <RouterLink class="dropdown-item" to="/usersmeappointment">Foglalásaim</RouterLink>
                     </li>
                   </template>
+                   <template v-if="hasMenuAccess('/usersmeappointmentbarber')">
+                    <li>
+                      <RouterLink class="dropdown-item" to="/usersmeappointmentbarber">Foglalások</RouterLink>
+                    </li>
+                  </template>
                   <template v-if="hasMenuAccess('/admin')">
                     <li>
                       <hr class="dropdown-divider" />
