@@ -101,7 +101,7 @@
               rel="noopener noreferrer"
               class="ref-item"
             >
-              <img :src="resolveImage(picture.picture)" alt="Barber referencia kep" />
+              <img :src="resolveImage(picture.picture)" alt="Barber referenciakép" />
             </a>
           </div>
         </div>
