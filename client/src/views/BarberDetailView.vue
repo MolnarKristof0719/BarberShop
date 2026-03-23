@@ -96,7 +96,7 @@
             class="reference-tile"
             @click="openLightbox(index)"
           >
-            <img :src="profileImage(picture.picture)" alt="Referencia kep" />
+            <img :src="profileImage(picture.picture)" alt="Referenciakép" />
           </button>
         </div>
       </section>
@@ -126,7 +126,7 @@
       <img
         :src="currentLightboxSrc"
         class="lightbox-image"
-        alt="Referencia kép nagyban"
+        alt="Referenciakép nagyban"
       />
       <button
         type="button"

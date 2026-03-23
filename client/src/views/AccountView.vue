@@ -152,7 +152,7 @@
                 <img
                   class="reference-image"
                   :src="resolveImage(picture.picture)"
-                  alt="Referencia kep"
+                  alt="Referenciakép"
                 />
                 <button
                   class="btn btn-outline-danger btn-sm w-100"
@@ -483,7 +483,13 @@ export default {
       this.referenceLoading = true;
       try {
         const response = await referencePictureService.getAll(this.barberRecordId);
-        this.referencePictures = Array.isArray(response?.data) ? response.data : [];
+        if (Array.isArray(response?.data)) {
+          this.referencePictures = response.data;
+        } else if (Array.isArray(response)) {
+          this.referencePictures = response;
+        } else {
+          this.referencePictures = [];
+        }
       } catch {
         this.referencePictures = [];
       } finally {
@@ -529,12 +535,23 @@ export default {
 
       try {
         const response = await barberService.uploadProfilePicture(this.barberRecordId, file);
-        this.barberProfilePicture = response?.data?.profilePicture || this.barberProfilePicture;
+        this.barberProfilePicture =
+          response?.data?.profilePicture ||
+          response?.profilePicture ||
+          this.barberProfilePicture;
 
         const toastStore = useToastStore();
         toastStore.messages.push("Profilkép sikeresen frissítve.");
         toastStore.show("Success");
       } catch (error) {
+        const toastStore = useToastStore();
+        const errors = error?.response?.data?.errors || {};
+        const firstError =
+          errors?.profilePicture?.[0] ||
+          error?.response?.data?.message ||
+          "A profilkép feltöltése nem sikerült.";
+        toastStore.messages.push(firstError);
+        toastStore.show("Error");
       } finally {
         this.barberLoading = false;
         if (this.$refs.profileFileInput) {
@@ -552,13 +569,22 @@ export default {
 
       this.referenceUploading = true;
       try {
-        await referencePictureService.create(file);
+        await referencePictureService.create(file, this.barberRecordId);
         await this.loadReferencePictures();
 
         const toastStore = useToastStore();
         toastStore.messages.push("Referenciakép sikeresen feltöltve.");
         toastStore.show("Success");
       } catch (error) {
+        const toastStore = useToastStore();
+        const errors = error?.response?.data?.errors || {};
+        const firstError =
+          errors?.picture?.[0] ||
+          errors?.barberId?.[0] ||
+          error?.response?.data?.message ||
+          "A referenciakép feltöltése nem sikerült.";
+        toastStore.messages.push(firstError);
+        toastStore.show("Error");
       } finally {
         this.referenceUploading = false;
         if (this.$refs.referenceFileInput) {
