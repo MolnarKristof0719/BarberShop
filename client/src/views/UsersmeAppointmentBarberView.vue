@@ -55,12 +55,12 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useAppointmentStore, ["getAll", "delete"]),
+    ...mapActions(useAppointmentStore, ["getAll", "cancelForBarber"]),
     async refreshAppointments() {
       await this.getAll();
     },
     async cancelAppointment(id) {
-      await this.delete(id);
+      await this.cancelForBarber(id);
     },
   },
   async mounted() {
