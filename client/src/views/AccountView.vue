@@ -88,17 +88,15 @@
                 </div>
               </div>
 
-              <div class="col-12 mt-3">
+              <div class="col-12 mt-3 d-flex align-items-center justify-content-between gap-2">
                 <button class="btn btn-dark" type="submit" :disabled="savingProfile || loading">
                   {{ savingProfile ? "Mentés..." : "Mentés" }}
                 </button>
+                <button class="btn btn-outline-dark btn-sm" type="button" @click="openPasswordChange">
+                  Jelszó módosítása
+                </button>
               </div>
             </form>
-            <div class="mt-3">
-              <button class="btn btn-outline-dark btn-sm" type="button" @click="openPasswordChange">
-                Jelszó módosítása
-              </button>
-            </div>
           </div>
         </div>
 
