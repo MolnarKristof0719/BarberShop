@@ -3,7 +3,7 @@
     <table class="table table-hover align-middle mb-0">
       <thead class="table-dark sticky-top my-table-head">
         <tr class="align-middle text-center">
-          <th class="actions-column">Muveletek</th>
+          <th class="actions-column">Műveletek</th>
           <template v-for="col in columns" :key="col.key">
             <th
               v-if="col.debug >= 1"
