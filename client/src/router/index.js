@@ -84,6 +84,16 @@ const router = createRouter({
       },
     },
     {
+      path: "/usersmeappointmentbarber",
+      name: "usersmeappointmentbarber",
+      component: () => import("@/views/UsersmeAppointmentBarberView.vue"),
+      beforeEnter: [checkIfNotLogged],
+      meta: {
+        title: () => "Foglalások",
+        roles: [2],
+      },
+    },
+    {
       path: "/review",
       name: "review",
       component: () => import("@/views/ReviewView.vue"),
