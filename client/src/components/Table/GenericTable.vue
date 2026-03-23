@@ -1,28 +1,19 @@
-<template>
-  <div
-    class="table-responsive my-table-container"
-    style="max-height: calc(100vh - 360px); overflow-y: auto"
-  >
-    <table class="table table-hover w-auto mx-auto">
-      <thead class="table-dark sticky-top" style="z-index: 10; top: 0">
+﻿<template>
+  <div class="table-responsive my-table-container">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-dark sticky-top my-table-head">
         <tr class="align-middle text-center">
-          <th>Műveletek</th>
-          <template v-for="col in columns">
+          <th class="actions-column">Muveletek</th>
+          <template v-for="col in columns" :key="col.key">
             <th
-              class="my-pointer"
               v-if="col.debug >= 1"
-              :key="col.key"
-              @click="$emit('sort', col.key)"
+              class="my-pointer"
               :class="{ 'my-debug': col.debug == 1 }"
+              @click="$emit('sort', col.key)"
             >
-              <div
-                class="d-flex align-items-center justify-content-center text-nowrap"
-              >
+              <div class="d-flex align-items-center justify-content-center text-nowrap">
                 <span>{{ col.label }}</span>
-                <span
-                  :class="{ invisible: sortColumn !== col.key }"
-                  class="ms-1"
-                >
+                <span :class="{ invisible: sortColumn !== col.key }" class="ms-1">
                   {{ sortDirection === "asc" ? "▲" : "▼" }}
                 </span>
               </div>
@@ -30,33 +21,31 @@
           </template>
         </tr>
       </thead>
+
       <tbody class="table-group-divider">
         <tr
           v-for="item in items"
           :key="item.id"
-          @click="onClickRow(item.id)"
+          class="my-table-row"
           :class="{ 'table-primary': selectedId === item.id }"
+          @click="onClickRow(item.id)"
         >
-          <td>
+          <td class="actions-column">
             <ButtonsCrud
               :id="item.id"
-              @delete="$emit('delete', $event)"
-              @update="$emit('update', $event)"
-              @create="$emit('create', $event)"
-              @passwordChange="$emit('passwordChange', $event)"
               :cButtonVisible="cButtonVisible"
               :uButtonVisible="uButtonVisible"
               :dButtonVisible="dButtonVisible"
               :pButtonVisible="pButtonVisible"
+              @delete="$emit('delete', $event)"
+              @update="$emit('update', $event)"
+              @create="$emit('create', $event)"
+              @passwordChange="$emit('passwordChange', $event)"
             />
-            
           </td>
-          <template v-for="col in columns">
-            <td
-              v-if="col.debug >= 1"
-              :key="col.key"
-              :class="{ 'my-debug': col.debug == 1 }"
-            >
+
+          <template v-for="col in columns" :key="col.key">
+            <td v-if="col.debug >= 1" :class="{ 'my-debug': col.debug == 1 }">
               {{ item[col.key] }}
             </td>
           </template>
@@ -71,23 +60,22 @@ import ButtonsCrud from "./ButtonsCrud.vue";
 
 export default {
   name: "GenericTable",
+  components: {
+    ButtonsCrud,
+  },
   props: {
     items: { type: Array, required: true },
-    columns: { type: Array, required: true }, // Pl: [{key: 'name', label: 'Név', debug: false}]
+    columns: { type: Array, required: true },
     useCollectionStore: { type: Function, required: true },
     cButtonVisible: { type: Boolean, default: true },
     uButtonVisible: { type: Boolean, default: true },
     dButtonVisible: { type: Boolean, default: true },
     pButtonVisible: { type: Boolean, default: false },
-
-  },
-  components: {
-    ButtonsCrud,
   },
   data() {
     return {
       selectedId: null,
-      store: null, // Itt tároljuk a példányosított store-t
+      store: null,
     };
   },
   created() {
@@ -96,7 +84,6 @@ export default {
     }
   },
   computed: {
-    // Ezeket a store-ból húzzuk be reaktívan
     sortColumn() {
       return this.store ? this.store.sortColumn : "";
     },
@@ -113,22 +100,42 @@ export default {
 </script>
 
 <style scoped>
-/* Ez a titkos szósz a sticky fejléc stabilizálásához */
 .my-table-container {
+  max-height: calc(100vh - 360px);
+  overflow-y: auto;
   border: 1px solid #dee2e6;
-  border-radius: 4px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
-/* Megakadályozza, hogy görgetéskor "átlátszanak" a betűk a fekete fejléc alatt */
-/* .sticky-top th {
-  background-color: #212529 !important;
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.15);
-} */
+.my-table-head {
+  z-index: 10;
+  top: 0;
+}
 
-/* Ha a táblázat keskenyebb mint a képernyő, de középre akarod tenni */
 .table {
-  margin-left: auto;
-  margin-right: auto;
-  width: auto !important; /* Csak akkor, ha nem akarod, hogy kifeszüljön */
+  width: 100%;
+  min-width: 780px;
+}
+
+.table th,
+.table td {
+  padding: 0.85rem 0.9rem;
+}
+
+.actions-column {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.my-table-row {
+  cursor: pointer;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.my-table-row:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 </style>
