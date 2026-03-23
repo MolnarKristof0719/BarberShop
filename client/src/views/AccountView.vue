@@ -143,7 +143,7 @@
             </p>
             <div v-else class="reference-grid mt-3">
               <div
-                v-for="picture in referencePictures"
+                v-for="picture in visibleReferencePictures"
                 :key="picture.id"
                 class="reference-card"
               >
@@ -151,6 +151,7 @@
                   class="reference-image"
                   :src="resolveImage(picture.picture)"
                   alt="Referenciakép"
+                  @error="onReferenceImageError(picture.id)"
                 />
                 <button
                   class="btn btn-outline-danger btn-sm w-100"
@@ -249,6 +250,7 @@ export default {
       barberLoading: false,
       selectedFileName: "",
       referencePictures: [],
+      brokenReferencePictureIds: [],
       referenceLoading: false,
       referenceUploading: false,
       referenceDeletingId: null,
@@ -288,6 +290,11 @@ export default {
     ...mapState(useUserLoginLogoutStore, ["item", "role", "loading"]),
     isBarber() {
       return this.role === 2;
+    },
+    visibleReferencePictures() {
+      return this.referencePictures.filter(
+        (picture) => !this.brokenReferencePictureIds.includes(picture.id),
+      );
     },
     avatarImageSrc() {
       if (!this.isBarber || !this.barberProfilePicture) return null;
@@ -475,12 +482,14 @@ export default {
     async loadReferencePictures() {
       if (!this.barberRecordId) {
         this.referencePictures = [];
+        this.brokenReferencePictureIds = [];
         return;
       }
 
       this.referenceLoading = true;
       try {
         const response = await referencePictureService.getAll(this.barberRecordId);
+        this.brokenReferencePictureIds = [];
         if (Array.isArray(response?.data)) {
           this.referencePictures = response.data;
         } else if (Array.isArray(response)) {
@@ -493,6 +502,11 @@ export default {
       } finally {
         this.referenceLoading = false;
       }
+    },
+    onReferenceImageError(pictureId) {
+      if (!pictureId) return;
+      if (this.brokenReferencePictureIds.includes(pictureId)) return;
+      this.brokenReferencePictureIds = [...this.brokenReferencePictureIds, pictureId];
     },
     async loadBarberProfile() {
       if (!this.isBarber || !this.item?.id) {
@@ -597,6 +611,9 @@ export default {
       try {
         await referencePictureService.delete(id);
         this.referencePictures = this.referencePictures.filter((picture) => picture.id !== id);
+        this.brokenReferencePictureIds = this.brokenReferencePictureIds.filter(
+          (brokenId) => brokenId !== id,
+        );
 
         const toastStore = useToastStore();
         toastStore.messages.push("Referenciakép törölve.");

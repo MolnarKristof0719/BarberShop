@@ -19,7 +19,30 @@ class ReferencePictureController extends Controller
                 $query->where('barberId', (int) $request->barberId);
             }
 
-            return $query->get();
+            return $query
+                ->get()
+                ->filter(function (CurrentModel $row) {
+                    $path = $row->picture;
+                    if (!is_string($path) || $path === '') {
+                        return false;
+                    }
+
+                    // Keep external URLs and data URLs.
+                    if (preg_match('/^https?:\/\//i', $path) || str_starts_with($path, 'data:')) {
+                        return true;
+                    }
+
+                    // For local files under /storage, show only existing files.
+                    $pathOnly = parse_url($path, PHP_URL_PATH) ?: $path;
+                    if (str_starts_with($pathOnly, '/storage/')) {
+                        $storagePath = ltrim(str_replace('/storage/', '', $pathOnly), '/');
+                        return Storage::disk('public')->exists($storagePath);
+                    }
+
+                    // Unknown relative path format: keep row.
+                    return true;
+                })
+                ->values();
         });
     }
 
