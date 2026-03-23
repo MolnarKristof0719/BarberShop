@@ -42,7 +42,7 @@
 
         <div class="col-12" v-if="isBarber">
           <div class="info-box">
-            <small class="label">Szabadnap kérelmezése</small>
+            <small class="label">Szabadnap rögzítése</small>
             <div class="d-flex flex-wrap gap-2 mt-2">
               <button
                 class="btn btn-dark btn-sm"
@@ -50,7 +50,7 @@
                 @click="openDayoffRequest"
                 :disabled="barberLoading || dayoffUploading || !barberRecordId"
               >
-                {{ dayoffUploading ? "Kérelem Küldése..." : "Új szabadnap kérelmezése" }}
+                {{ dayoffUploading ? "Rögzítés..." : "Új szabadnap rögzítése" }}
               </button>
             </div>
           </div>
@@ -125,7 +125,7 @@
                 @click="openReferenceUpload"
                 :disabled="barberLoading || referenceUploading || !barberRecordId"
               >
-                {{ referenceUploading ? "Feltöltés..." : "Új referencia kép feltöltése" }}
+                {{ referenceUploading ? "Feltöltés..." : "Új referenciakép feltöltése" }}
               </button>
             </div>
 
@@ -178,7 +178,7 @@
     <div v-if="showDayoffModal" class="dayoff-modal-backdrop" @click="closeDayoffRequest">
       <div class="dayoff-modal" @click.stop>
         <div class="d-flex align-items-center justify-content-between gap-2">
-          <h3 class="mb-0">Szabadnap kérelmezése</h3>
+          <h3 class="mb-0">Szabadnap rögzítése</h3>
           <button class="btn-close" type="button" @click="closeDayoffRequest"></button>
         </div>
 
