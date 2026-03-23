@@ -76,6 +76,9 @@
                     <li>
                       <RouterLink class="dropdown-item" to="/admin/services">Admin - Szolgáltatások</RouterLink>
                     </li>
+                    <li>
+                      <RouterLink class="dropdown-item" to="/admin/reviews">Admin - Vélemények</RouterLink>
+                    </li>
                   </template>
                   <li>
                     <hr class="dropdown-divider" />

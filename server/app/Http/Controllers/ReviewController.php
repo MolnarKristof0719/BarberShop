@@ -8,6 +8,51 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+
+    public function indexAbc()
+    {
+        return $this->apiResponse(
+            function () {
+                return DB::table('barbers')
+                    ->select('id', 'name')
+                    ->orderBy('name')
+                    ->get();
+            }
+        );
+    }
+
+    public function indexSortSearch($column, $direction, $search = null)
+    {
+        return $this->apiResponse(
+            function () use ($column, $direction, $search) {
+                $columnMap = [
+                    'id' => 'barbers.id',
+                    'userId' => 'barbers.userId',
+                    'userName' => 'users.name',
+                    'userEmail' => 'users.email',
+                    'isActiveLabel' => 'barbers.isActive',
+                    'isActive' => 'barbers.isActive',
+                ];
+                $sortColumn = $columnMap[$column] ?? 'barbers.id';
+                $sortDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+                $query = CurrentModel::query()
+                    ->leftJoin('users', 'users.id', '=', 'barbers.userId')
+                    ->select('barbers.*')
+                    ->with(['user:id,name,email']);
+
+                if (!empty($search) && $search !== 'all') {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('barbers.introduction', 'like', "%{$search}%")
+                            ->orWhere('users.name', 'like', "%{$search}%")
+                            ->orWhere('users.email', 'like', "%{$search}%");
+                    });
+                }
+
+                return $query->orderBy($sortColumn, $sortDirection)->get();
+            }
+        );
+    }
     public function index()
     {
         return $this->apiResponse(function () {

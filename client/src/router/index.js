@@ -134,6 +134,15 @@ const router = createRouter({
             roles: [1],
           },
         },
+        {
+          path: "reviews",
+          name: "adminReviews",
+          component: () => import("@/views/AdminReviewsView.vue"),
+          meta: {
+            title: () => "Admin Reviews",
+            roles: [1],
+          },
+        },
       ],
     },
     {
