@@ -42,7 +42,7 @@
 
         <div class="col-12" v-if="isBarber">
           <div class="info-box">
-            <small class="label">Szabadnap kérelmezése</small>
+            <small class="label">Szabadnap rögzítése</small>
             <div class="d-flex flex-wrap gap-2 mt-2">
               <button
                 class="btn btn-dark btn-sm"
@@ -50,7 +50,7 @@
                 @click="openDayoffRequest"
                 :disabled="barberLoading || dayoffUploading || !barberRecordId"
               >
-                {{ dayoffUploading ? "Kérelem Küldése..." : "Új szabadnap kérelmezése" }}
+                {{ dayoffUploading ? "Rögzítés..." : "Új szabadnap rögzítése" }}
               </button>
             </div>
           </div>
@@ -88,17 +88,15 @@
                 </div>
               </div>
 
-              <div class="col-12 mt-3">
+              <div class="col-12 mt-3 d-flex align-items-center justify-content-between gap-2">
                 <button class="btn btn-dark" type="submit" :disabled="savingProfile || loading">
                   {{ savingProfile ? "Mentés..." : "Mentés" }}
                 </button>
+                <button class="btn btn-outline-dark btn-sm" type="button" @click="openPasswordChange">
+                  Jelszó módosítása
+                </button>
               </div>
             </form>
-            <div class="mt-3">
-              <button class="btn btn-outline-dark btn-sm" type="button" @click="openPasswordChange">
-                Jelszó módosítása
-              </button>
-            </div>
           </div>
         </div>
 
@@ -125,7 +123,7 @@
                 @click="openReferenceUpload"
                 :disabled="barberLoading || referenceUploading || !barberRecordId"
               >
-                {{ referenceUploading ? "Feltöltés..." : "Új referencia kép feltöltése" }}
+                {{ referenceUploading ? "Feltöltés..." : "Új referenciakép feltöltése" }}
               </button>
             </div>
 
@@ -152,7 +150,7 @@
                 <img
                   class="reference-image"
                   :src="resolveImage(picture.picture)"
-                  alt="Referencia kep"
+                  alt="Referenciakép"
                 />
                 <button
                   class="btn btn-outline-danger btn-sm w-100"
@@ -178,7 +176,7 @@
     <div v-if="showDayoffModal" class="dayoff-modal-backdrop" @click="closeDayoffRequest">
       <div class="dayoff-modal" @click.stop>
         <div class="d-flex align-items-center justify-content-between gap-2">
-          <h3 class="mb-0">Szabadnap kérelmezése</h3>
+          <h3 class="mb-0">Szabadnap rögzítése</h3>
           <button class="btn-close" type="button" @click="closeDayoffRequest"></button>
         </div>
 
@@ -483,7 +481,13 @@ export default {
       this.referenceLoading = true;
       try {
         const response = await referencePictureService.getAll(this.barberRecordId);
-        this.referencePictures = Array.isArray(response?.data) ? response.data : [];
+        if (Array.isArray(response?.data)) {
+          this.referencePictures = response.data;
+        } else if (Array.isArray(response)) {
+          this.referencePictures = response;
+        } else {
+          this.referencePictures = [];
+        }
       } catch {
         this.referencePictures = [];
       } finally {
@@ -529,12 +533,23 @@ export default {
 
       try {
         const response = await barberService.uploadProfilePicture(this.barberRecordId, file);
-        this.barberProfilePicture = response?.data?.profilePicture || this.barberProfilePicture;
+        this.barberProfilePicture =
+          response?.data?.profilePicture ||
+          response?.profilePicture ||
+          this.barberProfilePicture;
 
         const toastStore = useToastStore();
         toastStore.messages.push("Profilkép sikeresen frissítve.");
         toastStore.show("Success");
       } catch (error) {
+        const toastStore = useToastStore();
+        const errors = error?.response?.data?.errors || {};
+        const firstError =
+          errors?.profilePicture?.[0] ||
+          error?.response?.data?.message ||
+          "A profilkép feltöltése nem sikerült.";
+        toastStore.messages.push(firstError);
+        toastStore.show("Error");
       } finally {
         this.barberLoading = false;
         if (this.$refs.profileFileInput) {
@@ -552,13 +567,22 @@ export default {
 
       this.referenceUploading = true;
       try {
-        await referencePictureService.create(file);
+        await referencePictureService.create(file, this.barberRecordId);
         await this.loadReferencePictures();
 
         const toastStore = useToastStore();
         toastStore.messages.push("Referenciakép sikeresen feltöltve.");
         toastStore.show("Success");
       } catch (error) {
+        const toastStore = useToastStore();
+        const errors = error?.response?.data?.errors || {};
+        const firstError =
+          errors?.picture?.[0] ||
+          errors?.barberId?.[0] ||
+          error?.response?.data?.message ||
+          "A referenciakép feltöltése nem sikerült.";
+        toastStore.messages.push(firstError);
+        toastStore.show("Error");
       } finally {
         this.referenceUploading = false;
         if (this.$refs.referenceFileInput) {
