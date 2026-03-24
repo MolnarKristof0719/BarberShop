@@ -676,6 +676,8 @@ export default {
 :deep(.avatar) {
   width: 46px;
   height: 46px;
+  flex: 0 0 46px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   background: #dce3ea;
   display: inline-flex;
