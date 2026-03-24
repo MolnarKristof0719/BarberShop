@@ -138,4 +138,21 @@ export default {
   transform: translateY(-1px);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
+
+@media (max-width: 767px) {
+  .table {
+    min-width: 600px;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.65rem 0.7rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .table {
+    min-width: 520px;
+  }
+}
 </style>

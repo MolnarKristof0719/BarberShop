@@ -292,4 +292,19 @@ export default {
   gap: 10px;
   margin-top: 18px;
 }
+
+@media (max-width: 575.98px) {
+  .review-card {
+    padding: 16px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions .btn {
+    width: 100%;
+  }
+}
 </style>

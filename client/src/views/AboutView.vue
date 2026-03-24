@@ -312,4 +312,24 @@ export default {
     order: 1;
   }
 }
+
+@media (max-width: 575.98px) {
+  .home-barbers {
+    padding: 28px 12px 24px;
+  }
+
+  .carousel-shell {
+    max-width: 100%;
+    min-height: auto;
+    gap: 10px;
+  }
+
+  .focus-content {
+    padding: 18px 16px 22px;
+  }
+
+  .nav-right {
+    margin-top: -40px;
+  }
+}
 </style>

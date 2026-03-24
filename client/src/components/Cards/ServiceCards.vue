@@ -62,4 +62,18 @@ export default {
   color: #5f646d;
   margin-top: 4px;
 }
+
+@media (max-width: 575.98px) {
+  .service-card {
+    padding: 16px;
+  }
+
+  .service-title {
+    font-size: 20px;
+  }
+
+  .price {
+    font-size: 18px;
+  }
+}
 </style>

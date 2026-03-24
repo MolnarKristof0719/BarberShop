@@ -308,4 +308,30 @@ export default {
     margin-top: 0.8rem;
   }
 }
+
+@media (max-width: 575.98px) {
+  .menu-bar {
+    padding: 0.5rem 0;
+  }
+
+  .menu-meta {
+    width: 100%;
+    align-items: stretch !important;
+  }
+
+  .menu-search {
+    width: 100%;
+  }
+
+  .menu-search .form-control {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .menu-btn,
+  .book-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
 </style>

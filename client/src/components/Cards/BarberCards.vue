@@ -153,4 +153,11 @@ export default {
   color: #343a40;
   line-height: 1.45;
 }
+
+@media (max-width: 575.98px) {
+  .barber-image,
+  .barber-image-placeholder {
+    height: 200px;
+  }
+}
 </style>

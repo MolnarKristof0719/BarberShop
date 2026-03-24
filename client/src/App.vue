@@ -66,4 +66,28 @@ export default {
 .app-page {
   height: 100%;
 }
+
+@media (max-width: 991.98px) {
+  .app-shell {
+    border-radius: 12px;
+    padding: 10px;
+  }
+
+  .app-main {
+    min-height: calc(100vh - 240px);
+    padding: 12px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .app-shell {
+    border-radius: 0;
+    padding: 8px;
+  }
+
+  .app-main {
+    min-height: auto;
+    padding: 10px;
+  }
+}
 </style>

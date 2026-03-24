@@ -843,9 +843,51 @@ export default {
   object-fit: cover;
 }
 
+@media (max-width: 991.98px) {
+  .flow {
+    grid-template-columns: 1fr;
+  }
+
+  .flow > * {
+    grid-column: auto;
+  }
+}
+
 @media (max-width: 767px) {
+  .hero {
+    padding: 16px;
+  }
+
+  .step-pill {
+    width: 100%;
+    text-align: center;
+  }
+
+  :deep(.flow-header) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   :deep(.stepper) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :deep(.select-card),
+  :deep(.barber-card) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  :deep(.barber-card .btn) {
+    width: 100%;
+  }
+
+  :deep(.calendar-tools) {
+    flex-wrap: wrap;
+  }
+
+  :deep(.calendar-tools .btn) {
+    flex: 1 1 120px;
   }
 
   :deep(.actions) {

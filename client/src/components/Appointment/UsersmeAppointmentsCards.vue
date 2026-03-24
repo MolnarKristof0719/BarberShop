@@ -249,4 +249,26 @@ export default {
   justify-content: space-between;
   align-items: flex-end;
 }
+
+@media (max-width: 575.98px) {
+  .appointments-list {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .review,
+  .delete {
+    justify-content: stretch;
+  }
+
+  .review .btn,
+  .delete .btn {
+    width: 100%;
+  }
+}
 </style>

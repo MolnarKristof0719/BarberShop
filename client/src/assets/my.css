@@ -2,6 +2,17 @@
   --my-border-space: 0px;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 .my-container {
   width: 100%;
   max-width: 1440px;
@@ -42,4 +53,16 @@
   align-items: center;
   justify-content: center;
   background: #111;
+}
+
+@media (max-width: 575.98px) {
+  .my-container {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .logo-box {
+    width: 60px;
+    height: 60px;
+  }
 }
