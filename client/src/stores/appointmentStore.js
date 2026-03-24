@@ -172,5 +172,22 @@ export const useAppointmentStore = defineStore("appointment", {
         this.loading = false;
       }
     },
+
+    // Barber nézethez: törlés (lemondás) után saját foglalások újratöltése
+    async cancelForBarber(id) {
+      this.loading = true;
+      this.error = null;
+      try {
+        await service.delete(id);
+        const response = await service.getAll();
+        this.items = response.data;
+        return true;
+      } catch (err) {
+        this.error = err;
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });
