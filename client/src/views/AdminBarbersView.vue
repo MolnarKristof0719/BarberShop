@@ -66,8 +66,7 @@ export default {
       pageTitle: "Admin - Barberek (táblázat)",
       tableColumns: [
         { key: "id", label: "ID", debug: 2 },
-        { key: "userId", label: "User ID", debug: 2 },
-        { key: "userName", label: "Név", debug: 2 },
+        { key: "userName", label: "User", debug: 2 },
         { key: "userEmail", label: "Email", debug: 2 },
         { key: "isActiveLabel", label: "Státusz", debug: 2 },
       ],
@@ -91,7 +90,6 @@ export default {
     tableItems() {
       return this.items.map((item) => ({
         id: item.id,
-        userId: item.userId,
         userName: item.user?.name || "",
         userEmail: item.user?.email || "",
         isActiveLabel: item.isActive ? "Aktív" : "Inaktív",

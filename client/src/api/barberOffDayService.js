@@ -7,6 +7,13 @@ export default {
     return await apiClient.get(route);
   },
 
+  async getAllSortSearch(column, direction, search) {
+    const searchValue = search ?? "all";
+    return await apiClient.get(
+      `${route}sortsearch/${column}/${direction}/${searchValue}`,
+    );
+  },
+
   async create(data) {
     return await apiClient.post(route, data);
   },

@@ -153,6 +153,15 @@ const router = createRouter({
             roles: [1],
           },
         },
+        {
+          path: "dayoffs",
+          name: "adminDayOffs",
+          component: () => import("@/views/AdminDayOffsView.vue"),
+          meta: {
+            title: () => "Admin Szabadnapok",
+            roles: [1],
+          },
+        },
       ],
     },
     {

@@ -12,24 +12,16 @@
     </div>
 
     <GenericTable
-      :items="items"
+      :items="displayItems"
       :columns="tableColumns"
       :useCollectionStore="useCollectionStore"
       :cButtonVisible="false"
       :uButtonVisible="false"
       @delete="deleteHandler"
-      @update="updateHandler"
       @sort="sortHandler"
       v-if="items.length > 0"
     />
-    <div v-else style="width: 120px" class="m-auto">Nincs találat</div>
-
-    <FormAdminReview
-      ref="form"
-      :title="title"
-      :item="item"
-      @yesEventForm="yesEventFormHandler"
-    />
+    <div v-else style="width: 120px" class="m-auto">Nincs talalat</div>
 
     <ConfirmModal
       :isOpenConfirmModal="isOpenConfirmModal"
@@ -41,20 +33,17 @@
 
 <script>
 import { mapActions, mapState } from "pinia";
-import { useReviewStore } from "@/stores/reviewStore";
+import { useBarberOffDayStore } from "@/stores/barberOffDayStore";
 import { useSearchStore } from "@/stores/searchStore";
+import { useBarberStore } from "@/stores/barberStore";
 import GenericTable from "@/components/Table/GenericTable.vue";
 import ConfirmModal from "@/components/Confirm/ConfirmModal.vue";
-import ButtonsCrudCreate from "@/components/Table/ButtonsCrudCreate.vue";
-import FormAdminReview from "@/components/Forms/FormAdminReview.vue";
 
 export default {
-  name: "AdminReviewsView",
+  name: "AdminDayOffsView",
   components: {
     GenericTable,
     ConfirmModal,
-    ButtonsCrudCreate,
-    FormAdminReview,
   },
   watch: {
     searchWord() {
@@ -63,87 +52,84 @@ export default {
   },
   data() {
     return {
-      pageTitle: "Admin - Vélemények (táblázat)",
+      pageTitle: "Admin - Szabadnapok (tablazat)",
       tableColumns: [
         { key: "id", label: "ID", debug: 2 },
         { key: "barberId", label: "Barber", debug: 2 },
-        { key: "userId", label: "User", debug: 2 },
-        { key: "comment", label: "Megjegyzés", debug: 2 },
-        { key: "rating", label: "Értékelés", debug: 2 },
+        { key: "offDay", label: "Szabadnap", debug: 2 },
       ],
-      useCollectionStore: useReviewStore,
+      useCollectionStore: useBarberOffDayStore,
       isOpenConfirmModal: false,
       toDeleteId: null,
-      state: "r",
-      title: "",
     };
   },
   computed: {
-    ...mapState(useReviewStore, [
-      "item",
+    ...mapState(useBarberOffDayStore, [
       "items",
       "loading",
       "sortColumn",
       "sortDirection",
       "getItemsLength",
     ]),
+    ...mapState(useBarberStore, { barberItems: "items" }),
     ...mapState(useSearchStore, ["searchWord"]),
+    barberNameById() {
+      const map = {};
+      (this.barberItems || []).forEach((barber) => {
+        if (!barber?.id) return;
+        map[barber.id] = barber.user?.name || "";
+      });
+      return map;
+    },
+    displayItems() {
+      return (this.items || []).map((row) => ({
+        ...row,
+        barberId: this.barberNameById[row.barberId] || row.barberId,
+        offDay: this.formatOffDay(row.offDay),
+      }));
+    },
   },
   methods: {
-    ...mapActions(useReviewStore, [
+    ...mapActions(useBarberOffDayStore, [
       "getAll",
       "getAllSortSearch",
-      "getById",
-      "update",
       "delete",
-      "clearItem",
     ]),
+    ...mapActions(useBarberStore, { getAllBarbers: "getAll" }),
     ...mapActions(useSearchStore, ["resetSearchWord"]),
     sortHandler(column) {
       this.getAllSortSearch(column);
     },
     deleteHandler(id) {
-      this.state = "d";
       this.isOpenConfirmModal = true;
       this.toDeleteId = id;
     },
-    updateHandler(id) {
-      this.state = "u";
-      this.title = "Vélemény módosítása";
-      this.getById(id);
-      this.$refs.form.show();
-    },
-    
     cancelHandler() {
       this.isOpenConfirmModal = false;
-      this.state = "r";
     },
     async confirmHandler() {
       try {
         await this.delete(this.toDeleteId);
       } catch (error) {}
       this.isOpenConfirmModal = false;
-      this.state = "r";
     },
-    async yesEventFormHandler({ item, done }) {
-      try {
-        if (this.state === "c") {
-          await this.create(item);
-        } else {
-          await this.update(item.id, item);
+    formatOffDay(value) {
+      const raw = String(value || "");
+      if (!raw) return "";
+      const dateOnly = raw.includes("T") ? raw.slice(0, 10) : raw;
+      const parts = dateOnly.split("-");
+      if (parts.length === 3) {
+        const [year, month, day] = parts;
+        if (year && month && day) {
+          return `${year}.${month}.${day}.`;
         }
-        this.state = "r";
-        done(true);
-      } catch (err) {
-        if (err.response && err.response.status === 422) {
-          this.$refs.form.setServerErrors(err.response.data.errors);
-        }
-        done(false);
       }
+      return dateOnly;
     },
   },
   async mounted() {
     this.resetSearchWord();
+    await this.getAllBarbers();
     await this.getAll();
   },
 };

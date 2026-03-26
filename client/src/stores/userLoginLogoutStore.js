@@ -44,6 +44,18 @@ export const useUserLoginLogoutStore = defineStore("userLoginLogout", {
   },
   //csinál vele valamit
   actions: {
+    clearLocalSession({ message = "", showToast = false } = {}) {
+      this.item = null;
+      this.error = null;
+      this.loading = false;
+      localStorage.removeItem("user_data");
+
+      if (showToast && message) {
+        const toastStore = useToastStore();
+        toastStore.messages.push(message);
+        toastStore.show("Error");
+      }
+    },
     canAccess(requiredRoles) {
       // Itt a 'this' kulcsszóval éred el a state-et
       if (!requiredRoles || requiredRoles.length === 0) return true;

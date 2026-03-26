@@ -2,7 +2,7 @@
   <div class="table-responsive my-table-container">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-dark sticky-top my-table-head">
-        <tr class="align-middle text-center">
+        <tr class="align-middle">
           <th class="actions-column">Műveletek</th>
           <template v-for="col in columns" :key="col.key">
             <th
@@ -11,7 +11,7 @@
               :class="{ 'my-debug': col.debug == 1 }"
               @click="$emit('sort', col.key)"
             >
-              <div class="d-flex align-items-center justify-content-center text-nowrap">
+              <div class="d-flex align-items-center justify-content-start text-nowrap">
                 <span>{{ col.label }}</span>
                 <span :class="{ invisible: sortColumn !== col.key }" class="ms-1">
                   {{ sortDirection === "asc" ? "▲" : "▼" }}
@@ -122,11 +122,13 @@ export default {
 .table th,
 .table td {
   padding: 0.85rem 0.9rem;
+  text-align: left;
 }
 
 .actions-column {
   white-space: nowrap;
   width: 1%;
+  text-align: center;
 }
 
 .my-table-row {

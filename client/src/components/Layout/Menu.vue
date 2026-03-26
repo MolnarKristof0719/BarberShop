@@ -84,6 +84,9 @@
                     <li>
                       <RouterLink class="dropdown-item" to="/admin/reviews">Admin - Vélemények</RouterLink>
                     </li>
+                    <li>
+                      <RouterLink class="dropdown-item" to="/admin/dayoffs">Admin - Szabadnapok</RouterLink>
+                    </li>
                   </template>
                   <li>
                     <hr class="dropdown-divider" />
