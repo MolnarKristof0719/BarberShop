@@ -17,6 +17,7 @@ class AppointmentController extends Controller
     private const WORK_START = '09:00';
     private const WORK_END = '18:00';
     private const SLOT_MINUTES = 30;
+    private const MIN_LEAD_MINUTES = 60;
 
     public function indexSortSearch($column, $direction, $search = null)
     {
@@ -87,7 +88,7 @@ class AppointmentController extends Controller
                     'date_format:H:i',
                     function (string $attribute, mixed $value, \Closure $fail) use ($validSlots): void {
                         if (!in_array($value, $validSlots, true)) {
-                            $fail('Az idopont csak 30 perces sav lehet 09:00 es 17:30 kozott.');
+                            $fail('Az időpont csak 30 perces sáv lehet 09:00 és 17:30 között.');
                         }
                     }
                 ],
@@ -96,8 +97,8 @@ class AppointmentController extends Controller
             ]);
 
             $appointmentDateTime = Carbon::parse($data['appointmentDate'] . ' ' . $data['appointmentTime']);
-            if ($appointmentDateTime->lt(now())) {
-                abort(422, 'Multbeli idopontra nem lehet foglalni.');
+            if ($appointmentDateTime->lt($this->minBookableDateTime())) {
+                abort(422, 'Az időpont legalább 1 órával későbbre foglalható.');
             }
 
             $isBarberActive = DB::table('barbers')
@@ -106,7 +107,7 @@ class AppointmentController extends Controller
                 ->exists();
 
             if (!$isBarberActive) {
-                abort(422, 'A barber jelenleg nem aktiv.');
+                abort(422, 'A barber jelenleg nem aktív.');
             }
 
             $isOffDay = DB::table('barber_off_days')
@@ -115,7 +116,7 @@ class AppointmentController extends Controller
                 ->exists();
 
             if ($isOffDay) {
-                abort(422, 'A barber ezen a napon szabadsagon van.');
+                abort(422, 'A barber ezen a napon szabadságon van.');
             }
 
             try {
@@ -145,7 +146,7 @@ class AppointmentController extends Controller
                 $mysqlCode = $e->errorInfo[1] ?? null;
 
                 if ($mysqlCode === 1062) {
-                    abort(409, 'Ez az idopont mar foglalt ennel a barbernel.');
+                    abort(409, 'Ez az időpont már foglalt ennél a barbernél.');
                 }
 
                 throw $e;
@@ -321,7 +322,7 @@ class AppointmentController extends Controller
                 ->with(['services', 'barber', 'user'])
                 ->find($id);
 
-            abort_if(!$appointment, 404, 'Az idopont nem talalhato.');
+            abort_if(!$appointment, 404, 'Az időpont nem található.');
 
             return $appointment;
         });
@@ -341,7 +342,7 @@ class AppointmentController extends Controller
             );
 
             if ($appointment->status === 'completed') {
-                abort(422, 'Completed idopont nem mondhato le.');
+                abort(422, 'Teljesített időpont nem mondható le.');
             }
 
             if ($appointment->status !== 'cancelled') {
@@ -409,10 +410,15 @@ class AppointmentController extends Controller
         }
 
         $slotDateTime = Carbon::parse($date . ' ' . $time);
-        if ($slotDateTime->lte(now())) {
+        if ($slotDateTime->lt($this->minBookableDateTime())) {
             return false;
         }
 
         return true;
+    }
+
+    private function minBookableDateTime(): Carbon
+    {
+        return now()->addMinutes(self::MIN_LEAD_MINUTES);
     }
 }
