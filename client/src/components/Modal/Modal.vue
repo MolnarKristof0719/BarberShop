@@ -9,14 +9,14 @@
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered" :class="modalSizeClass">
-      <div class="modal-content">
+      <div class="modal-content admin-modal">
         <form
           @submit.prevent="onClickYes"
           :class="{ 'was-validated': validated }"
           novalidate
         >
           <!-- header -->
-          <div class="modal-header">
+          <div class="modal-header admin-modal-header">
             <h1 class="modal-title fs-5" id="exampleModalLabel">{{ title }}</h1>
             <button
               type="button"
@@ -33,11 +33,11 @@
             <slot></slot>
           </div>
           <!-- footer -->
-          <div class="modal-footer">
+          <div class="modal-footer admin-modal-footer">
             <!-- cancel -->
             <button
               type="button"
-              class="btn btn-primary"
+              class="btn btn-admin btn-admin-secondary"
               v-if="no"
               @click="
                 hide();
@@ -49,7 +49,7 @@
             <!-- save -->
             <button
               type="submit"
-              class="btn btn-danger"
+              class="btn btn-admin btn-admin-create"
               @click="$event.target.blur()"
             >
               {{ yes }}

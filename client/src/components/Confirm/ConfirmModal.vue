@@ -3,8 +3,8 @@
     <div v-if="isOpenConfirmModal">
       <div class="modal fade show" tabindex="-1" style="display: block">
         <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content bg-light shadow-lg">
-            <div class="modal-header bg-info">
+          <div class="modal-content admin-modal shadow-lg">
+            <div class="modal-header admin-modal-header">
               <h5 class="modal-title">
                 {{ title }}
               </h5>
@@ -21,10 +21,10 @@
                 {{ message }}
               </p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer admin-modal-footer">
               <button
                 type="button"
-                class="btn btn-secondary"
+                class="btn btn-admin btn-admin-secondary"
                 data-bs-dismiss="modal"
                 @click="$emit('cancel')"
               >
@@ -32,7 +32,7 @@
               </button>
               <button
                 type="button"
-                class="btn btn-danger"
+                class="btn btn-admin btn-admin-delete"
                 data-bs-dismiss="modal"
                 @click="$emit('confirm')"
               >

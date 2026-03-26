@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button type="button" class="btn btn-outline-info btn-sm"
+    <button type="button" class="btn btn-sm btn-admin btn-admin-update"
         @click="onClickButton()"
     >
         <i class="bi bi-pencil"></i>

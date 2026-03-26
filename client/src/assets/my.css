@@ -66,3 +66,120 @@ img {
     height: 60px;
   }
 }
+
+.btn.btn-admin {
+  border-radius: 8px;
+  border: 2px solid var(--app-dark) !important;
+  background: #ffffff;
+  color: var(--app-dark);
+  padding: 0.35rem 0.5rem;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn.btn-admin:hover {
+  background: var(--app-dark);
+  color: var(--app-accent);
+  border-color: var(--app-dark) !important;
+}
+
+.btn.btn-admin:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(197, 160, 89, 0.35);
+}
+
+.btn.btn-admin-update {
+  background: #ffffff;
+  color: var(--app-dark);
+  border-color: var(--app-accent) !important;
+}
+
+.btn.btn-admin-update:hover {
+  background: var(--app-dark);
+  color: var(--app-accent);
+}
+
+.btn.btn-admin-create {
+  background: var(--app-accent);
+  color: var(--app-dark);
+  border-color: var(--app-dark) !important;
+}
+
+.btn.btn-admin-create:hover {
+  background: #d2b270;
+  border-color: #d2b270;
+  color: var(--app-dark);
+}
+
+.btn.btn-admin-password {
+  border-color: var(--app-accent) !important;
+  color: var(--app-dark);
+}
+
+.btn.btn-admin-delete {
+  background: var(--app-dark);
+  color: var(--app-accent);
+  border-color: var(--app-dark) !important;
+}
+
+.btn.btn-admin-delete:hover {
+  background: #000000;
+  color: var(--app-accent);
+  border-color: #000000 !important;
+}
+
+.btn.btn-admin-password:hover {
+  background: var(--app-accent);
+  color: var(--app-dark);
+  border-color: var(--app-accent);
+}
+
+.btn.btn-admin-secondary {
+  background: #ffffff;
+  color: var(--app-dark);
+  border-color: var(--app-dark) !important;
+}
+
+.btn.btn-admin-secondary:hover {
+  background: var(--app-dark);
+  color: var(--app-accent);
+  border-color: var(--app-dark) !important;
+}
+
+.admin-modal {
+  border-radius: 16px;
+  border: 1px solid var(--app-dark);
+  overflow: hidden;
+}
+
+.admin-modal-header {
+  background: var(--app-dark);
+  color: var(--app-accent);
+  border-bottom: 1px solid #1f1f1f;
+}
+
+.admin-modal .modal-title {
+  color: var(--app-accent);
+  font-weight: 600;
+}
+
+.admin-modal .btn-close {
+  filter: invert(1);
+  opacity: 0.85;
+}
+
+.admin-modal .btn-close:hover {
+  opacity: 1;
+}
+
+.admin-modal-footer {
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.modal-backdrop {
+  z-index: 2000 !important;
+}
+
+.modal {
+  z-index: 2010 !important;
+}

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button type="button" class="btn btn-success btn-sm"
+    <button type="button" class="btn btn-sm btn-admin btn-admin-create"
         @click="onClickButton()"
     >
         <i class="bi bi-plus-lg"></i>
