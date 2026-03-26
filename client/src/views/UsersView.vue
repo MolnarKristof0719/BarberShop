@@ -85,8 +85,7 @@ export default {
       pageTitle: "Userek",
       //módosít
       tableColumns: [
-        { key: "id", label: "ID", debug: import.meta.env.VITE_DEBUG_MODE },
-        { key: "name", label: "User név", debug: 2 },
+        { key: "name", label: "Név", debug: 2 },
         { key: "email", label: "Email", debug: 2 },
         { key: "role", label: "Szerepkör", debug: 2 },
       ],

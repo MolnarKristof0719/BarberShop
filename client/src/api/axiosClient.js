@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useUserLoginLogoutStore } from "@/stores/userLoginLogoutStore";
 import { useToastStore } from "@/stores/toastStore";
+import router from "@/router";
 
 // apiClient objektum:
 // tartalmazza az összes crud függvényt
@@ -48,12 +49,30 @@ apiClient.interceptors.response.use(
         // Csak adjuk tovább a hibát a komponensnek.
         return Promise.reject(error);
       }
-
-      // 2. Speciális eset: 401 Unauthorized
+      // 2. Specialis eset: 401 Unauthorized
       if (status === 401) {
-        // Ha login-nál kapunk 401-et, azt kiírhatjuk toast-ban (pl. Rossz jelszó)
-        toastStore.messages.push(message);
-        toastStore.show("Error");
+        const requestUrl = error?.config?.url || "";
+        const isLoginRequest = requestUrl.includes("/users/login");
+
+        if (isLoginRequest) {
+         
+          toastStore.messages.push(message);
+          toastStore.show("Error");
+          return Promise.reject(error);
+        }
+
+        const userStore = useUserLoginLogoutStore();
+        if (userStore.isLoggedIn) {
+          userStore.clearLocalSession({
+            showToast: true,
+            message: "Lejárt a bejelentkezés. Jelentkezz be újra.",
+          });
+        }
+
+        if (router.currentRoute?.value?.path !== "/login") {
+          router.push({ path: "/login" }).catch(() => {});
+        }
+
         return Promise.reject(error);
       }
 
@@ -82,3 +101,4 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+

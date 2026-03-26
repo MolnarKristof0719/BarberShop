@@ -425,6 +425,14 @@ export default {
     padding: 28px 12px 24px;
   }
 
+  .barber-focus-card {
+    display: none;
+  }
+
+  .barber-focus-card.is-active {
+    display: block;
+  }
+
   .carousel-shell {
     max-width: 100%;
     min-height: auto;

@@ -2,7 +2,7 @@
   <div class="table-responsive my-table-container">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-dark sticky-top my-table-head">
-        <tr class="align-middle text-center">
+        <tr class="align-middle">
           <th class="actions-column">Műveletek</th>
           <template v-for="col in columns" :key="col.key">
             <th
@@ -127,6 +127,7 @@ export default {
 .actions-column {
   white-space: nowrap;
   width: 1%;
+  text-align: center;
 }
 
 .my-table-row {

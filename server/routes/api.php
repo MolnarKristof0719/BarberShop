@@ -86,6 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- OFF DAYS (csak barber, abilities alapján) ---
     Route::get('/barber_off_days', [BarberOffDayController::class, 'index'])->middleware('ability:barber_off_days:get');
+    Route::get('/barber_off_dayssortsearch/{column}/{direction}/{search?}', [BarberOffDayController::class, 'indexSortSearch'])->middleware('ability:barber_off_days:get');
     Route::post('/barber_off_days', [BarberOffDayController::class, 'store'])->middleware('ability:barber_off_days:post');
     Route::delete('/barber_off_days/{id}', [BarberOffDayController::class, 'destroy'])->middleware('ability:barber_off_days:delete');
 

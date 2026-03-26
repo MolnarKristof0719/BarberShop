@@ -13,6 +13,38 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BarberOffDayController extends Controller
 {
+    public function indexSortSearch($column, $direction, $search = null)
+    {
+        return $this->apiResponse(function () use ($column, $direction, $search) {
+            $user = auth()->user();
+            $query = CurrentModel::query();
+
+            if ($user?->isAdmin()) {
+                // admin gets all
+            } elseif ($user?->isBarber()) {
+                $barberId = $user->barber?->id;
+                abort_unless($barberId, 403);
+                $query->where('barberId', $barberId);
+            } else {
+                abort(403);
+            }
+
+            if (!empty($search) && $search !== 'all') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('id', 'like', "%{$search}%")
+                        ->orWhere('barberId', 'like', "%{$search}%")
+                        ->orWhere('offDay', 'like', "%{$search}%");
+                });
+            }
+
+            $allowedColumns = ['id', 'barberId', 'offDay'];
+            $sortColumn = in_array($column, $allowedColumns) ? $column : 'id';
+            $sortDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+            return $query->orderBy($sortColumn, $sortDirection)->get();
+        });
+    }
+
     public function index()
     {
         return $this->apiResponse(function () {
