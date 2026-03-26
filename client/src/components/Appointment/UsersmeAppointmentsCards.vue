@@ -53,7 +53,8 @@
           </div>
           <div class="delete">
             <button class="btn btn-outline-danger btn-sm" type="button"
-              :disabled="appointment.status === 'cancelled' || loading || appointment.status === 'completed'"
+              v-if="appointment.status !== 'completed'"
+              :disabled="appointment.status === 'cancelled' || loading"
               @click="$emit('cancel', appointment.id)">
               Lemondás
             </button>
