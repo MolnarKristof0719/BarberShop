@@ -7,7 +7,7 @@
     </div>
 
     <div v-if="loading" class="state-box mt-3">Betöltés...</div>
-    <div v-else-if="!items.length" class="state-box mt-3">Még nincs foglalásod.</div>
+    <div v-else-if="!visibleItems.length" class="state-box mt-3">Még nincs foglalásod.</div>
 
     <template v-else>
       <UsersmeAppointmentsCards
@@ -20,11 +20,11 @@
         @review="openReview"
       />
 
-      <div v-if="cancelledItems.length" class="cancelled-block">
+      <div v-if="completedItems.length" class="cancelled-block">
         <hr class="section-separator" />
-        <p class="cancelled-title mb-2">Lemondott foglalások</p>
+        <p class="cancelled-title mb-2">Teljesített foglalások</p>
         <UsersmeAppointmentsCards
-          :appointments="cancelledItems"
+          :appointments="completedItems"
           :loading="loading"
           :reviewed-ids="reviewedAppointmentIds"
           @cancel="cancelAppointment"
@@ -56,11 +56,23 @@ export default {
   },
   computed: {
     ...mapState(useUsersmeAppointmentStore, ["items", "loading"]),
-    activeItems() {
-      return this.items.filter((item) => item?.status !== "cancelled");
+    sortedItems() {
+      return [...this.items].sort((a, b) => {
+        const keyA = `${a?.appointmentDate || ""} ${String(a?.appointmentTime || "").slice(0, 8)}`;
+        const keyB = `${b?.appointmentDate || ""} ${String(b?.appointmentTime || "").slice(0, 8)}`;
+        return keyA.localeCompare(keyB);
+      });
     },
-    cancelledItems() {
-      return this.items.filter((item) => item?.status === "cancelled");
+    activeItems() {
+      return this.sortedItems.filter(
+        (item) => item?.status !== "cancelled" && item?.status !== "completed",
+      );
+    },
+    completedItems() {
+      return this.sortedItems.filter((item) => item?.status === "completed");
+    },
+    visibleItems() {
+      return [...this.activeItems, ...this.completedItems];
     },
   },
   methods: {
