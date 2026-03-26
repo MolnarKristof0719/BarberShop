@@ -22,11 +22,11 @@
       :columns="tableColumns"
       :useCollectionStore="useCollectionStore"
       :cButtonVisible="false"
-      :pButtonVisible="true"
+      :pButtonVisible="
+      false"
       @delete="deleteHandler"
       @update="updateHandler"
       @create="createHandler"
-      @passwordChange="passwordChangeHandler"
       @sort="sortHandler"
       v-if="items.length > 0"
     />
@@ -38,11 +38,7 @@
       :item="item"
       @yesEventForm="yesEventFormHandler"
     />
-    <PasswordChangeForm
-      ref="passwordForm"
-      :title="passwordTitle"
-      @yesEventForm="yesEventPasswordHandler"
-    />
+    
 
     <!-- Confirm modal -->
     <ConfirmModal

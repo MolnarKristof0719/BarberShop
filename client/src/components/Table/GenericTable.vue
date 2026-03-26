@@ -11,7 +11,7 @@
               :class="{ 'my-debug': col.debug == 1 }"
               @click="$emit('sort', col.key)"
             >
-              <div class="d-flex align-items-center justify-content-center text-nowrap">
+              <div class="d-flex align-items-center justify-content-start text-nowrap">
                 <span>{{ col.label }}</span>
                 <span :class="{ invisible: sortColumn !== col.key }" class="ms-1">
                   {{ sortDirection === "asc" ? "▲" : "▼" }}
@@ -122,6 +122,7 @@ export default {
 .table th,
 .table td {
   padding: 0.85rem 0.9rem;
+  text-align: left;
 }
 
 .actions-column {
