@@ -69,7 +69,11 @@ export default {
       );
     },
     completedItems() {
-      return this.sortedItems.filter((item) => item?.status === "completed");
+      return this.sortedItems.filter(
+        (item) =>
+          item?.status === "completed" &&
+          !(this.reviewedAppointmentIds instanceof Set && this.reviewedAppointmentIds.has(item.id)),
+      );
     },
     visibleItems() {
       return [...this.activeItems, ...this.completedItems];
