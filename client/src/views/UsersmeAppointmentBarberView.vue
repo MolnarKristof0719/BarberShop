@@ -7,30 +7,18 @@
     </div>
 
     <div v-if="loading" class="state-box mt-3">Betöltés...</div>
-    <div v-else-if="!items.length" class="state-box mt-3">Még nincs hozzád tartozó foglalás.</div>
+    <div v-else-if="!pendingItems.length" class="state-box mt-3">Még nincs hozzád tartozó függőben lévő foglalás.</div>
 
     <template v-else>
       <UsersmeAppointmentsCards
-        v-if="activeItems.length"
+        v-if="pendingItems.length"
         class="mt-3"
-        :appointments="activeItems"
+        :appointments="pendingItems"
         :loading="loading"
         context="barber"
         :showReview="false"
         @cancel="cancelAppointment"
       />
-
-      <div v-if="cancelledItems.length" class="cancelled-block">
-        <hr class="section-separator" />
-        <p class="cancelled-title mb-2">Lemondott, hozzád tartozó foglalások</p>
-        <UsersmeAppointmentsCards
-          :appointments="cancelledItems"
-          :loading="loading"
-          context="barber"
-          :showReview="false"
-          @cancel="cancelAppointment"
-        />
-      </div>
     </template>
   </section>
 </template>
@@ -47,11 +35,15 @@ export default {
   },
   computed: {
     ...mapState(useAppointmentStore, ["items", "loading"]),
-    activeItems() {
-      return this.items.filter((item) => item?.status !== "cancelled");
+    sortedItems() {
+      return [...this.items].sort((a, b) => {
+        const keyA = `${a?.appointmentDate || ""} ${String(a?.appointmentTime || "").slice(0, 8)}`;
+        const keyB = `${b?.appointmentDate || ""} ${String(b?.appointmentTime || "").slice(0, 8)}`;
+        return keyA.localeCompare(keyB);
+      });
     },
-    cancelledItems() {
-      return this.items.filter((item) => item?.status === "cancelled");
+    pendingItems() {
+      return this.sortedItems.filter((item) => item?.status === "booked");
     },
   },
   methods: {
@@ -111,19 +103,4 @@ export default {
   color: #5f6b76;
 }
 
-.cancelled-block {
-  margin-top: 18px;
-}
-
-.section-separator {
-  border: 0;
-  border-top: 1px solid #d9e0e7;
-  margin: 0 0 12px 0;
-}
-
-.cancelled-title {
-  color: #6b7280;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-}
 </style>
