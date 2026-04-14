@@ -1,66 +1,160 @@
-﻿# Projekt dokumentacio - Fontosabb commitok alapjan
+﻿# Dokumentáció – BarberShop
 
-## Cel
-Ebben a dokumentumban a projekt fontosabb lepesei vannak osszefoglalva commitonkent, roviden korulirva. A hangsuly azon van, hogy nagyjabol mi tortent egy-egy merfoldkonel.
+## A szoftver célja
+A BarberShop egy fodrászat számára készült időpontfoglaló rendszer. A vendégek online tudnak időpontot foglalni, a fodrászok kezelni tudják saját foglalásaikat és referencia képeiket, az admin pedig a teljes rendszert felügyeli (felhasználók, fodrászok, szolgáltatások, értékelések, szabadnapok).
 
-## Fontosabb commitok es hozzajarulasok
+## Használatának rövid bemutatása
+Az alábbi képernyőképek a felhasználói folyamatokat mutatják be. A képek helye a repo gyökerében lévő `DokumnetacioKepek` mappa.
 
-### 2026-01-08 - Laravel alapok letetele
-Itt raktatok le a Laravel backend stabil alapjat: a projekt szerkezete, alap konfiguraciok, indulashoz szukseges fajlok osszealltak. Ez volt az a pont, amire a kesobbi API fejlesztest ra lehetett epiteni.
+Képernyőképek javasolt listája:
+- `DokumnetacioKepek/01_home.png` – Főoldal
+- `DokumnetacioKepek/02_login.png` – Bejelentkezés
+- `DokumnetacioKepek/03_services.png` – Szolgáltatások listája
+- `DokumnetacioKepek/04_appointment.png` – Időpontfoglalás
+- `DokumnetacioKepek/05_my_appointments.png` – Saját foglalások
+- `DokumnetacioKepek/06_admin_users.png` – Admin felhasználókezelés
 
-### 2026-01-09 - Barber es referencia kep modul vaz
-A barber es reference picture modulok lenyegeben mukodo vazat kaptak: modellek, kontrollerek, validaciok es jogosultsagok is bekerultek. Ezzel mar ket kulcs entitas teljesebb kezelese is elindult.
+## Komponensek technikai leírása
 
-### 2026-01-09 - Appointment alapok felepitese
-Az idopontfoglalashoz kotodo appointment resz komolyabb szintre lepett. A tabla/model/request/controller vonal nagyjabol osszeallt, igy a foglalasi logika epitheto lett a gyakorlatban.
+### Adatbázis
+- Technológia: MySQL
+- Diagram: `Diagram.png`
+- Biztonsági mentés: `AdatbazisBackup.sql`
 
-### 2026-01-16 - Migracios kapcsolatok rendezese
-A migraciok sorrendje es kapcsolatai rendezettebbek lettek, kulonosen az idegen kulcsos osszefuggesek miatt. Ez sokat javitott az adatbazis stabilitasan es az ujrahuzhatosagon.
+Táblák és mezők (röviden):
 
-### 2026-01-20 - Timeslot logika bevezetese
-Bejott a timeslot szemlelet, ami mar a tenyleges foglalasi idopontok kezelesehez adott alapot. Ezzel a projekt kozelebb kerult egy valos idopontkezelo mukodeshez.
+`users`
+- `id`, `name`, `email`, `phoneNumber`, `password`, `role`, `created_at`, `updated_at`
+- `role`: 1=admin, 2=barber, 3=customer
 
-### 2026-01-21 - API endpointok bovitese
-Nagyobb API-epitesi szakasz: tobb controller egyutt fejlodott, igy a kulonbozo entitasok CRUD-ja es endpointjai mar hasznalhatobb formaban alltak ossze.
+`barbers`
+- `id`, `userId`, `profilePicture`, `introduction`, `isActive`
 
-### 2026-01-22 - Mukodo API allapot stabilizalasa
-Egy olyan allapot, ahol az API mar jol mukodott a napi fejleszteshez. Route-ok, controller reszek es teszteleshez hasznalt request mintak is jobban a helyukre kerultek.
+`services`
+- `id`, `service`, `price`
 
-### 2026-01-26 - Barber off-day funkcionalitas kesz
-A barber off-day funkcionalitas kapott egy mukodo, hasznalhato allapotot. Ez a foglalasi rendszer realisabb viselkedesehez fontos lepest jelentett.
+`appointments`
+- `id`, `barberId`, `userId`, `appointmentDate`, `appointmentTime`, `totalPrice`, `status`, `cancelledBy`
+- egy barber egy időpontra csak egyszer foglalható (`uniq_barber_slot`)
 
-### 2026-01-28 - Cascade torlesi szabalyok finomitasa
-Adatbazis oldalon a torlesi szabalyok finomitasa tortent (cascade szemlelet), ami kovetkezetesebb adatkezeleshez segitett hozza.
+`appointment_services`
+- `id`, `appointmentId`, `serviceId` (kapcsolótábla)
 
-### 2026-01-28 - Appointment controller csiszolasa
-Az AppointmentController tobb korben lett csiszolva. Ezekkel a modositasokkal a foglalasi folyamat viselkedese es kezelese stabilabb lett.
+`barber_off_days`
+- `id`, `barberId`, `offDay`
 
-### 2026-01-28 - Referencia kep controller javitasok
-A referencia kepek kezelesen volt fokusz: a controller logika finomitasaval tisztabb lett a kepkezeleshez kotodo API viselkedes.
+`reference_pictures`
+- `id`, `picture`, `barberId`, `created_at`, `updated_at`
 
-### 2026-01-29 - Review kezeles pontositasa
-A review kezelesnel tortentek celzott modositasi lepesek, hogy a visszajelzesekhez kotodo muveletek egyertelmubbek es megbizhatobbak legyenek.
+`reviews`
+- `id`, `appointmentId`, `barberId`, `userId`, `rating`, `comment`
 
-### 2026-01-29 - Service controller stabilizalas
-A service controller oldalon lett javitas es rendezettseg, ami a szolgaltatasok API hasznalatat stabilabb iranyba vitte.
+### Backend
+- Technológia: Laravel 12, PHP 8.2, Laravel Sanctum
+- Fő belépési pont: `server/routes/api.php`
 
-### 2026-01-30 - Appointment tesztek bovitese
-Az appointment tesztek kidolgozasa es javitasa tortent. Ez segitett abban, hogy a foglalashoz kotodo valtozasokat biztonsagosabban lehessen tovabbfejleszteni.
+#### Migráció (mintakód)
+`server/database/migrations/2026_01_16_100000_create_services_table.php`
+```php
+Schema::create('services', function (Blueprint $table) {
+    $table->id();
+    $table->string('service', 50)->unique();
+    $table->integer('price');
+});
+```
 
-### 2026-01-27 - Tesztalapok megerositese
-A tesztelesi alapok jelentosen megerosodtek (test base, database test szemlelet), amivel rendszerezettebb lett a backend minosegbiztositasi oldala.
+#### Seeder
+A seedelés CSV forrásból is történik. A forrásfájlok a `server/database/csv` mappában vannak.
 
-### 2026-02-02 - Tesztlefedettseg szelesitese
-Ebben az idoszakban tobb kulcs tesztkeszlet allt ossze (review/reference/ping vonal), ami mar egy lathatoan szelesebb lefedettseget adott a rendszernek.
+`server/database/seeders/ServiceSeeder.php`
+```php
+$fileName = 'csv/services.csv';
+$delimiter = ';';
+$data = CsvReader::csvToArray($fileName, $delimiter);
+Service::factory()->createMany($data);
+```
 
-### 2026-02-03 - Email kuldes es sablon csiszolas
-Az email kuldes folyamata es a sablon minosege fejlodott tovabb. A foglalasi ertesitesek nemcsak mukodtek, hanem tartalmilag es formatumban is kezelhetobbek lettek.
+#### Endpointok (minták)
+Az API REST elven működik, az útvonalak a `server/routes/api.php` fájlban vannak.
 
-### 2026-02-05 - Referenciakep fajlfeltoltes javitasa
-A referenciakepek tenyleges fajlfeltoltese kerult egy jobb, gyakorlatiasabb allapotba, ami mar valos hasznalathoz kozelebb allo mukodest adott.
+Példák:
+- `POST /api/users/login` – bejelentkezés
+- `POST /api/users` – regisztráció
+- `GET /api/services` – szolgáltatások listája
+- `POST /api/appointments` – időpont foglalás
+- `DELETE /api/appointments/{id}` – időpont lemondás
+- `GET /api/barbers` – fodrászok listája
 
-### 2026-02-06 - Request validaciok atfogo frissitese
-Atfogo request-validacios korrekcio tortent. A bemeneti ellenorzes konzisztenciaja javult, ami csokkenti a hibas adatok bejutasat es tisztabb API-valaszt ad.
+#### Minta kontroller
+`server/app/Http/Controllers/ServiceController.php`
+```php
+public function store(StoreServiceRequest $request)
+{
+    return $this->apiResponse(function () use ($request) {
+        $this->authorizeAdmin();
+        $data = $request->validated();
+        return CurrentModel::create($data);
+    });
+}
+```
 
-## Osszkep
- Kristof foleg az alap architektura, adatbazis, API gerinc es tobb nagyobb funkcio felepiteset vitte, Mate pedig jelentosen hozzajarult a kontrollerek csiszolasahoz, request validaciok erositeshez es tobb tesztmodul kialakitasahoz. A ket munka egyutt adta a jelenlegi, hasznalhato backend allapotot.
+#### Minta validáció (422)
+`server/app/Http/Requests/StoreServiceRequest.php`
+```php
+public function rules(): array
+{
+    return [
+        'service' => ['required', 'string', 'max:50', Rule::unique('services', 'service')],
+        'price' => ['required', 'integer', 'min:0'],
+    ];
+}
+```
+A hibák 422-es státusszal és részletes JSON válasszal térnek vissza.
+
+#### Autentikáció
+- Laravel Sanctum token alapú autentikáció
+- A tokenhez szerepkörönként eltérő jogosultságok (abilities) tartoznak
+- Szerepkörök: admin (1), barber (2), customer (3)
+- Bejelentkezés után a kliens a tokent `Authorization: Bearer <token>` formában küldi
+
+### Frontend
+- Technológia: Vue 3 + Vite + Pinia + Axios + Bootstrap
+- Belépési pont: `client/src/main.js`
+- Fő komponens: `client/src/App.vue`
+
+#### Oldal szerkezet
+- `client/src/router/index.js` – oldalak, route-ok, jogosultság kezelés
+- `client/src/views` – oldalak
+- `client/src/components` – újrahasznosítható UI elemek
+
+#### Jogosultsági rendszer kezelése
+- Backend szinten: Sanctum token + abilities
+- Menü szinten: a megjelenítés role alapján történik
+- Route szinten: a router `meta.roles` alapján enged be
+
+#### Kliens oldali mappa-szerkezet
+- `client/src/api` – Axios API hívások
+- `client/src/stores` – Pinia store-ok (auth, szolgáltatások, foglalások, stb.)
+- `client/src/views` – oldalak
+- `client/src/components` – komponensek
+
+#### Példa API szolgáltatás
+`client/src/api/serviceService.js`
+```js
+import axiosClient from "./axiosClient";
+
+export default {
+  getAll() {
+    return axiosClient.get("/services");
+  },
+};
+```
+
+#### Reszponzivitás
+A felület Bootstrap segítségével reszponzív. Mobilon a rácsos elrendezés és a menü is alkalmazkodik a kisebb kijelzőkhöz.
+
+## Forráslista
+- Laravel dokumentáció
+- Vue.js dokumentáció
+- Bootstrap dokumentáció
+- School_2026 mintaprojekt (frontend mintafeladat)

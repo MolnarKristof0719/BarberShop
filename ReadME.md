@@ -1,81 +1,62 @@
-# Barber Shop – Időpontfoglaló Webalkalmazás
+﻿# README – Műszaki feltételek és telepítés
 
-Ez a projekt egy **fodrászat számára készült webalkalmazás**, amely lehetővé teszi a vendégek számára az **online időpontfoglalást**, valamint külön felületet biztosít a **fodrászok** és az **adminisztrátor** számára az időpontok és felhasználók kezelésére.
+## Fejlesztési környezethez szükséges szoftverek
+- Git
+- PHP 8.2
+- Composer
+- Node.js (ajánlott: 20.19.0 vagy újabb)
+- MySQL
 
-A rendszer **Laravel (backend API)** és **Vue.js (frontend)** technológiákra épül.
+## Forráskód letöltése
+1. Klónozd a repót.
+2. Lépj be a projekt gyökerébe, ahol a `client` és `server` mappák vannak.
 
----
+## Backend telepítés és futtatás
+1. Lépj a `server` mappába.
+2. Telepítsd a PHP csomagokat.
+3. Másold az `.env.example` fájlt `.env` néven, és állítsd be az adatbázis kapcsolatot.
+4. Generálj alkalmazás kulcsot.
+5. Futtasd a migrációkat és seedereket.
+6. Indítsd el a fejlesztői szervert.
 
-## Fő funkciók
+Parancsok:
+```console
+cd server
+composer install
+copy .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan db:seed
+php artisan serve
+```
 
-### Vendég (User) funkciók
-- Regisztráció és bejelentkezés
-- Elérhető fodrászok megtekintése
-- Naptár alapú időpontválasztás
-- **30 perces idősávok** közül időpont foglalása
-- Több szolgáltatás kiválasztása egy időponthoz
-- Saját időpontok megtekintése
-- Időpont lemondása
-- Értékelés leadása hajvágás után (**1–5 csillag + szöveges vélemény**)
+## Frontend telepítés és futtatás
+1. Lépj a `client` mappába.
+2. Telepítsd a csomagokat.
+3. Indítsd el a fejlesztői szervert.
 
----
+Parancsok:
+```console
+cd client
+npm install
+npm run dev
+```
 
-### Fodrász (Barber) funkciók
-- Saját **admin felület** bejelentkezés után
-- Saját időpontok megtekintése
-- Lefoglalt időpontok lemondása
-- Szabadnapok megadása (**teljes nap kihagyása**)
-- Profiladatok kezelése (bemutatkozás, profilkép)
-- Referencia képek feltöltése
+## Teszt környezet futtatása
+Backend:
+```console
+cd server
+php artisan test
+```
 
----
+Frontend (unit):
+```console
+cd client
+npm run test:unit
+```
 
-### Admin funkciók
-- Új fodrászok létrehozása
-- Fodrászok **aktiválása / deaktiválása**
-- Felhasználók kezelése
-- Teljes rendszer áttekintése
-
----
-
-## Időpontfoglalás működése
-
-- A rendszer **fix nyitvatartással** dolgozik
-- Egy nap **30 perces idősávokra** van bontva
-- Egy idősáv egyszerre csak **egy foglalást** tartalmazhat
-- A foglalás során a rendszer figyelembe veszi:
-  - a már lefoglalt időpontokat
-  - a fodrász által megadott szabadnapokat
-
----
-
-## Email értesítések
-
-A rendszer automatikus **email értesítéseket** küld:
-- sikeres időpontfoglalás után
-- a hajvágás befejezése után értékelés kérés céljából
-
----
-
-## Értékelési rendszer
-
-- Értékelést csak **befejezett időponthoz** lehet leadni
-- Egy időponthoz csak **egy értékelés** tartozhat
-- Az értékelések a **fodrász profilján** jelennek meg
-
----
-
-## Technológiai stack
-
-- **Backend:** Laravel (REST API)
-- **Frontend:** Vue.js
-- **Adatbázis:** MySQL
-- **Hitelesítés:** Laravel Auth / Sanctum
-- **Időzített feladatok:** Laravel Scheduler
-- **Email küldés:** Laravel Mail
-
----
-
-## Projekt célja
-
-A projekt célja egy **átlátható, könnyen használható online időpontfoglaló rendszer** készítése egy fodrászat számára, amely csökkenti a telefonos egyeztetés szükségességét, és megkönnyíti a vendégek és a fodrászok mindennapi munkáját.
+Frontend (e2e):
+```console
+cd client
+npm run test:e2e
+```
